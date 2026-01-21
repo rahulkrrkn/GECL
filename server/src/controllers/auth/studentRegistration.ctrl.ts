@@ -241,6 +241,7 @@ export async function studentRegistrationMainCtrl(req: Request, res: Response) {
     },
   );
 }
+<<<<<<< HEAD
 
 // ==============================
 // ✅ EMPLOYEE REGISTRATION
@@ -408,3 +409,5 @@ export async function employeeRegistrationMainCtrl(
     },
   );
 }
+=======
+>>>>>>> cfe4065365279e7fe3033906551ec22ec7f79b67
