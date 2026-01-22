@@ -2,7 +2,7 @@ import { Navbar } from "@/gecl/components/navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://gecl.rahulkrrkn.com/"),
+  metadataBase: new URL("https://gecl.rahulkrrkn.com"),
   title: {
     default:
       "Government Engineering College Lakhisarai | Engineering College in Bihar",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
       "Government Engineering College, Lakhisarai — Engineering College in Bihar",
     description:
       "Official details, courses, admissions, and overview of Government Engineering College in Lakhisarai, Bihar — public AICTE-approved technical institute established in 2019.",
-    url: "https://yourdomain.com",
+    url: "https://gecl.rahulkrrkn.com",
     siteName: "GEC Lakhisarai",
     locale: "en_IN",
     type: "website",

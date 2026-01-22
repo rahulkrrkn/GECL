@@ -69,7 +69,6 @@ export const studentRegistrationSchema = z.object({
   REGISTRATION_KEY: z.string().min(10),
 });
 
-<<<<<<< HEAD
 export const employeeRegistrationSchema = z.object({
   fullName: z.string().min(3, "Full name must be at least 3 characters"),
 
@@ -105,8 +104,6 @@ export const employeeRegistrationSchema = z.object({
   REGISTRATION_KEY: z.string().min(10),
 });
 
-=======
->>>>>>> cfe4065365279e7fe3033906551ec22ec7f79b67
 /* ================= EXPORT GROUP ================= */
 export const login = {
   emailSendOtp,
