@@ -32,7 +32,16 @@ export const metadata: Metadata = {
     siteName: "GEC Lakhisarai",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "/gecl/images/college-building-main.jpg",
+        width: 1200,
+        height: 630,
+        alt: "GEC Lakhisarai Campus",
+      },
+    ],
   },
+
   robots: {
     index: true,
     follow: true,

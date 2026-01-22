@@ -41,7 +41,8 @@ type RetryAxiosRequestConfig = InternalAxiosRequestConfig & {
 };
 
 // FIXED: Removed trailing slash
-const BASE_URL = "http://localhost:3001";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://api.gecl.rahulkrrkn.com";
 
 export const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,

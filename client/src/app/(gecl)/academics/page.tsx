@@ -126,11 +126,9 @@ export default function AcademicsHubPage() {
       </section>
 
       {/* --- BREADCRUMB --- */}
-      <div className="sticky top-[64px] z-30 w-full">
         <Breadcrumb
           items={[{ label: "Home", href: "/" }, { label: "Academics" }]}
         />
-      </div>
 
       <div className="container mx-auto px-4 py-16">
         {/* --- INTRODUCTION STATS --- */}

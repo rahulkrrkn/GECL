@@ -72,7 +72,7 @@ export async function apiRequest<TResponse, TBody = unknown>({
     // We just ensure success is boolean
     return {
       ...response.data,
-      success: response.data.success === true,
+      success: response.data.status === "success" ? true : false,
     } as ApiResult<TResponse>;
   } catch (err: unknown) {
     const error = err as AxiosError<BackendErrorResponse>;
