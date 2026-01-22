@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useApi } from "@/gecl/hooks/useApi";
+import { Navbar } from "@/gecl/components/navbar";
 
 type LoginResponse = {
   success: boolean;
@@ -48,6 +49,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gecl-background p-4">
+      
       <div className="w-full max-w-md rounded-2xl bg-gecl-surface shadow-lg p-6 border border-black/5">
         <h1 className="text-2xl font-bold text-gecl-text-primary">
           Login (Test Page)
