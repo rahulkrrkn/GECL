@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import LoginPage from "./LoginPage"; // Import the client component
+import { Breadcrumb } from "@/gecl/components/ui/";
 
 export const metadata: Metadata = {
   title: "Login | Government Engineering College, Lakhisarai",
@@ -56,6 +57,7 @@ export default function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Login" }]} />
       <LoginPage />
     </>
   );

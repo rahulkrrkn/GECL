@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import StudentRegisterForm from "./StudentRegisterForm"; // Importing the client component
+import { Breadcrumb } from "@/gecl/components/ui";
 
 export const metadata: Metadata = {
   title: "Student Registration | Government Engineering College, Lakhisarai",
@@ -36,5 +37,16 @@ export const metadata: Metadata = {
 };
 
 export default function StudentRegistrationPage() {
-  return <StudentRegisterForm />;
+  return (
+    <>
+      <Breadcrumb
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Register" },
+          { label: "Student" },
+        ]}
+      />
+      <StudentRegisterForm />;
+    </>
+  );
 }

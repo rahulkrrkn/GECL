@@ -1,6 +1,7 @@
 // app/auth/register/teacher/page.tsx
 import { Metadata } from "next";
 import TeacherRegisterForm from "./TeacherRegisterForm";
+import { Breadcrumb } from "@/gecl/components/ui";
 
 export const metadata: Metadata = {
   title: "Faculty Registration | Government Engineering College, Lakhisarai",
@@ -24,5 +25,17 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <TeacherRegisterForm />;
+  return (
+    <>
+      {" "}
+      <Breadcrumb
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Register" },
+          { label: "Teacher" },
+        ]}
+      />
+      <TeacherRegisterForm />;
+    </>
+  );
 }
