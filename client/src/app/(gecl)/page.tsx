@@ -87,7 +87,7 @@ export default function HomePage() {
   return (
     <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
       {/* 1. HOME HERO SECTION (Custom for Landing Page) */}
-      <section className="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-900 text-white">
+      <section className="relative h-[85vh] min-h-150 flex items-center justify-center overflow-hidden bg-slate-900 text-white">
         {/* Background Image with Parallax Effect */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -97,7 +97,7 @@ export default function HomePage() {
             className="object-cover opacity-40 scale-105 animate-slow-zoom"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/30 via-slate-900/60 to-slate-900"></div>
+          <div className="absolute inset-0 bg-linear-to-b from-slate-900/30 via-slate-900/60 to-slate-900"></div>
         </div>
 
         <div className="container mx-auto px-4 relative z-10 text-center">
@@ -108,7 +108,7 @@ export default function HomePage() {
 
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-display mb-6 tracking-tight leading-tight drop-shadow-lg">
             Government Engineering College <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-200 to-white">
               Lakhisarai
             </span>
           </h1>
@@ -149,7 +149,7 @@ export default function HomePage() {
           <span className="bg-gecl-accent text-xs font-bold px-2 py-1 rounded mr-4 shrink-0 uppercase tracking-wider">
             Latest News
           </span>
-          <div className="flex-grow overflow-hidden relative h-6">
+          <div className="grow overflow-hidden relative h-6">
             <div className="absolute whitespace-nowrap animate-marquee flex items-center gap-8 text-sm font-medium text-blue-100">
               <span>
                 🚀 Application forms for B.Tech Lateral Entry are now available.
@@ -235,7 +235,7 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              <div className="p-2 overflow-y-auto max-h-[400px] custom-scrollbar">
+              <div className="p-2 overflow-y-auto max-h-100 custom-scrollbar">
                 <ul className="divide-y divide-slate-100">
                   {NOTICES.map((notice) => (
                     <li
@@ -358,7 +358,7 @@ export default function HomePage() {
       {/* 5. CALL TO ACTION */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="bg-gradient-to-r from-gecl-primary to-slate-900 rounded-3xl p-8 md:p-16 text-center md:text-left relative overflow-hidden shadow-2xl">
+          <div className="bg-linear-to-r from-gecl-primary to-slate-900 rounded-3xl p-8 md:p-16 text-center md:text-left relative overflow-hidden shadow-2xl">
             {/* Background Pattern */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
 
@@ -388,7 +388,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4 min-w-[200px]">
+              <div className="flex flex-col gap-4 min-w-50">
                 <Link
                   href="/admissions/how-to-apply"
                   className="px-8 py-4 bg-gecl-accent text-white font-bold rounded-xl text-center hover:bg-orange-600 transition-colors shadow-lg"

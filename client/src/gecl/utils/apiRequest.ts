@@ -1,28 +1,63 @@
-import type { AxiosError, Method, RawAxiosRequestHeaders } from "axios";
+import { AxiosError, type Method, type RawAxiosRequestHeaders } from "axios";
 import { api } from "../services/api/axiosInstance";
 
-export type ApiRequestOptions<TData = unknown> = {
+// --------------------
+// Backend response type
+// --------------------
+export type BackendResponse<T> = {
+  success: boolean;
+  statusCode: number;
+  status: string;
+  code: string;
+  message: string;
+  data: T;
+  error: unknown | null;
+};
+
+// --------------------
+// Success / Failure union
+// --------------------
+export type ApiSuccess<T> = BackendResponse<T> & { success: true };
+
+export type ApiFailure = BackendResponse<null> & { success: false };
+
+export type ApiResult<T> = ApiSuccess<T> | ApiFailure;
+
+// --------------------
+// Error payload type (axios error response)
+// --------------------
+interface BackendErrorResponse {
+  message?: string;
+  errors?: Record<string, unknown> | Array<unknown>;
+  [key: string]: unknown;
+}
+
+// --------------------
+// Request options
+// --------------------
+export type ApiRequestOptions<TBody = unknown> = {
   method?: Method;
   url: string;
-  data?: TData | FormData | null;
+  data?: TBody | FormData | null;
   params?: Record<string, unknown>;
   headers?: RawAxiosRequestHeaders;
 };
 
-export const apiRequest = async <TResponse = any, TData = unknown>({
+// --------------------
+// API Request function
+// --------------------
+export async function apiRequest<TResponse, TBody = unknown>({
   method = "GET",
   url,
   data = null,
   params = {},
   headers = {},
-}: ApiRequestOptions<TData>): Promise<
-  { success: true; statusCode: number } & TResponse
-> => {
+}: ApiRequestOptions<TBody>): Promise<ApiResult<TResponse>> {
   try {
     const isFormData =
       typeof FormData !== "undefined" && data instanceof FormData;
 
-    const response = await api.request<TResponse>({
+    const response = await api.request<BackendResponse<TResponse>>({
       method,
       url,
       data,
@@ -33,32 +68,26 @@ export const apiRequest = async <TResponse = any, TData = unknown>({
       },
     });
 
-    // ✅ SUCCESS: return response.data directly
+    // ✅ backend already sends { success, statusCode, data, ... }
+    // We just ensure success is boolean
     return {
-      success: true,
-      statusCode: response.status,
-      ...(response.data as TResponse),
-    };
+      ...response.data,
+      success: response.data.success === true,
+    } as ApiResult<TResponse>;
   } catch (err: unknown) {
-    const error = err as AxiosError<any>;
+    const error = err as AxiosError<BackendErrorResponse>;
 
-    const statusCode = error.response?.status ?? 0;
-    const errorData = error.response?.data;
-
-    // ✅ ERROR: return errorData directly
-    if (typeof errorData === "object" && errorData !== null) {
-      return {
-        success: false as const,
-        statusCode,
-        ...(errorData as object),
-      } as any;
-    }
-
-    // fallback if errorData is not object
     return {
-      success: false as const,
-      statusCode,
-      message: error.message || "Something went wrong",
-    } as any;
+      success: false,
+      statusCode: error.response?.status ?? 0,
+      status: "error",
+      code: "",
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Something went wrong",
+      data: null,
+      error: error.response?.data?.errors || null,
+    };
   }
-};
+}

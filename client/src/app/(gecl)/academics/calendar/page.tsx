@@ -8,7 +8,7 @@ import {
   LuDownload,
   LuEye,
   LuX,
-  LuInfo,
+  // LuInfo,
   LuFileText,
   LuClock,
 } from "react-icons/lu";
@@ -19,7 +19,7 @@ import {
   PageHero,
   SidebarNavigation,
   SidebarWidget,
-  SectionHeader,
+  // SectionHeader,
 } from "@/gecl/components/ui";
 
 // --- SEO METADATA ---
@@ -410,7 +410,7 @@ export default function AcademicCalendarPage() {
             {/* Important Notes */}
             {currentData.length > 0 && (
               <div className="mt-6 p-5 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-4 text-sm text-amber-900">
-                <FaExclamationTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <FaExclamationTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold mb-2 text-amber-800">
                     Important Notes:
@@ -507,9 +507,9 @@ export default function AcademicCalendarPage() {
             </div>
 
             {/* Modal Body - Image Viewer */}
-            <div className="flex-grow overflow-auto p-4 bg-slate-100 text-center flex items-center justify-center min-h-[300px]">
+            <div className="grow overflow-auto p-4 bg-slate-100 text-center flex items-center justify-center min-h-75">
               {selectedYear === "2026" ? (
-                <div className="relative w-full h-full min-h-[500px]">
+                <div className="relative w-full h-full min-h-125">
               
                   <Image
                     src="/gecl/images/calendar-2026-notice.webp"

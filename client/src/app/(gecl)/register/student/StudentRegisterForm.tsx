@@ -6,6 +6,9 @@ import React, { useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
 import { useApi } from "@/gecl/hooks/useApi";
+// IMPORT TYPES FROM YOUR UTILS
+import type { ApiFailure } from "@/gecl/utils/apiRequest";
+
 import {
   FiMail,
   FiLock,
@@ -26,35 +29,19 @@ import {
   FiMapPin,
 } from "react-icons/fi";
 
-// ... [CONSTANTS & TYPES REMAIN THE SAME] ...
+// ----------------------------
+// Constants & Types
+// ----------------------------
 
-const BRANCHES = [
-  { label: "Computer Science & Engg. (CSE)", value: "CSE" },
-  { label: "Civil Engineering (CE)", value: "CE" },
-  { label: "Mechanical Engineering (ME)", value: "ME" },
-  { label: "Electrical Engineering (EE)", value: "EE" },
-  { label: "Electronics & Comm. (ECE)", value: "ECE" },
-  { label: "CSE - Data Science", value: "CSE-DS" },
-  { label: "CSE - AI", value: "CSE-AI" },
-  { label: "Electrical & Electronics (EEE)", value: "EEE" },
-];
-
-interface BaseResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  code?: string;
-  error?: any;
+// Data type for Step 2 Response
+interface OtpVerifyData {
+  email: string;
+  REGISTRATION_KEY: string;
 }
 
-interface OtpVerifyResponse extends BaseResponse {
-  data: {
-    email: string;
-    REGISTRATION_KEY: string;
-  };
-}
-
-// ... [ZOD SCHEMAS REMAIN THE SAME] ...
+// ----------------------------
+// Zod Schemas
+// ----------------------------
 
 const step1Schema = z.object({
   fullName: z.string().min(3, "Name must be at least 3 characters"),
@@ -69,7 +56,6 @@ const step3Schema = z
   .object({
     mobile: z.string().regex(/^[6-9]\d{9}$/, "Invalid 10-digit mobile number"),
     regNo: z.string().min(5, "Invalid Registration Number").max(20, "Too long"),
-    branch: z.string().min(1, "Select your branch"),
     password: z.string().min(8, "Min 8 characters"),
     confirmPassword: z.string(),
   })
@@ -78,7 +64,9 @@ const step3Schema = z
     path: ["confirmPassword"],
   });
 
-// ... [UI COMPONENTS REMAIN THE SAME] ...
+// ----------------------------
+// UI Components (Typed)
+// ----------------------------
 
 function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ");
@@ -116,6 +104,16 @@ function GeneralError({
   );
 }
 
+// Fixed Input Props Interface
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  icon?: React.ReactNode;
+  rightSlot?: React.ReactNode;
+  // Override onChange to keep it simple for state updates
+  onChange: (e: any) => void;
+}
+
 function Input({
   icon,
   value,
@@ -127,7 +125,7 @@ function Input({
   error,
   rightSlot,
   inputMode,
-}: any) {
+}: InputProps) {
   return (
     <div className="space-y-1.5 w-full">
       {label && (
@@ -141,7 +139,7 @@ function Input({
         </div>
         <input
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange(e.target.value)} // Pass string directly
           placeholder={placeholder}
           type={type}
           readOnly={readOnly}
@@ -174,53 +172,14 @@ function Input({
   );
 }
 
-function Select({ icon, value, onChange, options, label, error }: any) {
-  return (
-    <div className="space-y-1.5 w-full">
-      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
-        {label}
-      </label>
-      <div className="relative group">
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors">
-          {icon}
-        </div>
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={cn(
-            "w-full appearance-none bg-slate-950/50 border border-slate-800 rounded-xl py-3.5 pl-11 pr-10 text-sm text-slate-200 outline-none transition-all cursor-pointer",
-            "focus:border-blue-500/50 focus:bg-slate-900 focus:shadow-[0_0_20px_-5px_rgba(59,130,246,0.3)] hover:border-slate-700",
-            error && "border-red-500/50 focus:border-red-500",
-          )}
-        >
-          <option value="" disabled className="bg-slate-900 text-slate-500">
-            Select...
-          </option>
-          {options.map((opt: any) => (
-            <option
-              key={opt.value}
-              value={opt.value}
-              className="bg-slate-900 text-slate-200"
-            >
-              {opt.label}
-            </option>
-          ))}
-        </select>
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
-          <FiChevronDown />
-        </div>
-      </div>
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, x: -5 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="text-xs text-red-400 pl-1 flex items-center gap-1"
-        >
-          <FiAlertCircle className="text-[10px]" /> {error}
-        </motion.div>
-      )}
-    </div>
-  );
+// Fixed Select Props Interface
+interface SelectProps {
+  label?: string;
+  error?: string;
+  icon?: React.ReactNode;
+  value: string;
+  onChange: (val: string) => void;
+  options: { label: string; value: string }[];
 }
 
 function StepIndicator({ currentStep }: { currentStep: string }) {
@@ -248,7 +207,7 @@ function StepIndicator({ currentStep }: { currentStep: string }) {
         return (
           <div
             key={s.id}
-            className="flex flex-col items-center gap-2 bg-[#0f172a] px-1 z-10"
+            className="flex flex-col items-center gap-2 bg-primary px-1 z-10"
           >
             <div
               className={cn(
@@ -287,6 +246,10 @@ const anim = {
   exit: { opacity: 0, x: -20 },
 };
 
+// ----------------------------
+// MAIN COMPONENT
+// ----------------------------
+
 export default function StudentRegisterForm() {
   const { request } = useApi();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -298,9 +261,8 @@ export default function StudentRegisterForm() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    mobile: "", // In step 3
+    mobile: "",
     regNo: "",
-    branch: "",
     password: "",
     confirmPassword: "",
   });
@@ -314,15 +276,15 @@ export default function StudentRegisterForm() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // <--- ADDED HERE
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const collegeName = "Government Engineering College";
+  // const collegeName = "Government Engineering College";
   const collegeLocation = "Lakhisarai";
   const imagePath =
     "/gecl/images/college/gecl-government-engineering-college-lakhisarai.webp";
 
   // --- Helpers ---
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field])
       setErrors((prev) => {
@@ -352,7 +314,8 @@ export default function StudentRegisterForm() {
     }
   };
 
-  const handleApiError = (res: BaseResponse) => {
+  // Fixed: Accepts ApiFailure from utils, not a local interface
+  const handleApiError = (res: ApiFailure) => {
     const code = res.code || "UNKNOWN";
     const msg = res.message || "An error occurred.";
 
@@ -374,7 +337,8 @@ export default function StudentRegisterForm() {
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {};
       parsed.error.issues.forEach((issue) => {
-        fieldErrors[issue.path[0]] = issue.message;
+        const key = String(issue.path[0]);
+        fieldErrors[key] = issue.message;
       });
       setErrors(fieldErrors);
       return;
@@ -382,7 +346,8 @@ export default function StudentRegisterForm() {
 
     setLoading(true);
     try {
-      const res = await request<any, any>(
+      // Use 'unknown' for data if none expected
+      const res = await request<unknown>(
         {
           method: "POST",
           url: "/auth/registration/otp/send",
@@ -391,8 +356,11 @@ export default function StudentRegisterForm() {
         { showSuccessMsg: true, showMsg: false, showErrorMsg: false },
       );
 
-      if (res?.success) setStep("otp");
-      else if (res) handleApiError(res);
+      if (res.success) {
+        setStep("otp");
+      } else {
+        handleApiError(res);
+      }
     } catch {
       setServerError("Unable to connect to server.");
     } finally {
@@ -412,7 +380,7 @@ export default function StudentRegisterForm() {
 
     setLoading(true);
     try {
-      const res = await request<OtpVerifyResponse, any>(
+      const res = await request<OtpVerifyData>(
         {
           method: "POST",
           url: "/auth/registration/otp/verify",
@@ -421,10 +389,14 @@ export default function StudentRegisterForm() {
         { showSuccessMsg: true, showMsg: false, showErrorMsg: false },
       );
 
-      if (res?.success && res.data?.REGISTRATION_KEY) {
+      if (res.success) {
+        console.log("res", res);
+
         setRegistrationKey(res.data.REGISTRATION_KEY);
         setStep("academic");
-      } else if (res) handleApiError(res);
+      } else {
+        handleApiError(res);
+      }
     } catch {
       setServerError("Unable to connect to server.");
     } finally {
@@ -440,7 +412,8 @@ export default function StudentRegisterForm() {
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {};
       parsed.error.issues.forEach((issue) => {
-        fieldErrors[issue.path[0]] = issue.message;
+        const key = String(issue.path[0]);
+        fieldErrors[key] = issue.message;
       });
       setErrors(fieldErrors);
       return;
@@ -458,6 +431,8 @@ export default function StudentRegisterForm() {
 
     setLoading(true);
     try {
+      console.log("registrationKey", registrationKey);
+
       const data = new FormData();
       // Identity
       data.append("fullName", formData.fullName);
@@ -466,14 +441,13 @@ export default function StudentRegisterForm() {
       data.append("password", formData.password);
       data.append("REGISTRATION_KEY", registrationKey);
 
-      // Academic (Semester removed)
+      // Academic
       data.append("regNo", formData.regNo);
-      data.append("branch", formData.branch);
 
       // File
       data.append("profilePhoto", profileFile);
 
-      const res = await request<any, any>(
+      const res = await request<unknown>(
         {
           method: "POST",
           url: "/auth/registration/student",
@@ -481,9 +455,13 @@ export default function StudentRegisterForm() {
         },
         { showSuccessMsg: false, showMsg: false, showErrorMsg: false },
       );
+      console.log("res", res);
 
-      if (res?.success) setStep("success");
-      else if (res) handleApiError(res);
+      if (res.success) {
+        setStep("success");
+      } else {
+        handleApiError(res);
+      }
     } catch {
       setServerError("Unable to connect to server. Please try again.");
     } finally {
@@ -522,7 +500,7 @@ export default function StudentRegisterForm() {
               className="object-cover opacity-20"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a] via-[#0f172a]/90 to-[#0f172a]" />
+            <div className="absolute inset-0 bg-linear-to-b from-primary via-primary/90 to-primary" />
           </div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-6">
@@ -549,7 +527,7 @@ export default function StudentRegisterForm() {
         {/* RIGHT PANEL: Form */}
         <section className="flex flex-col justify-center">
           <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl p-6 sm:p-10 relative">
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-blue-500/50 to-transparent" />
 
             {step !== "success" && (
               <div className="mb-8 flex justify-between items-start">
@@ -607,7 +585,7 @@ export default function StudentRegisterForm() {
                   <button
                     onClick={sendOtp}
                     disabled={loading}
-                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                    className="w-full h-12 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
                   >
                     {loading ? "Sending OTP..." : "Verify Identity"}{" "}
                     <FiArrowRight />
@@ -672,24 +650,17 @@ export default function StudentRegisterForm() {
                     error={errors.mobile}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input
-                      label="Registration Number"
-                      icon={<FiHash />}
-                      value={formData.regNo}
-                      onChange={(v: string) => handleChange("regNo", v)}
-                      placeholder="221051290XX"
-                      error={errors.regNo}
-                    />
-                    <Select
-                      label="Branch"
-                      icon={<FiCpu />}
-                      value={formData.branch}
-                      onChange={(v: string) => handleChange("branch", v)}
-                      options={BRANCHES}
-                      error={errors.branch}
-                    />
-                  </div>
+                  {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> */}
+                  <Input
+                    label="Registration Number"
+                    icon={<FiHash />}
+                    value={formData.regNo}
+                    onChange={(v: string) => handleChange("regNo", v)}
+                    placeholder="221051290XX"
+                    error={errors.regNo}
+                  />
+
+                  {/* </div> */}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input

@@ -6,6 +6,9 @@ import React, { useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
 import { useApi } from "@/gecl/hooks/useApi";
+// Import strict type from your utils
+import type { ApiFailure } from "@/gecl/utils/apiRequest";
+
 import {
   FiMail,
   FiLock,
@@ -15,7 +18,7 @@ import {
   FiEyeOff,
   FiCalendar,
   FiCheckCircle,
-  FiCpu,
+  // FiCpu,
   FiAlertCircle,
   FiX,
   FiClock,
@@ -25,6 +28,8 @@ import {
   FiChevronDown,
   FiPhone,
   FiMapPin,
+  FiBriefcase,
+  FiAward,
 } from "react-icons/fi";
 
 // ----------------------------
@@ -38,13 +43,12 @@ const DESIGNATIONS = [
   "Lab Assistant",
 ];
 
-// Mapping Display Name -> Backend Value
 const BRANCH_OPTIONS = [
-  { label: "Computer Science & Engineering (CSE)", value: "CSE" },
+  { label: "Computer Science & Engg. (CSE)", value: "CSE" },
   { label: "Civil Engineering (CE)", value: "CE" },
   { label: "Mechanical Engineering (ME)", value: "ME" },
   { label: "Electrical Engineering (EE)", value: "EE" },
-  { label: "Electronics & Communication (ECE)", value: "ECE" },
+  { label: "Electronics & Comm. (ECE)", value: "ECE" },
   { label: "CSE - Data Science", value: "CSE-DS" },
   { label: "CSE - AI", value: "CSE-AI" },
   { label: "Electrical & Electronics (EEE)", value: "EEE" },
@@ -53,19 +57,9 @@ const BRANCH_OPTIONS = [
 // ----------------------------
 // API Types
 // ----------------------------
-interface BaseResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  code?: string;
-  error?: any;
-}
-
-interface OtpVerifyResponse extends BaseResponse {
-  data: {
-    email: string;
-    REGISTRATION_KEY: string;
-  };
+interface OtpVerifyData {
+  email: string;
+  REGISTRATION_KEY: string;
 }
 
 // ----------------------------
@@ -91,7 +85,11 @@ const step3Schema = z
       .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),
     designation: z.string().min(1, "Select a designation"),
     joiningDate: z.string().min(1, "Joining date is required"),
-    officialEmail: z.string().email().optional().or(z.literal("")),
+    officialEmail: z
+      .string()
+      .email("Invalid email")
+      .optional()
+      .or(z.literal("")),
     specialization: z.string().min(2, "Area of specialization is required"),
     branches: z.array(z.string()).min(1, "Select at least one department"),
     password: z.string().min(8, "Password must be at least 8 characters"),
@@ -141,6 +139,15 @@ function GeneralError({
   );
 }
 
+// Fixed Input Props
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  icon?: React.ReactNode;
+  rightSlot?: React.ReactNode;
+  onChange: (e: any) => void;
+}
+
 function Input({
   icon,
   value,
@@ -152,7 +159,7 @@ function Input({
   error,
   rightSlot,
   inputMode,
-}: any) {
+}: InputProps) {
   return (
     <div className="space-y-1.5 w-full">
       {label && (
@@ -199,7 +206,17 @@ function Input({
   );
 }
 
-function Select({ icon, value, onChange, options, label, error }: any) {
+// Fixed Select Props
+interface SelectProps {
+  label?: string;
+  error?: string;
+  icon?: React.ReactNode;
+  value: string;
+  onChange: (val: string) => void;
+  options: string[]; // For simple string arrays like Designations
+}
+
+function Select({ icon, value, onChange, options, label, error }: SelectProps) {
   return (
     <div className="space-y-1.5 w-full">
       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
@@ -221,7 +238,7 @@ function Select({ icon, value, onChange, options, label, error }: any) {
           <option value="" disabled className="bg-slate-900 text-slate-500">
             Select...
           </option>
-          {options.map((opt: string) => (
+          {options.map((opt) => (
             <option
               key={opt}
               value={opt}
@@ -273,7 +290,7 @@ function StepIndicator({ currentStep }: { currentStep: string }) {
         return (
           <div
             key={s.id}
-            className="flex flex-col items-center gap-2 bg-[#0f172a] px-1 z-10"
+            className="flex flex-col items-center gap-2 bg-primary px-1 z-10"
           >
             <div
               className={cn(
@@ -312,6 +329,10 @@ const anim = {
   exit: { opacity: 0, x: -20 },
 };
 
+// ----------------------------
+// MAIN COMPONENT
+// ----------------------------
+
 export default function TeacherRegisterForm() {
   const { request } = useApi();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -324,10 +345,10 @@ export default function TeacherRegisterForm() {
     fullName: "",
     email: "",
     mobile: "",
-    role: "teacher", // Hardcoded
+    role: "teacher",
 
     // Professional
-    designation: "Assistant Professor",
+    designation: "",
     joiningDate: "",
     officialEmail: "",
     specialization: "",
@@ -346,9 +367,10 @@ export default function TeacherRegisterForm() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const collegeName = "Government Engineering College";
-  const collegeLocation = "Lakhisarai";
+  // const collegeName = "Government Engineering College";
+  // const collegeLocation = "Lakhisarai";
   const imagePath =
     "/gecl/images/college/gecl-government-engineering-college-lakhisarai.webp";
 
@@ -399,7 +421,8 @@ export default function TeacherRegisterForm() {
     }
   };
 
-  const handleApiError = (res: BaseResponse) => {
+  // Fixed: Use ApiFailure type
+  const handleApiError = (res: ApiFailure) => {
     const code = res.code || "UNKNOWN";
     const msg = res.message || "An error occurred.";
 
@@ -422,7 +445,8 @@ export default function TeacherRegisterForm() {
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {};
       parsed.error.issues.forEach((issue) => {
-        fieldErrors[issue.path[0]] = issue.message;
+        const key = String(issue.path[0]);
+        fieldErrors[key] = issue.message;
       });
       setErrors(fieldErrors);
       return;
@@ -430,7 +454,7 @@ export default function TeacherRegisterForm() {
 
     setLoading(true);
     try {
-      const res = await request<any, any>(
+      const res = await request<unknown>(
         {
           method: "POST",
           url: "/auth/registration/otp/send",
@@ -439,8 +463,8 @@ export default function TeacherRegisterForm() {
         { showSuccessMsg: true, showMsg: false, showErrorMsg: false },
       );
 
-      if (res?.success) setStep("otp");
-      else if (res) handleApiError(res);
+      if (res.success) setStep("otp");
+      else handleApiError(res);
     } catch {
       setServerError("Server unreachable. Please check your connection.");
     } finally {
@@ -460,7 +484,7 @@ export default function TeacherRegisterForm() {
 
     setLoading(true);
     try {
-      const res = await request<OtpVerifyResponse, any>(
+      const res = await request<OtpVerifyData>(
         {
           method: "POST",
           url: "/auth/registration/otp/verify",
@@ -469,10 +493,12 @@ export default function TeacherRegisterForm() {
         { showSuccessMsg: true, showMsg: false, showErrorMsg: false },
       );
 
-      if (res?.success && res.data?.REGISTRATION_KEY) {
+      if (res.success) {
         setRegistrationKey(res.data.REGISTRATION_KEY);
         setStep("details");
-      } else if (res) handleApiError(res);
+      } else {
+        handleApiError(res);
+      }
     } catch {
       setServerError("Server unreachable. Please check your connection.");
     } finally {
@@ -488,7 +514,8 @@ export default function TeacherRegisterForm() {
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {};
       parsed.error.issues.forEach((issue) => {
-        fieldErrors[issue.path[0]] = issue.message;
+        const key = String(issue.path[0]);
+        fieldErrors[key] = issue.message;
       });
       setErrors(fieldErrors);
       return;
@@ -528,7 +555,7 @@ export default function TeacherRegisterForm() {
       // File
       data.append("profilePhoto", profileFile);
 
-      const res = await request<any, any>(
+      const res = await request<unknown>(
         {
           method: "POST",
           url: "/auth/registration/employee",
@@ -537,11 +564,11 @@ export default function TeacherRegisterForm() {
         { showSuccessMsg: false, showMsg: false, showErrorMsg: false },
       );
 
-      if (res?.success) setStep("success");
-      else if (res) handleApiError(res);
+      if (res.success) setStep("success");
+      else handleApiError(res);
     } catch {
       setServerError(
-        "Submission failed. Ensure you are connected to the GEC network or internet.",
+        "Submission failed. Ensure you are connected to the GEC network.",
       );
     } finally {
       setLoading(false);
@@ -580,7 +607,7 @@ export default function TeacherRegisterForm() {
               priority
               sizes="(max-width: 768px) 100vw, 50vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a] via-[#0f172a]/90 to-[#0f172a]" />
+            <div className="absolute inset-0 bg-linear-to-b from-primary via-primary/90 to-primary" />
           </div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-6">
@@ -607,7 +634,7 @@ export default function TeacherRegisterForm() {
         {/* RIGHT PANEL: Dynamic Form */}
         <section className="flex flex-col justify-center">
           <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl p-6 sm:p-10 relative">
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/50 to-transparent" />
 
             {step !== "success" && (
               <div className="mb-8 flex justify-between items-start">
@@ -616,12 +643,12 @@ export default function TeacherRegisterForm() {
                     {step === "identity" && "Faculty Identity"}
                     {step === "otp" && "Verify Email"}
                     {step === "details" && "Professional Info"}
-                    {step === "photo" && "Upload Photo"}
+                    {step === "photo" && "Profile Photo"}
                   </h3>
                 </div>
                 <Link
                   href="/login"
-                  className="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
                 >
                   Already registered?
                 </Link>
@@ -647,7 +674,7 @@ export default function TeacherRegisterForm() {
                     icon={<FiUser />}
                     value={formData.fullName}
                     onChange={(v: string) => handleChange("fullName", v)}
-                    placeholder="Dr. Rahul Kumar"
+                    placeholder="Prof. John Doe"
                     error={errors.fullName}
                   />
                   <Input
@@ -655,23 +682,19 @@ export default function TeacherRegisterForm() {
                     icon={<FiMail />}
                     value={formData.email}
                     onChange={(v: string) => handleChange("email", v)}
-                    placeholder="rahul@gmail.com"
+                    placeholder="john.doe@gmail.com"
                     error={errors.email}
                   />
-
                   <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs text-slate-400">
-                    <span className="text-emerald-400 font-bold">Note:</span>{" "}
-                    You are registering as a <strong>Teacher</strong> for GEC
-                    Lakhisarai.
+                    <span className="text-emerald-400 font-bold">Note:</span> We
+                    will send a verification code to this email.
                   </div>
-
                   <button
                     onClick={sendOtp}
                     disabled={loading}
-                    className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                    className="w-full h-12 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
                   >
-                    {loading ? "Sending OTP..." : "Verify Identity"}{" "}
-                    <FiArrowRight />
+                    {loading ? "Sending OTP..." : "Continue"} <FiArrowRight />
                   </button>
                 </motion.div>
               )}
@@ -692,7 +715,7 @@ export default function TeacherRegisterForm() {
                           setOtp("");
                           setServerError(null);
                         }}
-                        className="text-xs text-blue-400 underline"
+                        className="text-xs text-emerald-400 underline"
                       >
                         Change
                       </button>
@@ -715,98 +738,99 @@ export default function TeacherRegisterForm() {
                     disabled={loading}
                     className="w-full h-12 bg-white text-slate-900 font-bold rounded-xl shadow-lg hover:bg-slate-100 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
                   >
-                    {loading ? "Verifying..." : "Confirm OTP"} <FiArrowRight />
+                    {loading ? "Verifying..." : "Verify OTP"} <FiArrowRight />
                   </button>
                 </motion.div>
               )}
 
-              {/* STEP 3: DETAILS */}
+              {/* STEP 3: PROFESSIONAL INFO */}
               {step === "details" && (
                 <motion.div key="details" {...anim} className="space-y-5">
-                  {/* Personal Contact */}
-                  <Input
-                    label="Mobile Number"
-                    icon={<FiPhone />}
-                    value={formData.mobile}
-                    onChange={(v: string) => handleChange("mobile", v)}
-                    placeholder="9876543210"
-                    inputMode="numeric"
-                    error={errors.mobile}
-                  />
-
+                  {/* Row 1 */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
-                      label="Official Email (Optional)"
-                      icon={<FiMail />}
-                      value={formData.officialEmail}
-                      onChange={(v: string) => handleChange("officialEmail", v)}
-                      placeholder="rahul@gecl.ac.in"
+                      label="Mobile Number"
+                      icon={<FiPhone />}
+                      value={formData.mobile}
+                      onChange={(v: string) => handleChange("mobile", v)}
+                      placeholder="9876543210"
+                      inputMode="numeric"
+                      error={errors.mobile}
                     />
-                    <Input
-                      label="Joining Date"
-                      icon={<FiCalendar />}
-                      value={formData.joiningDate}
-                      onChange={(v: string) => handleChange("joiningDate", v)}
-                      type="date"
-                      error={errors.joiningDate}
+                    <Select
+                      label="Designation"
+                      icon={<FiBriefcase />}
+                      value={formData.designation}
+                      onChange={(v: string) => handleChange("designation", v)}
+                      options={DESIGNATIONS}
+                      error={errors.designation}
                     />
                   </div>
 
-                  {/* FACULTY SPECIFIC */}
-                  <div className="p-4 bg-slate-950/50 rounded-xl border border-slate-800 space-y-4">
-                    <div className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-2">
-                      Faculty Details
-                    </div>
+                  {/* Row 2 */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      label="Date of Joining"
+                      icon={<FiCalendar />}
+                      type="date"
+                      value={formData.joiningDate}
+                      onChange={(v: string) => handleChange("joiningDate", v)}
+                      error={errors.joiningDate}
+                    />
+                    <Input
+                      label="Area of Specialization"
+                      icon={<FiAward />}
+                      value={formData.specialization}
+                      onChange={(v: string) =>
+                        handleChange("specialization", v)
+                      }
+                      placeholder="e.g. AI/ML, Structural Eng."
+                      error={errors.specialization}
+                    />
+                  </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Select
-                        label="Designation"
-                        icon={<FiUser />}
-                        value={formData.designation}
-                        onChange={(v: string) => handleChange("designation", v)}
-                        options={DESIGNATIONS}
-                      />
-                      <Input
-                        label="Specialization"
-                        icon={<FiCpu />}
-                        value={formData.specialization}
-                        onChange={(v: string) =>
-                          handleChange("specialization", v)
-                        }
-                        placeholder="AI, IoT, etc."
-                        error={errors.specialization}
-                      />
-                    </div>
+                  <Input
+                    label="Official Email (Optional)"
+                    icon={<FiMail />}
+                    value={formData.officialEmail}
+                    onChange={(v: string) => handleChange("officialEmail", v)}
+                    placeholder="prof.name@gecl.ac.in"
+                    error={errors.officialEmail}
+                  />
 
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-1 block">
-                        Branches Handled
-                      </label>
-                      <div className="flex flex-wrap gap-2">
-                        {BRANCH_OPTIONS.map((b) => (
+                  {/* Branch Multi-Select */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
+                      Department / Branches (Multi-Select)
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {BRANCH_OPTIONS.map((b) => {
+                        const isSelected = formData.branches.includes(b.value);
+                        return (
                           <button
                             key={b.value}
+                            type="button"
                             onClick={() => handleBranchToggle(b.value)}
                             className={cn(
                               "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
-                              formData.branches.includes(b.value)
-                                ? "bg-emerald-600 border-emerald-500 text-white"
-                                : "bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600",
+                              isSelected
+                                ? "bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/20"
+                                : "bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-600 hover:text-slate-200",
                             )}
                           >
                             {b.label}
                           </button>
-                        ))}
-                      </div>
-                      {errors.branches && (
-                        <p className="text-xs text-red-400 mt-2">
-                          {errors.branches}
-                        </p>
-                      )}
+                        );
+                      })}
                     </div>
+                    {errors.branches && (
+                      <p className="text-xs text-red-400 pl-1">
+                        {errors.branches}
+                      </p>
+                    )}
                   </div>
 
-                  {/* SECURITY */}
+                  {/* Passwords */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                       label="Password"
@@ -833,8 +857,18 @@ export default function TeacherRegisterForm() {
                         handleChange("confirmPassword", v)
                       }
                       placeholder="Repeat password"
-                      type={showPassword ? "text" : "password"}
+                      type={showConfirmPassword ? "text" : "password"}
                       error={errors.confirmPassword}
+                      rightSlot={
+                        <button
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="p-1 text-slate-500 hover:text-slate-300"
+                        >
+                          {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                        </button>
+                      }
                     />
                   </div>
 
@@ -847,7 +881,7 @@ export default function TeacherRegisterForm() {
                 </motion.div>
               )}
 
-              {/* STEP 4: PHOTO UPLOAD */}
+              {/* STEP 4: PHOTO */}
               {step === "photo" && (
                 <motion.div
                   key="photo"
@@ -907,7 +941,7 @@ export default function TeacherRegisterForm() {
                     disabled={loading}
                     className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
                   >
-                    {loading ? "Registering..." : "Submit Application"}{" "}
+                    {loading ? "Registering..." : "Submit Registration"}{" "}
                     <FiCheckCircle />
                   </button>
                   <button
@@ -933,12 +967,13 @@ export default function TeacherRegisterForm() {
                     Application Submitted
                   </h2>
                   <p className="text-slate-400 mb-8 leading-relaxed">
-                    Your registration is pending approval. You will be notified
-                    via email once approved.
+                    Your faculty registration is pending approval by the
+                    administration. You will receive an email confirmation at{" "}
+                    <strong>{formData.email}</strong> once verified.
                   </p>
                   <Link
                     href="/login"
-                    className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                    className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
                   >
                     Return to Login <FiArrowRight />
                   </Link>
