@@ -1,4 +1,4 @@
-import Redis from "ioredis";
+import { Redis } from "ioredis";
 
 let redis: Redis | null = null;
 
@@ -7,13 +7,17 @@ export function getRedis(): Redis {
     redis = new Redis({
       host: process.env.GECL_REDIS_HOST || "127.0.0.1",
       port: Number(process.env.GECL_REDIS_PORT) || 6379,
-      username: process.env.GECL_REDIS_USERNAME || undefined,
-      password: process.env.GECL_REDIS_PASSWORD || undefined,
+      ...(process.env.GECL_REDIS_USERNAME && {
+        username: process.env.GECL_REDIS_USERNAME,
+      }),
+      ...(process.env.GECL_REDIS_PASSWORD && {
+        password: process.env.GECL_REDIS_PASSWORD,
+      }),
     });
 
     redis.on("connect", () => console.log("✅ Redis connected"));
     redis.on("ready", () => console.log("🚀 Redis ready"));
-    redis.on("error", (err) => console.error("❌ Redis error:", err));
+    redis.on("error", (err: Error) => console.error("❌ Redis error:", err));
     redis.on("end", () => console.log("⚠️ Redis connection closed"));
   }
 

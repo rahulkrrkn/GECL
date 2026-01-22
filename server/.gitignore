@@ -5,6 +5,7 @@
 /src/auth/auth
 /extra
 /test
+/dist
 
 # Temporal files
 # /src/gecl

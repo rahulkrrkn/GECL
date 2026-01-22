@@ -13,7 +13,9 @@ export const emailNormalization = (rawEmail: unknown): string | null => {
   // Gmail normalization
   if (domain === "gmail.com") {
     let normalizedLocal = local.replace(/\./g, "");
-    normalizedLocal = normalizedLocal.split("+")[0];
+
+    normalizedLocal = normalizedLocal.split("+")[0] ?? "";
+
     email = `${normalizedLocal}@gmail.com`;
   }
 

@@ -31,5 +31,5 @@
     /* Performance */
     "skipLibCheck": true
   },
-  "include": ["src", "src/types", "src/server.ts"]
+  "include": ["src", "src/types"]
 }
