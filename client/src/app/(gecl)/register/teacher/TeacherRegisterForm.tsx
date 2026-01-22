@@ -46,7 +46,7 @@ const BRANCH_OPTIONS = [
   { label: "Electrical Engineering (EE)", value: "EE" },
   { label: "Electronics & Communication (ECE)", value: "ECE" },
   { label: "CSE - Data Science", value: "CSE-DS" },
-  { label: "CSE - AI & ML", value: "CSE-AI" },
+  { label: "CSE - AI", value: "CSE-AI" },
   { label: "Electrical & Electronics (EEE)", value: "EEE" },
 ];
 

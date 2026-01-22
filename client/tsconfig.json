@@ -30,6 +30,6 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     "src/gecl/components/uiOld/Button.tsx"
-  ],
+, "src/app/(gecl)/about/page.tsx"  ],
   "exclude": ["node_modules"]
 }

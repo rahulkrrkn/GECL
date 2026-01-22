@@ -2,6 +2,7 @@ import { Navbar } from "@/gecl/components/navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://gecl.rahulkrrkn.com/"),
   title: {
     default:
       "Government Engineering College Lakhisarai | Engineering College in Bihar",
@@ -22,7 +23,6 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Government Engineering College, Lakhisarai" }],
   creator: "Government Engineering College Lakhisarai",
-  metadataBase: new URL("https://yourdomain.com"), // change to your real domain
   openGraph: {
     title:
       "Government Engineering College, Lakhisarai — Engineering College in Bihar",
