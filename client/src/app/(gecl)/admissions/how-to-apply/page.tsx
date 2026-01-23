@@ -208,7 +208,7 @@ const HowToApplyPage = () => {
                     window is different (usually April-May).
                   </p>
                   <Link
-                    href="/admissions/eligibility#lateral-entry"
+                    href="/admissions/lateral-entry"
                     className="text-sm font-bold text-blue-700 hover:underline"
                   >
                     Check LE Eligibility & Process →

@@ -1,20 +1,29 @@
-import {
-  FiHome,
-  FiInfo,
-  FiTarget,
-  FiMessageSquare,
-  FiUsers,
-  FiBook,
-  FiLayers,
-  FiCalendar,
-  FiClock,
-  FiFileText,
-  FiAlertCircle,
-  FiShield,
-  FiCheckSquare,
-  FiGrid,
-} from "react-icons/fi";
 import { IconType } from "react-icons";
+import {
+  FaHouse,
+  FaCircleInfo,
+  FaBuildingColumns,
+  FaBullseye,
+  FaQuoteLeft,
+  FaUsersGear,
+  FaGraduationCap,
+  FaLayerGroup,
+  FaCalendarDays,
+  FaScaleBalanced,
+  FaShieldHalved,
+  FaClipboardUser,
+  FaUserPlus,
+  FaListCheck,
+  FaLaptopFile,
+  FaMoneyBillWave,
+  FaHandHoldingDollar,
+  FaFileContract,
+  FaBed,
+  FaBarsProgress,
+  FaArrowRightToBracket,
+  FaChair,
+  FaCircleQuestion,
+} from "react-icons/fa6";
 
 // ✅ Roles (Updated)
 export type UserRole =
@@ -47,137 +56,132 @@ export const menuConfig: MenuItem[] = [
   {
     label: "Home",
     href: "/",
-    icon: FiHome,
+    icon: FaHouse,
   },
   {
     label: "About",
     href: "/about",
-    icon: FiInfo,
+    icon: FaCircleInfo,
     children: [
       {
         label: "About College",
         href: "/about/college",
-        icon: FiGrid,
+        icon: FaBuildingColumns,
       },
       {
         label: "Vision & Mission",
         href: "/about/vision-mission",
-        icon: FiTarget,
+        icon: FaBullseye,
       },
       {
         label: "Principal's Message",
         href: "/about/principal-message",
-        icon: FiMessageSquare,
+        icon: FaQuoteLeft,
       },
       {
         label: "Administration",
         href: "/about/administration",
-        icon: FiUsers,
+        icon: FaUsersGear,
       },
     ],
   },
   {
     label: "Academics",
     href: "/academics",
-    icon: FiBook,
+    icon: FaGraduationCap,
     children: [
       {
         label: "Programs",
         href: "/academics/programs",
-        icon: FiLayers,
+        icon: FaLayerGroup,
       },
       {
         label: "Calendar",
         href: "/academics/calendar",
-        icon: FiCalendar,
+        icon: FaCalendarDays,
       },
       // {
       //   label: "Timetable",
       //   href: "/academics/timetable",
-      //   icon: FiClock,
+      //   icon: FaClock,
       // },
       // {
       //   label: "Syllabus",
       //   href: "/academics/syllabus",
-      //   icon: FiFileText,
+      //   icon: FaFileLines,
       // },
       {
         label: "Rules & Regulations",
         href: "/academics/rules-regulations",
-        icon: FiAlertCircle,
+        icon: FaScaleBalanced,
       },
       {
         label: "Anti-Ragging",
         href: "/academics/anti-ragging",
-        icon: FiShield,
+        icon: FaShieldHalved,
       },
       {
         label: "Attendance Policy",
         href: "/academics/attendance-policy",
-        icon: FiCheckSquare,
+        icon: FaClipboardUser,
       },
     ],
   },
   {
     label: "Admissions",
     href: "/admissions",
-    icon: FiHome,
+    icon: FaUserPlus,
     children: [
       {
         label: "Eligibility",
         href: "/admissions/eligibility",
-        icon: FiHome,
+        icon: FaListCheck,
       },
       {
         label: "How to Apply",
         href: "/admissions/how-to-apply",
-        icon: FiHome,
+        icon: FaLaptopFile,
       },
       {
         label: "Fee Structure",
         href: "/admissions/fee-structure",
-        icon: FiHome,
+        icon: FaMoneyBillWave,
       },
       {
         label: "Scholarships",
         href: "/admissions/scholarships",
-        icon: FiHome,
+        icon: FaHandHoldingDollar,
       },
       {
         label: "Required Documents",
         href: "/admissions/required-documents",
-        icon: FiHome,
+        icon: FaFileContract,
       },
       {
         label: "Hostel Admission",
         href: "/admissions/hostel-admission",
-        icon: FiHome,
+        icon: FaBed,
       },
       {
         label: "Admission Process",
         href: "/admissions/admission-process",
-        icon: FiHome,
+        icon: FaBarsProgress,
+      },
+      {
+        label: "Lateral Entry (LE)",
+        href: "/admissions/lateral-entry",
+        icon: FaArrowRightToBracket,
       },
       {
         label: "Seat Intake",
         href: "/admissions/seat-intake",
-        icon: FiHome,
+        icon: FaChair,
       },
       {
         label: "FAQ",
         href: "/admissions/faq",
-        icon: FiHome,
+        icon: FaCircleQuestion,
       },
     ],
   },
 ];
-// /admissions
-// /admissions/eligibility
-// /admissions/how-to-apply
-// /admissions/fee-structure
-// /admissions/scholarships
-// /admissions/required-documents
-// /admissions/hostel-admission
-// /admissions/admission-process
-// /admissions/seat-intake
-// /admissions/faq

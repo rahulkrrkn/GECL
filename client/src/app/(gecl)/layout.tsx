@@ -1,4 +1,6 @@
 import { Navbar } from "@/gecl/components/navbar";
+import { Footer } from "@/gecl/components/footer";
+
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -57,6 +59,7 @@ export default function RootLayout({
     <>
       <Navbar />
       {children}
+      <Footer />
     </>
   );
 }

@@ -213,7 +213,15 @@ export default function AboutCollegePage() {
               <div className="bg-slate-100 rounded-2xl h-80 flex items-center justify-center border border-slate-200 relative overflow-hidden">
                 {/* Embed Google Map here in production */}
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3609.687258079288!2d86.09658731501007!3d25.21376898388854!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f2070020120127%3A0x6b8665792500c283!2sGovernment%20Engineering%20College%20Lakhisarai!5e0!3m2!1sen!2sin!4v1625647895412!5m2!1sen!2sin"
+                  title="Government Engineering College Lakhisarai Location"
+                  src="https://www.google.com/maps?q=Government%20Engineering%20College%20Lakhisarai&output=embed"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="w-full h-full border-0"
+                />
+
+                <iframe
+                  src="https://www.google.com/maps?q=Government%20Engineering%20College%20Lakhisarai&output=embed"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
