@@ -130,7 +130,7 @@ export default function AntiRaggingPage() {
       </section>
 
       {/* Reusable Breadcrumb */}
-      <div className="sticky top-[64px] z-30 w-full">
+      <div className="sticky top-16 z-30 w-full">
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },

@@ -91,16 +91,16 @@ export const menuConfig: MenuItem[] = [
         href: "/academics/calendar",
         icon: FiCalendar,
       },
-      {
-        label: "Timetable",
-        href: "/academics/timetable",
-        icon: FiClock,
-      },
-      {
-        label: "Syllabus",
-        href: "/academics/syllabus",
-        icon: FiFileText,
-      },
+      // {
+      //   label: "Timetable",
+      //   href: "/academics/timetable",
+      //   icon: FiClock,
+      // },
+      // {
+      //   label: "Syllabus",
+      //   href: "/academics/syllabus",
+      //   icon: FiFileText,
+      // },
       {
         label: "Rules & Regulations",
         href: "/academics/rules-regulations",
@@ -118,4 +118,66 @@ export const menuConfig: MenuItem[] = [
       },
     ],
   },
+  {
+    label: "Admissions",
+    href: "/admissions",
+    icon: FiHome,
+    children: [
+      {
+        label: "Eligibility",
+        href: "/admissions/eligibility",
+        icon: FiHome,
+      },
+      {
+        label: "How to Apply",
+        href: "/admissions/how-to-apply",
+        icon: FiHome,
+      },
+      {
+        label: "Fee Structure",
+        href: "/admissions/fee-structure",
+        icon: FiHome,
+      },
+      {
+        label: "Scholarships",
+        href: "/admissions/scholarships",
+        icon: FiHome,
+      },
+      {
+        label: "Required Documents",
+        href: "/admissions/required-documents",
+        icon: FiHome,
+      },
+      {
+        label: "Hostel Admission",
+        href: "/admissions/hostel-admission",
+        icon: FiHome,
+      },
+      {
+        label: "Admission Process",
+        href: "/admissions/admission-process",
+        icon: FiHome,
+      },
+      {
+        label: "Seat Intake",
+        href: "/admissions/seat-intake",
+        icon: FiHome,
+      },
+      {
+        label: "FAQ",
+        href: "/admissions/faq",
+        icon: FiHome,
+      },
+    ],
+  },
 ];
+// /admissions
+// /admissions/eligibility
+// /admissions/how-to-apply
+// /admissions/fee-structure
+// /admissions/scholarships
+// /admissions/required-documents
+// /admissions/hostel-admission
+// /admissions/admission-process
+// /admissions/seat-intake
+// /admissions/faq

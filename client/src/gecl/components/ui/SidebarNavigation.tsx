@@ -5,9 +5,11 @@ import { usePathname } from "next/navigation";
 import { LuBookOpen, LuArrowRight } from "react-icons/lu";
 import { cn } from "@/gecl/lib/cn";
 
-interface NavLink {
+// ✅ Fix: Added 'active' (optional) to solve the build error
+export interface NavLink {
   label: string;
   href: string;
+  active?: boolean;
 }
 
 interface SidebarNavigationProps {
@@ -26,7 +28,7 @@ export default function SidebarNavigation({
   return (
     <div
       className={cn(
-        "bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden",
+        "bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden", // ❌ Removed 'sticky top-24'
         className,
       )}
     >
@@ -38,8 +40,11 @@ export default function SidebarNavigation({
       </div>
       <nav className="p-2 flex flex-col gap-1">
         {links.map((link) => {
+          // Logic: Use manual 'active' prop if provided, else check pathname
           const isActive =
-            pathname === link.href || pathname.startsWith(link.href + "/"); // Handle sub-routes if needed
+            link.active !== undefined
+              ? link.active
+              : pathname === link.href || pathname.startsWith(link.href + "/");
 
           return (
             <Link

@@ -275,7 +275,7 @@ export default function AboutHubPage() {
 
               <div className="mt-8 md:mt-10">
                 <Link
-                  href="/admissions/apply"
+                  href="/admissions/how-to-apply"
                   className="inline-flex items-center gap-2 bg-gecl-primary text-white px-6 md:px-8 py-3 md:py-3.5 rounded-xl font-semibold hover:bg-gecl-primary/90 hover:-translate-y-1 transition-all shadow-lg shadow-blue-900/20 text-sm md:text-base"
                 >
                   Apply for Admission <LuArrowRight className="w-5 h-5" />

@@ -110,14 +110,14 @@ export default function AboutCollegePage() {
             <section id="campus" className="scroll-mt-28">
               <SectionHeader title="Campus Infrastructure" icon={LuBuilding2} />
 
-              <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl mb-8 group">
+              <div className="relative h-100 rounded-2xl overflow-hidden shadow-xl mb-8 group">
                 <Image
                   src="/gecl/images/college-building-main.webp"
                   alt="GEC Lakhisarai Campus View"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-8">
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent flex items-end p-8">
                   <div className="text-white">
                     <h3 className="text-xl font-bold">Shivsona Road Campus</h3>
                     <p className="opacity-90">Located in Kharsari, Chandwara</p>

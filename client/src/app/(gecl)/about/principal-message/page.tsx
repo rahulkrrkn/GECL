@@ -84,7 +84,7 @@ export default function PrincipalMessagePage() {
             <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-10 border-t-4 border-gecl-accent transform hover:-translate-y-1 transition-transform duration-300">
               <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
                 {/* Principal Photo */}
-                <div className="relative w-48 h-48 md:w-56 md:h-56 flex-shrink-0 group">
+                <div className="relative w-48 h-48 md:w-56 md:h-56 shrink-0 group">
                   <div className="absolute inset-0 bg-gecl-primary rounded-full blur-lg opacity-20 group-hover:opacity-30 transition-opacity"></div>
                   <Image
                     src="/gecl/images/principal-bimlesh-kumar.webp"
