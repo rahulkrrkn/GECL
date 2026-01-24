@@ -66,3 +66,71 @@ export default function SidebarNavigation({
     </div>
   );
 }
+// "use client";
+
+// import Link from "next/link";
+// import { usePathname } from "next/navigation";
+// import {
+//   LuInfo,
+//   LuUsers,
+//   LuBookOpen,
+//   LuCalendarClock,
+//   LuFlaskConical,
+//   LuTrophy,
+//   LuImage,
+//   LuPhone,
+// } from "react-icons/lu";
+
+// // ICON MAPPER: Translates strings into Components
+// const ICONS: Record<string, any> = {
+//   about: LuInfo,
+//   hod: LuUsers,
+//   faculty: LuUsers,
+//   syllabus: LuBookOpen,
+//   timetable: LuCalendarClock,
+//   labs: LuFlaskConical,
+//   placements: LuTrophy,
+//   gallery: LuImage,
+//   contact: LuPhone,
+// };
+
+// export default function SidebarNavigation({
+//   title,
+//   links,
+// }: {
+//   title: string;
+//   links: any[];
+// }) {
+//   const pathname = usePathname();
+
+//   return (
+//     <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+//       <div className="p-6 bg-slate-50 border-b border-slate-100">
+//         <h3 className="font-black text-slate-900 uppercase text-[10px] tracking-widest">
+//           {title}
+//         </h3>
+//       </div>
+//       <nav className="p-3">
+//         {links.map((link) => {
+//           const Icon = ICONS[link.iconKey] || LuInfo;
+//           const isActive = pathname === link.href;
+
+//           return (
+//             <Link
+//               key={link.href}
+//               href={link.href}
+//               className={`flex items-center gap-3 p-4 rounded-2xl text-sm font-bold transition-all ${
+//                 isActive
+//                   ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100"
+//                   : "text-slate-500 hover:bg-slate-50 hover:text-indigo-600"
+//               }`}
+//             >
+//               <Icon size={18} />
+//               {link.label}
+//             </Link>
+//           );
+//         })}
+//       </nav>
+//     </div>
+//   );
+// }

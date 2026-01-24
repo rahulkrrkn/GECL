@@ -224,11 +224,8 @@ export default function Footer() {
               <FooterLink href="/mandatory/aicte">AICTE Approvals</FooterLink>
               <FooterLink href="/mandatory/nirf">NIRF Ranking</FooterLink>
               <FooterLink href="/mandatory/rti">RTI Cell</FooterLink>
-              <FooterLink href="/mandatory/anti-ragging">
-                Anti-Ragging Committee
-              </FooterLink>
-              <FooterLink href="/mandatory/grievance">
-                Grievance Redressal
+              <FooterLink href="/academics/anti-ragging">
+                Anti-Ragging
               </FooterLink>
               <FooterLink href="/mandatory/icc">
                 Internal Complaint (ICC)

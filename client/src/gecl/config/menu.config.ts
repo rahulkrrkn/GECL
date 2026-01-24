@@ -29,6 +29,19 @@ import {
   FaUsers,
   FaBook,
   FaMicroscope,
+  FaChalkboardUser,
+  FaUserTie,
+  FaFlask,
+  FaBridge,
+  FaRobot,
+  FaDatabase,
+  FaBolt,
+  FaGears,
+  FaBriefcase,
+  FaDiagramProject,
+  FaMagnifyingGlass,
+  FaImages,
+  FaPhone,
 } from "react-icons/fa6";
 
 // ✅ Roles (Updated)
@@ -79,6 +92,11 @@ export const menuConfig: MenuItem[] = [
         icon: FaBuildingColumns,
       },
       {
+        label: "Board of Governors (BOG)",
+        href: "/about/bog",
+        icon: FaUsers,
+      },
+      {
         label: "Vision & Mission",
         href: "/about/vision-mission",
         icon: FaBullseye,
@@ -93,11 +111,6 @@ export const menuConfig: MenuItem[] = [
         href: "/about/administration",
         icon: FaUsersGear,
       },
-      {
-        label: "Board of Governors (BOG)",
-        href: "/about/bog",
-        icon: FaUsers,
-      },
     ],
   },
 
@@ -107,6 +120,16 @@ export const menuConfig: MenuItem[] = [
     href: "/academics",
     icon: FaGraduationCap,
     children: [
+      {
+        label: "Syllabus",
+        href: "/academics/syllabus",
+        icon: FaBook,
+      },
+      {
+        label: "Class Routine",
+        href: "/academics/timetable",
+        icon: FaBarsProgress,
+      },
       {
         label: "Programs",
         href: "/academics/programs",
@@ -194,6 +217,56 @@ export const menuConfig: MenuItem[] = [
     ],
   },
 
+  // ✅ Departments (Branch-wise)
+  {
+    label: "Departments",
+    href: "/departments",
+    icon: FaBuildingColumns,
+    children: [
+      //     // ✅ Applied Science
+      {
+        label: "Applied Science",
+        href: "/departments/applied-science",
+        icon: FaFlask,
+      },
+
+      // ✅ Civil Engineering
+      {
+        label: "Civil Engineering",
+        href: "/departments/civil",
+        icon: FaBridge,
+      },
+
+      // ✅ CSE - AI
+      {
+        label: "CSE (AI)",
+        href: "/departments/cse-ai",
+        icon: FaRobot,
+      },
+
+      // ✅ CSE - DS
+      {
+        label: "CSE (DS)",
+        href: "/departments/cse-ds",
+        icon: FaDatabase,
+      },
+
+      // ✅ Electrical Engineering
+      {
+        label: "Electrical Engineering",
+        href: "/departments/electrical",
+        icon: FaBolt,
+      },
+
+      // ✅ Mechanical Engineering
+      {
+        label: "Mechanical Engineering",
+        href: "/departments/mechanical",
+        icon: FaGears,
+      },
+    ],
+  },
+
   // ✅ Campus Life
   {
     label: "Campus Life",
@@ -247,6 +320,11 @@ export const menuConfig: MenuItem[] = [
   {
     label: "All Links",
     href: "/links",
+    icon: FaHouse,
+  },
+  {
+    label: "All Images",
+    href: "/images",
     icon: FaHouse,
   },
 ];

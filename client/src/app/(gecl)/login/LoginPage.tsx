@@ -211,7 +211,7 @@ export default function LoginPage() {
   const handleLoginSuccess = (token: string) => {
     localStorage.setItem("GECL_ACCESS_TOKEN", token);
     document.cookie = `GECL_ACCESS_TOKEN=${token}; path=/; max-age=86400; SameSite=Strict; Secure`;
-    router.push("/dashboard");
+    router.push("/");
   };
 
   // --- Handlers ---

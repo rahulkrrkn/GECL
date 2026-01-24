@@ -2,9 +2,29 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { working, done, pending, notChecked } from "./data";
+import {
+  working,
+  done,
+  pending,
+  notChecked,
+  workLater,
+  brokenLinks,
+  dataVerified,
+  imageUpload,
+  finished,
+} from "./data";
 
-type TabKey = "all" | "working" | "done" | "pending" | "notChecked";
+type TabKey =
+  | "all"
+  | "working"
+  | "done"
+  | "pending"
+  | "notChecked"
+  | "workLater"
+  | "brokenLinks"
+  | "dataVerified"
+  | "imageUpload"
+  | "finished";
 
 export default function LinksPage() {
   const [tab, setTab] = useState<TabKey>("all");
@@ -20,6 +40,36 @@ export default function LinksPage() {
         title: "Not Checked",
         emoji: "⚪",
         list: notChecked,
+      },
+      {
+        key: "workLater" as const,
+        title: "Work Later",
+        emoji: "🟠",
+        list: workLater,
+      },
+      {
+        key: "brokenLinks" as const,
+        title: "Broken Links",
+        emoji: "🔴",
+        list: brokenLinks,
+      },
+      {
+        key: "dataVerified" as const,
+        title: "Data Verified",
+        emoji: "🟣",
+        list: dataVerified,
+      },
+      {
+        key: "imageUpload" as const,
+        title: "Image Upload",
+        emoji: "🟤",
+        list: imageUpload,
+      },
+      {
+        key: "finished" as const,
+        title: "Finished",
+        emoji: "🟦",
+        list: finished,
       },
     ],
     [],
@@ -52,6 +102,11 @@ export default function LinksPage() {
   const doneCount = done.length;
   const pendingCount = pending.length;
   const notCheckedCount = notChecked.length;
+  const workLaterCount = workLater.length;
+  const brokenLinksCount = brokenLinks.length;
+  const dataVerifiedCount = dataVerified.length;
+  const imageUploadCount = imageUpload.length;
+  const finishedCount = finished.length;
 
   const copyText = async (text: string) => {
     try {
@@ -172,6 +227,11 @@ export default function LinksPage() {
             <StatCard title="Done" value={doneCount} />
             <StatCard title="Pending" value={pendingCount} />
             <StatCard title="Not Checked" value={notCheckedCount} />
+            <StatCard title="Work Later" value={workLaterCount} />
+            <StatCard title="Broken Links" value={brokenLinksCount} />
+            <StatCard title="Data Verified" value={dataVerifiedCount} />
+            <StatCard title="Image Upload" value={imageUploadCount} />
+            <StatCard title="Finished" value={finishedCount} />
           </div>
 
           {/* Search + Tabs */}
@@ -243,6 +303,36 @@ export default function LinksPage() {
                 onClick={() => setTab("notChecked")}
               >
                 Not Checked
+              </TabButton>
+              <TabButton
+                active={tab === "workLater"}
+                onClick={() => setTab("workLater")}
+              >
+                Work Later
+              </TabButton>
+              <TabButton
+                active={tab === "brokenLinks"}
+                onClick={() => setTab("brokenLinks")}
+              >
+                Broken Links
+              </TabButton>
+              <TabButton
+                active={tab === "dataVerified"}
+                onClick={() => setTab("dataVerified")}
+              >
+                Data Verified
+              </TabButton>
+              <TabButton
+                active={tab === "imageUpload"}
+                onClick={() => setTab("imageUpload")}
+              >
+                Image Upload
+              </TabButton>
+              <TabButton
+                active={tab === "finished"}
+                onClick={() => setTab("finished")}
+              >
+                Finished
               </TabButton>
             </div>
           </div>

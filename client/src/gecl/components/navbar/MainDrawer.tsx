@@ -264,7 +264,7 @@ export const MainDrawer = ({
                 </Link>
                 <span className="w-1 h-1 rounded-full bg-white/20"></span>
                 <Link
-                  href="/support"
+                  href="/contact"
                   onClick={onClose}
                   className="flex items-center gap-1.5 hover:text-white transition-colors"
                 >

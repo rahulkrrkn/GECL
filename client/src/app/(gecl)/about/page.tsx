@@ -75,9 +75,9 @@ const SECTIONS = [
     theme: "text-purple-600 bg-purple-50/50",
   },
   {
-    title: "Governing Body",
+    title: "Board of Governors",
     desc: "The Board of Governors (BoG) that steers the institution's policies and quality standards.",
-    href: "/about/governing-body",
+    href: "/about/bog",
     icon: LuUsers,
     color: "bg-cyan-600",
     theme: "text-cyan-600 bg-cyan-50/50",

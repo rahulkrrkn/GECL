@@ -38,8 +38,8 @@ const STATE_PATRONS = [
   },
   {
     role: "Hon'ble Minister, DSTTE",
-    name: "Shri Sumit Kumar Singh",
-    image: "/gecl/images/gov/minister-sumit-singh.webp",
+    name: "Shri Sunil Kumar",
+    image: "/gecl/images/gov/minister-dstte.webp",
     message:
       "Empowering youth with world-class technical education and infrastructure.",
     color: "border-blue-500",
@@ -49,9 +49,9 @@ const STATE_PATRONS = [
 // --- DATA: HODs ---
 const HOD_DATA = [
   {
-    name: "Prof. [Name]",
+    name: "Prof. Phool Kumari",
     dept: "Computer Science (AI)",
-    email: "hod.cse@geclakhisarai.ac.in",
+    email: "phoolkumari.cusb@gmail.com",
   },
   {
     name: "Prof. Phool Kumari",
@@ -153,7 +153,7 @@ export default function AdministrationPage() {
                     Affiliating University Head
                   </span>
                   <h3 className="text-2xl font-bold text-slate-800 mb-1">
-                    Prof. (Dr.) Sharat Kumar Singh
+                    Prof. Suresh Kant Verma
                   </h3>
                   <p className="text-indigo-600 font-semibold mb-4">
                     Vice Chancellor, Bihar Engineering University (BEU)

@@ -142,7 +142,7 @@ export default function AdministrationFullTree() {
                 Vice Chancellor
               </span>
               <h3 className="text-3xl md:text-4xl font-black text-slate-900 leading-tight">
-                Prof. [Name of VC]
+                Prof. Suresh Kant Verma
               </h3>
               <p className="text-xl text-slate-500 font-medium mt-1">
                 Bihar Engineering University (BEU), Patna

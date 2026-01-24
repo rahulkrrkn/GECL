@@ -1,326 +1,254 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { Breadcrumb } from "@/gecl/components/ui/";
 import {
   LuBookOpen,
-  LuFileText,
-  LuEye,
   LuDownload,
-  LuFilter,
+  LuCpu,
+  LuZap,
+  LuBuilding2,
+  LuSettings,
+  LuDatabase,
+  LuFileText,
+  LuExternalLink,
   LuArrowRight,
-  LuBell,
+  LuAtom,
 } from "react-icons/lu";
-import { FaCheckCircle } from "react-icons/fa";
-// --- MOCK SYLLABUS DATA ---
-const SYLLABUS_DATA = [
+
+// Shared UI Components
+import {
+  PageHero,
+  SectionHeader,
+  SidebarNavigation,
+  SidebarWidget,
+} from "@/gecl/components/ui";
+
+// --- SEO METADATA ---
+export const metadata: Metadata = {
+  title: "B.Tech Syllabus & Curriculum | BEU Patna | GEC Lakhisarai",
+  description:
+    "Access the official BEU Patna syllabus for Applied Science (1st Year) and specialized Engineering branches at GEC Lakhisarai. Download semester-wise course structures.",
+  keywords: [
+    "GEC Lakhisarai Syllabus",
+    "Applied Science and Humanities Syllabus",
+    "BEU Patna Engineering Curriculum",
+    "B.Tech 1st Year Syllabus Bihar",
+    "CSE AI Data Science Syllabus",
+  ],
+};
+
+// --- BRANCH DATA ---
+const DEPT_SYLLABUS = [
   {
-    id: 1,
-    branch: "CSE-AI",
-    semester: "3rd Sem",
-    subject: "B.Tech CSE (AI) Syllabus - 2024 Scheme",
-    date: "Aug 2024",
+    title: "Computer Science (AI)",
+    slug: "cse-ai",
+    icon: LuCpu,
+    color: "text-blue-600 bg-blue-50",
   },
   {
-    id: 2,
-    branch: "CSE-AI",
-    semester: "5th Sem",
-    subject: "B.Tech CSE (AI) Syllabus - 2023 Scheme",
-    date: "Aug 2023",
+    title: "Computer Science (DS)",
+    slug: "cse-ds",
+    icon: LuDatabase,
+    color: "text-indigo-600 bg-indigo-50",
   },
   {
-    id: 3,
-    branch: "Civil",
-    semester: "3rd Sem",
-    subject: "B.Tech Civil Engineering Syllabus - 2024 Scheme",
-    date: "Aug 2024",
+    title: "Civil Engineering",
+    slug: "civil",
+    icon: LuBuilding2,
+    color: "text-orange-600 bg-orange-50",
   },
   {
-    id: 4,
-    branch: "Civil",
-    semester: "5th Sem",
-    subject: "B.Tech Civil Engineering Syllabus - 2023 Scheme",
-    date: "Aug 2023",
+    title: "Electrical Engineering",
+    slug: "electrical",
+    icon: LuZap,
+    color: "text-yellow-600 bg-yellow-50",
   },
   {
-    id: 5,
-    branch: "Mechanical",
-    semester: "3rd Sem",
-    subject: "B.Tech Mechanical Syllabus - 2024 Scheme",
-    date: "Aug 2024",
-  },
-  {
-    id: 6,
-    branch: "Electrical",
-    semester: "3rd Sem",
-    subject: "B.Tech Electrical Syllabus - 2024 Scheme",
-    date: "Aug 2024",
-  },
-  {
-    id: 7,
-    branch: "Common",
-    semester: "1st Year",
-    subject: "1st Year Common Syllabus (All Branches)",
-    date: "July 2024",
+    title: "Mechanical Engineering",
+    slug: "mechanical",
+    icon: LuSettings,
+    color: "text-slate-600 bg-slate-100",
   },
 ];
 
-export default function SyllabusPage() {
-  const [activeTab, setActiveTab] = useState("All");
-
-  // Filter Logic
-  const filteredData =
-    activeTab === "All"
-      ? SYLLABUS_DATA
-      : SYLLABUS_DATA.filter(
-          (item) => item.branch === activeTab || item.branch === "Common",
-        );
-
+export default function SyllabusHubPage() {
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
-      {/* --- HERO SECTION --- */}
-      <section className="relative bg-gecl-primary text-white py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a,#1e293b)]"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-3xl md:text-5xl font-bold font-display mb-3">
-            Syllabus & Curriculum
-          </h1>
-          <p className="text-slate-300 max-w-2xl text-lg">
-            Download the latest AICTE & BEU approved course structure for your
-            branch.
-          </p>
-        </div>
-      </section>
-
-      <Breadcrumb
-        items={[
+    <main className="bg-slate-50 min-h-screen font-sans text-slate-900 pb-20">
+      {/* ================= HERO SECTION ================= */}
+      <PageHero
+        title="Curriculum & Syllabus"
+        badge="BEU Patna Standards"
+        icon={<LuBookOpen />}
+        description="Explore the academic roadmap for the Department of Applied Applied Science and all core Engineering branches."
+        image="/gecl/images/campus/college-building.webp"
+        className="bg-[#0f172a]"
+        themeColor="text-blue-400"
+        breadcrumbItems={[
           { label: "Home", href: "/" },
           { label: "Academics", href: "/academics" },
           { label: "Syllabus" },
         ]}
       />
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex flex-col lg:flex-row gap-12">
           {/* --- MAIN CONTENT --- */}
-          <main className="lg:w-3/4">
-            {/* Branch Filter Tabs */}
-            <div className="flex flex-wrap gap-2 mb-8">
-              {["All", "CSE-AI", "Civil", "Mechanical", "Electrical"].map(
-                (tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 border ${
-                      activeTab === tab
-                        ? "bg-gecl-primary text-white border-gecl-primary shadow-md"
-                        : "bg-white text-slate-600 border-slate-200 hover:border-gecl-primary hover:text-gecl-primary"
-                    }`}
-                  >
-                    {tab === "All" ? "All Branches" : tab}
-                  </button>
-                ),
-              )}
-            </div>
+          <div className="lg:w-3/4 space-y-16">
+            {/* 1. FOUNDATION: Applied Science */}
+            <section id="applied-science" className="scroll-mt-28">
+              <SectionHeader
+                title="Applied Applied Science"
+                icon={LuAtom}
+                subtitle="The foundation semesters for all engineering disciplines."
+              />
 
-            {/* Syllabus List */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                <h3 className="font-bold text-slate-700 flex items-center gap-2">
-                  <LuFileText className="text-gecl-accent" />
-                  Available Documents
-                </h3>
-                <span className="text-xs text-slate-500 bg-white px-2 py-1 rounded border border-slate-200">
-                  Total: {filteredData.length}
-                </span>
+              <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-200 shadow-sm relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full pointer-events-none opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+
+                <div className="relative z-10">
+                  <h3 className="text-2xl font-black text-slate-800 mb-4">
+                    First Year Curriculum
+                  </h3>
+                  <p className="text-slate-600 mb-8 leading-relaxed max-w-2xl">
+                    All undergraduate students at GEC Lakhisarai begin their
+                    journey with the Department of Applied Applied Science,
+                    mastering the fundamental concepts of physics, chemistry,
+                    and mathematics.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Sem 1 Card */}
+                    <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-200 hover:border-blue-400 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                          01
+                        </span>
+                        <h4 className="font-bold text-slate-800">
+                          1st Semester
+                        </h4>
+                      </div>
+                      <p className="text-xs text-slate-500 mb-6">
+                        Physics, Math-I, Basic Electrical, and Graphics modules.
+                      </p>
+                      <Link
+                        href="/departments/applied-science/syllabus"
+                        className="text-sm font-black text-blue-600 flex items-center gap-2 hover:gap-3 transition-all"
+                      >
+                        Detailed Syllabus <LuArrowRight size={16} />
+                      </Link>
+                    </div>
+
+                    {/* Sem 2 Card */}
+                    <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-200 hover:border-emerald-400 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">
+                          02
+                        </span>
+                        <h4 className="font-bold text-slate-800">
+                          2nd Semester
+                        </h4>
+                      </div>
+                      <p className="text-xs text-slate-500 mb-6">
+                        Chemistry, Math-II, PPS, and Workshop modules.
+                      </p>
+                      <Link
+                        href="/departments/applied-science/syllabus"
+                        className="text-sm font-black text-emerald-600 flex items-center gap-2 hover:gap-3 transition-all"
+                      >
+                        Detailed Syllabus <LuArrowRight size={16} />
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 pt-8 border-t border-slate-100 flex justify-center md:justify-start">
+                    <Link
+                      href="/departments/applied-science/syllabus"
+                      className="bg-[#0f172a] text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg"
+                    >
+                      Visit Department Syllabus Page{" "}
+                      <LuExternalLink size={14} />
+                    </Link>
+                  </div>
+                </div>
               </div>
+            </section>
 
-              <div className="divide-y divide-slate-100">
-                {filteredData.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-5 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 group"
+            {/* 2. CORE ENGINEERING BRANCHES */}
+            <section id="engineering-branches" className="scroll-mt-28">
+              <SectionHeader
+                title="Engineering Specializations"
+                icon={LuFileText}
+                subtitle="Course structures for Semester 3 to Semester 8."
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                {DEPT_SYLLABUS.map((dept) => (
+                  <Link
+                    key={dept.slug}
+                    href={`/departments/${dept.slug}/syllabus`}
+                    className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all flex items-center justify-between"
                   >
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <LuBookOpen className="w-6 h-6" />
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`p-3 rounded-xl shrink-0 transition-transform group-hover:scale-110 duration-300 ${dept.color}`}
+                      >
+                        <dept.icon size={20} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-800 text-sm md:text-base mb-1 group-hover:text-gecl-primary transition-colors">
-                          {item.subject}
-                        </h4>
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-                          <span className="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-medium text-slate-600">
-                            {item.branch}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-gecl-accent"></span>
-                            {item.semester}
-                          </span>
-                          <span>Updated: {item.date}</span>
-                        </div>
+                        <h3 className="text-base font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
+                          {dept.title}
+                        </h3>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                          Branch Core
+                        </p>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-3 md:ml-auto pl-14 md:pl-0">
-                      {/* View Button */}
-                      <button className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-gecl-primary border border-gecl-primary/30 rounded-lg hover:bg-gecl-primary hover:text-white transition-all">
-                        <LuEye className="w-4 h-4" /> View
-                      </button>
-
-                      {/* Download Button (Optional if different) */}
-                      {/* <button className="p-2 text-slate-400 hover:text-gecl-accent transition-colors" title="Download PDF">
-                        <LuDownload className="w-5 h-5" />
-                      </button> */}
-                    </div>
-                  </div>
+                    <LuArrowRight
+                      className="text-slate-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all"
+                      size={18}
+                    />
+                  </Link>
                 ))}
-
-                {filteredData.length === 0 && (
-                  <div className="p-12 text-center text-slate-500">
-                    <LuFileText className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                    <p>No syllabus documents found for this category.</p>
-                  </div>
-                )}
               </div>
-            </div>
-          </main>
+            </section>
+          </div>
 
           {/* --- SIDEBAR --- */}
           <aside className="lg:w-1/4 space-y-8">
-            <div className="sticky top-28">
-              {/* Navigation Widget (Cleaned Up) */}
-              <div className="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
-                <div className="bg-gecl-primary p-4">
-                  <h3 className="text-white font-bold flex items-center gap-2">
-                    <LuBookOpen className="text-gecl-secondary" />
-                    Academics
-                  </h3>
-                </div>
-                <nav className="p-2 flex flex-col gap-1">
-                  <SidebarLink
-                    href="/academics/programs"
-                    label="Programs Offered"
-                  />
-                  <SidebarLink
-                    href="/academics/calendar"
-                    label="Academic Calendar"
-                  />
-                  <SidebarLink
-                    href="/academics/syllabus"
-                    label="Syllabus"
-                    active
-                  />
-                  <SidebarLink
-                    href="/academics/timetable"
-                    label="Class Routine"
-                  />
-                  <SidebarLink
-                    href="/academics/rules-regulations"
-                    label="Rules & Regulations"
-                  />
-                  <SidebarLink
-                    href="/academics/anti-ragging"
-                    label="Anti-Ragging Policy"
-                  />
-                </nav>
-              </div>
+            <div className="sticky top-28 space-y-8">
+              <SidebarNavigation
+                title="Curriculum Hub"
+                links={[
+                  {
+                    label: "Applied Science",
+                    href: "#applied-science",
+                  },
+                  {
+                    label: "Engineering Branches",
+                    href: "#engineering-branches",
+                  },
+                  { label: "Academic Calendar", href: "/academics/calendar" },
+                  {
+                    label: "Examination Rules",
+                    href: "/academics/rules-regulations",
+                  },
+                ]}
+              />
 
-              {/* --- ADMISSION MODES WIDGET --- */}
-              <div className="bg-gradient-to-br from-indigo-50 to-white rounded-xl shadow-md border border-indigo-100 p-5">
-                <h4 className="font-bold text-indigo-900 mb-4 flex items-center gap-2">
-                  <FaCheckCircle className="text-indigo-600" />
-                  Ways to Admission
-                </h4>
-
+              <SidebarWidget title="Official PDF" variant="info">
                 <div className="space-y-4">
-                  {/* Mode 1 */}
-                  <div className="flex gap-3">
-                    <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                      1
-                    </div>
-                    <div>
-                      <h5 className="text-sm font-bold text-slate-800">
-                        JEE Mains + UGEAC
-                      </h5>
-                      <p className="text-xs text-slate-500 leading-snug">
-                        Primary mode for 1st Year B.Tech via BCECE counselling
-                        based on JEE rank.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Mode 2 */}
-                  <div className="flex gap-3">
-                    <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                      2
-                    </div>
-                    <div>
-                      <h5 className="text-sm font-bold text-slate-800">
-                        BCECE Board Exam
-                      </h5>
-                      <p className="text-xs text-slate-500 leading-snug">
-                        State level entrance for filling remaining vacant seats
-                        (if any).
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Mode 3 */}
-                  <div className="flex gap-3">
-                    <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                      3
-                    </div>
-                    <div>
-                      <h5 className="text-sm font-bold text-slate-800">
-                        BCECE (Lateral Entry)
-                      </h5>
-                      <p className="text-xs text-slate-500 leading-snug">
-                        Direct 2nd Year admission for Diploma/B.Sc holders via
-                        LE exam.
-                      </p>
-                    </div>
-                  </div>
+                  <p className="text-xs text-indigo-900 font-medium leading-relaxed">
+                    Download the complete BEU Patna 2023-Scheme credit
+                    distribution.
+                  </p>
+                  <button className="bg-white text-indigo-600 w-full py-2.5 rounded-xl border border-indigo-200 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-indigo-600 hover:text-white transition-all">
+                    <LuDownload size={14} /> Download BEU Master PDF
+                  </button>
                 </div>
-
-                <Link
-                  href="/notices"
-                  className="mt-6 flex items-center justify-center gap-2 w-full py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:border-gecl-primary hover:text-gecl-primary transition-all shadow-sm"
-                >
-                  <LuBell className="w-3.5 h-3.5" />
-                  View All Admission Notices
-                </Link>
-              </div>
+              </SidebarWidget>
             </div>
           </aside>
         </div>
       </div>
-    </div>
-  );
-}
-
-// --- HELPER COMPONENT ---
-function SidebarLink({
-  href,
-  label,
-  active = false,
-}: {
-  href: string;
-  label: string;
-  active?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-lg transition-all ${
-        active
-          ? "bg-gecl-primary text-white shadow-md"
-          : "text-slate-600 hover:bg-slate-50 hover:text-gecl-primary hover:pl-5"
-      }`}
-    >
-      {label}
-      {active && <LuArrowRight className="w-4 h-4" />}
-    </Link>
+    </main>
   );
 }
