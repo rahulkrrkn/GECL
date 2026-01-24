@@ -148,10 +148,21 @@ export default function Footer() {
           <div>
             <FooterHeading icon={<FaBookOpen />} title="Academics" />
             <ul className="space-y-2.5">
-              <FooterLink href="/dept/cse">Computer Science & Engg.</FooterLink>
-              <FooterLink href="/dept/civil">Civil Engineering</FooterLink>
-              <FooterLink href="/dept/mech">Mechanical Engineering</FooterLink>
-              <FooterLink href="/dept/eee">Electrical & Electronics</FooterLink>
+              <FooterLink href="/departments/cse-ai">
+                Computer Science & Engg. AI
+              </FooterLink>
+              <FooterLink href="/departments/cse-ds">
+                Computer Science & Engg. DS
+              </FooterLink>
+              <FooterLink href="/departments/civil">
+                Civil Engineering
+              </FooterLink>
+              <FooterLink href="/departments/mechanical">
+                Mechanical Engineering
+              </FooterLink>
+              <FooterLink href="/departments/electrical">
+                Electrical & Electronics
+              </FooterLink>
               <FooterLink href="/academics/syllabus">
                 Syllabus & Curriculum
               </FooterLink>
@@ -192,10 +203,10 @@ export default function Footer() {
           <div>
             <FooterHeading icon={<FaUserGraduate />} title="Student Life" />
             <ul className="space-y-2.5">
-              <FooterLink href="/facilities/library">
+              <FooterLink href="/campus-life/library">
                 Central Library
               </FooterLink>
-              <FooterLink href="/facilities/hostel">
+              <FooterLink href="/campus-life/hostel">
                 Hostels (Boys/Girls)
               </FooterLink>
               <FooterLink href="/placement">Training & Placement</FooterLink>

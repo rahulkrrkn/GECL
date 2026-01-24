@@ -20,10 +20,11 @@ import {
   SidebarNavigation,
   SidebarWidget,
   FeatureItem,
+  ImageCard, // Added for better visuals
 } from "@/gecl/components/ui";
 
 export const metadata: Metadata = {
-  title: "Eligibility Criteria | Admission 2025 | GECL Lakhisarai",
+  title: "Eligibility Criteria | Admission  | GECL Lakhisarai",
   description:
     "Check eligibility criteria for B.Tech admission at Government Engineering College Lakhisarai. Details on JEE Main, UGEAC, BCECE Lateral Entry, and domicile requirements.",
   openGraph: {
@@ -35,7 +36,6 @@ export const metadata: Metadata = {
 };
 
 const EligibilityPage = () => {
-  // ✅ Fixed: Using 'href' to match PageHeroProps
   const breadcrumbItems = [
     { label: "Home", href: "/" },
     { label: "Admissions", href: "/admissions" },
@@ -44,11 +44,15 @@ const EligibilityPage = () => {
 
   return (
     <main className="bg-gecl-background min-h-screen pb-16">
-      {/* ✅ Fixed: Using 'image' and 'breadcrumbItems' props exactly as per interface */}
+      {/* ================= HERO SECTION ================= */}
       <PageHero
         title="Eligibility Criteria"
+        badge="Admission "
+        icon={<FaUserGraduate />}
         description="Detailed academic prerequisites, entrance exam requirements, and domicile rules for B.Tech Admission at GECL."
         image="/gecl/images/admissions/ugeac-counselling.webp"
+        className="bg-indigo-950" // Custom Theme
+        themeColor="text-indigo-400"
         breadcrumbItems={breadcrumbItems}
       />
 
@@ -92,7 +96,6 @@ const EligibilityPage = () => {
 
             {/* 2. B.Tech (4 Years) Eligibility */}
             <section id="btech-regular">
-              {/* ✅ Fixed: Removed 'subtitle' (not in interface). Added it as <p> below. */}
               <SectionHeader
                 title="B.Tech (1st Year) Eligibility"
                 icon={FaUserGraduate}
@@ -102,7 +105,6 @@ const EligibilityPage = () => {
               </p>
 
               <div className="bg-gecl-surface rounded-xl shadow-sm border border-gecl-border overflow-hidden p-6 space-y-6">
-                {/* ✅ Fixed: Changed 'description' -> 'text' to match FeatureItemProps */}
                 <FeatureItem
                   title="Entrance Examination"
                   text="Must have a valid score in Joint Entrance Examination (JEE) Main conducted by NTA."
@@ -249,8 +251,6 @@ const EligibilityPage = () => {
 
           {/* ==================== Sidebar Area ==================== */}
           <div className="lg:col-span-1 space-y-8">
-            {/* ✅ Fixed: Changed 'path' -> 'href' to fix the unique key error */}
-            {/* Removed 'active' prop as it's not in your Interface */}
             <SidebarNavigation
               title="Admissions"
               links={[
@@ -291,7 +291,7 @@ const EligibilityPage = () => {
                     href="#"
                     className="flex items-center gap-2 text-sm text-gecl-primary hover:text-gecl-accent transition"
                   >
-                    <FaFileAlt className="text-red-500" /> UGEAC Prospectus 2025
+                    <FaFileAlt className="text-red-500" /> UGEAC Prospectus 
                   </a>
                 </li>
                 <li>

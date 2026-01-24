@@ -1,21 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Breadcrumb } from "@/gecl/components/ui/";
 import {
   LuGraduationCap,
   LuCalendarDays,
   LuBookOpen,
   LuClock,
   LuScale,
-  LuShieldAlert,
   LuArrowRight,
   LuAward,
   LuFileText,
+  LuLibrary,
 } from "react-icons/lu";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle,  } from "react-icons/fa";
+
+// Import Reusable Components
+import { PageHero,  StatCard } from "@/gecl/components/ui";
+
 // --- SEO METADATA ---
 export const metadata: Metadata = {
-  title: "Academics | Government Engineering College, Lakhisarai",
+  title: "Academics | B.Tech Programs & Resources | GEC Lakhisarai",
   description:
     "Central hub for GEC Lakhisarai academics. Access B.Tech programs, syllabus, academic calendar, class routines, and examination rules.",
   keywords: [
@@ -29,7 +32,7 @@ export const metadata: Metadata = {
     title: "Academics | GEC Lakhisarai",
     description:
       "Excellence in Technical Education. Explore our programs and academic resources.",
-    url: "/academics",
+    url: "https://geclakhisarai.ac.in/academics",
     type: "website",
     images: [
       {
@@ -42,7 +45,7 @@ export const metadata: Metadata = {
   },
 };
 
-// --- NAVIGATION CARDS ---
+// --- NAVIGATION SECTIONS ---
 const ACADEMIC_SECTIONS = [
   {
     title: "Academic Programs",
@@ -50,7 +53,7 @@ const ACADEMIC_SECTIONS = [
     href: "/academics/programs",
     icon: LuGraduationCap,
     color: "bg-blue-600",
-    bg: "bg-blue-50 border-blue-100",
+    theme: "text-blue-600 border-blue-100 bg-blue-50/50",
   },
   {
     title: "Syllabus & Curriculum",
@@ -58,7 +61,7 @@ const ACADEMIC_SECTIONS = [
     href: "/academics/syllabus",
     icon: LuBookOpen,
     color: "bg-indigo-600",
-    bg: "bg-indigo-50 border-indigo-100",
+    theme: "text-indigo-600 border-indigo-100 bg-indigo-50/50",
   },
   {
     title: "Academic Calendar",
@@ -66,7 +69,7 @@ const ACADEMIC_SECTIONS = [
     href: "/academics/calendar",
     icon: LuCalendarDays,
     color: "bg-emerald-600",
-    bg: "bg-emerald-50 border-emerald-100",
+    theme: "text-emerald-600 border-emerald-100 bg-emerald-50/50",
   },
   {
     title: "Class Routine",
@@ -74,7 +77,7 @@ const ACADEMIC_SECTIONS = [
     href: "/academics/timetable",
     icon: LuClock,
     color: "bg-orange-600",
-    bg: "bg-orange-50 border-orange-100",
+    theme: "text-orange-600 border-orange-100 bg-orange-50/50",
   },
   {
     title: "Attendance Policy",
@@ -82,7 +85,7 @@ const ACADEMIC_SECTIONS = [
     href: "/academics/attendance-policy",
     icon: FaCheckCircle,
     color: "bg-teal-600",
-    bg: "bg-teal-50 border-teal-100",
+    theme: "text-teal-600 border-teal-100 bg-teal-50/50",
   },
   {
     title: "Rules & Regulations",
@@ -90,156 +93,189 @@ const ACADEMIC_SECTIONS = [
     href: "/academics/rules-regulations",
     icon: LuScale,
     color: "bg-slate-600",
-    bg: "bg-slate-100 border-slate-200",
-  },
-  {
-    title: "Anti-Ragging",
-    desc: "Zero Tolerance Policy. Access helpline numbers and report incidents immediately.",
-    href: "/academics/anti-ragging",
-    icon: LuShieldAlert,
-    color: "bg-red-600",
-    bg: "bg-red-50 border-red-100",
+    theme: "text-slate-600 border-slate-200 bg-slate-100/50",
   },
 ];
 
 export default function AcademicsHubPage() {
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
-      {/* --- HERO SECTION --- */}
-      <section className="relative bg-gecl-primary text-white py-20 lg:py-24 overflow-hidden">
-        {/* Background Overlay */}
-        <div className="absolute inset-0 bg-[url('/gecl/images/academic-building.webp')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-gecl-primary via-gecl-primary/95 to-gecl-primary/80"></div>
-
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <span className="inline-block py-1 px-3 rounded-full bg-gecl-accent/20 border border-gecl-accent/30 text-gecl-accent font-semibold text-sm mb-4 backdrop-blur-sm">
-            Knowledge & Innovation
-          </span>
-          <h1 className="text-4xl md:text-6xl font-bold font-display mb-6 tracking-tight">
-            Academic Excellence
-          </h1>
-          <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed">
-            Empowering students with a rigorous curriculum, practical exposure,
-            and a disciplined learning environment.
-          </p>
-        </div>
-      </section>
-
-      {/* --- BREADCRUMB --- */}
-        <Breadcrumb
-          items={[{ label: "Home", href: "/" }, { label: "Academics" }]}
-        />
+    <main className="bg-slate-50 min-h-screen font-sans text-slate-800 pb-16">
+      {/* ================= HERO SECTION ================= */}
+      <PageHero
+        title="Academic Excellence"
+        badge="Quality Education"
+        icon={<LuLibrary />}
+        description="Empowering students with a rigorous curriculum, hands-on practical exposure, and a disciplined learning environment designed for the engineers of tomorrow."
+        image="/gecl/images/academic-building.webp"
+        className="bg-gecl-primary"
+        themeColor="text-gecl-accent"
+        breadcrumbItems={[{ label: "Home", href: "/" }, { label: "Academics" }]}
+      />
 
       <div className="container mx-auto px-4 py-16">
-        {/* --- INTRODUCTION STATS --- */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16 border-b border-slate-200 pb-16">
-          <div className="text-center">
-            <div className="inline-flex p-3 bg-blue-50 text-blue-600 rounded-2xl mb-4">
-              <LuAward className="w-8 h-8" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-800">AICTE Approved</h3>
-            <p className="text-slate-500 text-sm">
-              All programs approved by All India Council for Technical
-              Education.
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="inline-flex p-3 bg-orange-50 text-orange-600 rounded-2xl mb-4">
-              <LuFileText className="w-8 h-8" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-800">BEU Affiliated</h3>
-            <p className="text-slate-500 text-sm">
-              Curriculum and examinations conducted by Bihar Engineering
-              University.
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="inline-flex p-3 bg-green-50 text-green-600 rounded-2xl mb-4">
-              <LuGraduationCap className="w-8 h-8" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-800">
-              NBA Accredited*
-            </h3>
-            <p className="text-slate-500 text-sm">
-              Striving for excellence with outcome-based education standards.
-            </p>
-          </div>
+        {/* --- INSTITUTIONAL AFFILIATIONS --- */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+          <StatCard
+            icon={<LuAward />}
+            number="AICTE"
+            label="Approved Intake"
+            variant="light"
+          />
+          <StatCard
+            icon={<LuFileText />}
+            number="BEU"
+            label="Affiliated University"
+            variant="light"
+          />
+          <StatCard
+            icon={<LuGraduationCap />}
+            number="B.Tech"
+            label="Degree Program"
+            variant="light"
+          />
         </div>
 
         {/* --- MAIN NAVIGATION GRID --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {ACADEMIC_SECTIONS.map((item, idx) => (
-            <Link
-              key={idx}
-              href={item.href}
-              className={`group relative p-8 rounded-2xl border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col h-full ${item.bg}`}
-            >
-              <div className="flex items-center justify-between mb-6">
+        <section className="mb-24">
+          <SectionHeader
+            title="Academic Resources"
+            subtitle="Everything you need for your academic journey at GECL"
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+            {ACADEMIC_SECTIONS.map((item, idx) => (
+              <Link
+                key={idx}
+                href={item.href}
+                className={`group relative p-8 rounded-3xl border transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl flex flex-col h-full bg-white border-slate-100`}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div
+                    className={`p-4 rounded-2xl text-white shadow-lg ${item.color}`}
+                  >
+                    <item.icon className="w-6 h-6" />
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-gecl-primary group-hover:text-white transition-all">
+                    <LuArrowRight className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-gecl-primary transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
+                  {item.desc}
+                </p>
+
                 <div
-                  className={`p-3.5 rounded-xl text-white shadow-md ${item.color}`}
+                  className={`inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest py-2 px-4 rounded-full border ${item.theme}`}
                 >
-                  <item.icon className="w-6 h-6" />
+                  Explore <LuArrowRight className="w-3 h-3" />
                 </div>
-                <div className="w-8 h-8 rounded-full bg-white/50 flex items-center justify-center text-slate-400 group-hover:bg-white group-hover:text-gecl-primary transition-colors">
-                  <LuArrowRight className="w-4 h-4" />
-                </div>
-              </div>
+              </Link>
+            ))}
+          </div>
+        </section>
 
-              <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-gecl-primary transition-colors">
-                {item.title}
-              </h3>
-              <p className="text-slate-600 text-sm leading-relaxed mb-4 flex-grow">
-                {item.desc}
+        {/* --- QUICK ACTION BANNER --- */}
+        <div className="grid md:grid-cols-2 gap-8 mt-12">
+          <Link
+            href="/academics/timetable"
+            className="relative overflow-hidden rounded-3xl bg-orange-600 p-8 text-white group shadow-xl"
+          >
+            <div className="absolute -right-10 -top-10 text-white/10 group-hover:scale-110 transition-transform duration-500">
+              <LuClock size={200} />
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-2xl font-bold mb-2">Class Routine</h3>
+              <p className="text-orange-100 mb-6 text-sm max-w-xs">
+                Don't miss a lecture. Check your batch's daily timetable and lab
+                schedules.
               </p>
-
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 group-hover:text-gecl-primary mt-auto">
-                View Details
+              <span className="bg-white text-orange-600 px-6 py-2 rounded-full font-bold text-sm shadow-lg">
+                View Timetable
               </span>
-            </Link>
-          ))}
+            </div>
+          </Link>
+
+          <Link
+            href="/academics/syllabus"
+            className="relative overflow-hidden rounded-3xl bg-indigo-600 p-8 text-white group shadow-xl"
+          >
+            <div className="absolute -right-10 -top-10 text-white/10 group-hover:scale-110 transition-transform duration-500">
+              <LuBookOpen size={200} />
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-2xl font-bold mb-2">Detailed Syllabus</h3>
+              <p className="text-indigo-100 mb-6 text-sm max-w-xs">
+                Stay ahead in your studies. Download the subject-wise curriculum
+                for all branches.
+              </p>
+              <span className="bg-white text-indigo-600 px-6 py-2 rounded-full font-bold text-sm shadow-lg">
+                Download Syllabus
+              </span>
+            </div>
+          </Link>
         </div>
 
         {/* --- ADMISSION CTA SECTION --- */}
-        <div className="mt-20 bg-slate-900 rounded-3xl p-8 md:p-12 relative overflow-hidden text-center md:text-left">
-          {/* Decorative Blobs */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gecl-accent/20 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
+        <div className="mt-24 bg-slate-900 rounded-[3rem] p-8 md:p-16 relative overflow-hidden text-center md:text-left border border-slate-800">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gecl-accent/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
 
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div>
-              <h2 className="text-3xl font-bold text-white mb-4">
-                Ready to join GEC Lakhisarai?
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+            <div className="max-w-2xl">
+              <span className="inline-block py-1 px-3 rounded-full bg-gecl-accent/10 border border-gecl-accent/20 text-gecl-accent text-xs font-bold uppercase tracking-widest mb-6">
+                Admission Portal
+              </span>
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
+                Aspiring to be an Engineer? <br />
+                <span className="text-gecl-accent">Join GEC Lakhisarai.</span>
               </h2>
-              <p className="text-slate-400 max-w-xl">
-                Admissions are open for the 2026-27 academic session through JEE
-                Mains, BCECE, and Lateral Entry modes.
+              <p className="text-slate-400 text-lg leading-relaxed mb-8">
+                Admissions for the 2026-27 session are conducted via the Bihar
+                UGEAC counseling process based on your JEE Main scores.
               </p>
 
-              <div className="flex flex-wrap gap-4 mt-6 justify-center md:justify-start">
-                <div className="flex items-center gap-2 text-sm text-slate-300 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
-                  <span className="w-2 h-2 rounded-full bg-green-400"></span>{" "}
-                  JEE Mains
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-300 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
-                  <span className="w-2 h-2 rounded-full bg-blue-400"></span>{" "}
-                  BCECE
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-300 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
-                  <span className="w-2 h-2 rounded-full bg-yellow-400"></span>{" "}
-                  Lateral Entry
-                </div>
+              <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                {["JEE Mains", "BCECE", "Lateral Entry"].map((tag) => (
+                  <div
+                    key={tag}
+                    className="flex items-center gap-2 text-sm text-slate-300 bg-white/5 px-4 py-2 rounded-xl border border-white/10"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-gecl-accent"></span>{" "}
+                    {tag}
+                  </div>
+                ))}
               </div>
             </div>
 
             <Link
               href="/admissions/how-to-apply"
-              className="flex-shrink-0 px-8 py-4 bg-gecl-accent text-white font-bold rounded-xl hover:bg-orange-600 transition-colors shadow-lg shadow-orange-900/30 flex items-center gap-2"
+              className="flex-shrink-0 px-10 py-5 bg-gecl-accent text-white font-black rounded-2xl hover:bg-orange-600 transition-all shadow-2xl shadow-orange-950/40 flex items-center gap-3 transform hover:-translate-y-1"
             >
-              Apply Now <LuArrowRight className="w-5 h-5" />
+              Apply Now <LuArrowRight className="w-6 h-6" />
             </Link>
           </div>
         </div>
       </div>
+    </main>
+  );
+}
+
+// --- LOCAL COMPONENT HELPERS ---
+function SectionHeader({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <div className="text-center max-w-2xl mx-auto">
+      <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+        {title}
+      </h2>
+      <p className="text-slate-500">{subtitle}</p>
+      <div className="w-20 h-1.5 bg-gecl-accent mx-auto mt-6 rounded-full"></div>
     </div>
   );
 }

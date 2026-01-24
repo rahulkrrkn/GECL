@@ -23,6 +23,12 @@ import {
   FaArrowRightToBracket,
   FaChair,
   FaCircleQuestion,
+  FaFutbol,
+  FaUtensils,
+  FaVirus,
+  FaUsers,
+  FaBook,
+  FaMicroscope,
 } from "react-icons/fa6";
 
 // ✅ Roles (Updated)
@@ -53,11 +59,15 @@ export interface MenuItem {
 // ✅ Single Menu Config Only (Public + Role Protected)
 export const menuConfig: MenuItem[] = [
   // ---------------- PUBLIC MENU ----------------
+
+  // ✅ Home
   {
     label: "Home",
     href: "/",
     icon: FaHouse,
   },
+
+  // ✅ About
   {
     label: "About",
     href: "/about",
@@ -83,8 +93,15 @@ export const menuConfig: MenuItem[] = [
         href: "/about/administration",
         icon: FaUsersGear,
       },
+      {
+        label: "Board of Governors (BOG)",
+        href: "/about/bog",
+        icon: FaUsers,
+      },
     ],
   },
+
+  // ✅ Academics
   {
     label: "Academics",
     href: "/academics",
@@ -100,16 +117,6 @@ export const menuConfig: MenuItem[] = [
         href: "/academics/calendar",
         icon: FaCalendarDays,
       },
-      // {
-      //   label: "Timetable",
-      //   href: "/academics/timetable",
-      //   icon: FaClock,
-      // },
-      // {
-      //   label: "Syllabus",
-      //   href: "/academics/syllabus",
-      //   icon: FaFileLines,
-      // },
       {
         label: "Rules & Regulations",
         href: "/academics/rules-regulations",
@@ -127,6 +134,8 @@ export const menuConfig: MenuItem[] = [
       },
     ],
   },
+
+  // ✅ Admissions
   {
     label: "Admissions",
     href: "/admissions",
@@ -183,5 +192,61 @@ export const menuConfig: MenuItem[] = [
         icon: FaCircleQuestion,
       },
     ],
+  },
+
+  // ✅ Campus Life
+  {
+    label: "Campus Life",
+    href: "/campus-life",
+    icon: FaBuildingColumns,
+    children: [
+      {
+        label: "Hostel",
+        href: "/campus-life/hostel",
+        icon: FaBed,
+      },
+      {
+        label: "Academic Facilities",
+        href: "/campus-life/academic-facilities",
+        icon: FaGraduationCap,
+      },
+      {
+        label: "Sports",
+        href: "/campus-life/sports",
+        icon: FaFutbol,
+      },
+      {
+        label: "Food",
+        href: "/campus-life/food",
+        icon: FaUtensils,
+      },
+      {
+        label: "Health & Safety",
+        href: "/campus-life/health-safety",
+        icon: FaVirus,
+      },
+      {
+        label: "Clubs & Events",
+        href: "/campus-life/clubs-events",
+        icon: FaUsers,
+      },
+      {
+        label: "Library",
+        href: "/campus-life/library",
+        icon: FaBook,
+      },
+      {
+        label: "Labs",
+        href: "/campus-life/labs",
+        icon: FaMicroscope,
+      },
+    ],
+  },
+
+  // ✅ All Links
+  {
+    label: "All Links",
+    href: "/links",
+    icon: FaHouse,
   },
 ];

@@ -11,8 +11,9 @@ import {
   LuWifi,
   LuCoffee,
   LuHouse,
-  LuUser,
+  LuArrowRight,
 } from "react-icons/lu";
+import { FaBuildingColumns, FaMapLocationDot } from "react-icons/fa6";
 
 // Import Reusable Components
 import {
@@ -26,43 +27,29 @@ import {
 
 // --- SEO METADATA ---
 export const metadata: Metadata = {
-  title: "About College | Government Engineering College, Lakhisarai",
+  title: "About College | GEC Lakhisarai | Legacy of Technical Excellence",
   description:
-    "Established in 2019, GEC Lakhisarai is a premier AICTE-approved government institute affiliated with Bihar Engineering University, offering B.Tech in CSE, Civil, Mechanical, and Electrical Engineering.",
+    "Established in 2019 under the 'Saat Nischay' program, GEC Lakhisarai is an AICTE-approved premier government institute affiliated with Bihar Engineering University (BEU).",
   keywords: [
     "About GEC Lakhisarai",
     "History of GEC Lakhisarai",
     "Best Government Engineering College Bihar",
-    "B.Tech Admission Lakhisarai",
-    "GEC Lakhisarai Infrastructure",
     "Bihar Engineering University Affiliated Colleges",
+    "GEC Lakhisarai Faculty",
   ],
-  openGraph: {
-    title: "About Government Engineering College, Lakhisarai",
-    description:
-      "Discover our journey from 2019 to becoming a center of technical excellence in Bihar.",
-    url: "https://www.geclakhisarai.ac.in/about/college",
-    type: "website",
-    images: [
-      {
-        url: "/gecl/images/college-building-main.webp",
-        width: 1200,
-        height: 630,
-        alt: "GEC Lakhisarai Administrative Building",
-      },
-    ],
-  },
 };
 
 export default function AboutCollegePage() {
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
-      {/* 1. REUSABLE HERO SECTION */}
+    <main className="bg-slate-50 min-h-screen font-sans text-slate-800 pb-16">
+      {/* 1. HERO SECTION */}
       <PageHero
         title="A Legacy of Technical Excellence"
         description="Government Engineering College, Lakhisarai is dedicated to fostering innovation and empowering the youth of Bihar with world-class technical education."
         badge="Estd. 2019 • AICTE Approved"
         image="/gecl/images/college-building-main.webp"
+        className="bg-gecl-primary"
+        themeColor="text-gecl-accent"
         breadcrumbItems={[
           { label: "Home", href: "/" },
           { label: "About", href: "/about" },
@@ -78,31 +65,31 @@ export default function AboutCollegePage() {
             <section id="history" className="scroll-mt-28">
               <SectionHeader title="Our History & Inception" icon={LuHistory} />
 
-              <div className="prose prose-lg text-slate-600 max-w-none">
-                <p>
+              <div className="prose prose-lg text-slate-600 max-w-none mb-10">
+                <p className="leading-relaxed">
                   Government Engineering College (GEC), Lakhisarai was
                   established on <strong>25th September 2019</strong>. The
                   foundation stone was laid and the institution was inaugurated
-                  by the Honorable Chief Minister of Bihar,{" "}
-                  <strong>Shri Nitish Kumar</strong>.
+                  by the Honorable Chief Minister of Bihar,
+                  <strong> Shri Nitish Kumar</strong>.
                 </p>
-                <p>
-                  Created under the visionary <strong>"Saat Nischay"</strong>{" "}
+
+                <p className="leading-relaxed">
+                  Created under the visionary <strong>"Saat Nischay"</strong>
                   (Seven Resolves) program of the Bihar Government, the college
                   operates under the Department of Science, Technology &
-                  Technical Education. While initially affiliated with
-                  Aryabhatta Knowledge University (AKU), it is now proudly
-                  affiliated with the newly formed{" "}
-                  <strong>Bihar Engineering University (BEU), Patna</strong>.
+                  Technical Education (DSTTE). It is now proudly affiliated with
+                  the <strong>Bihar Engineering University (BEU), Patna</strong>
+                  .
                 </p>
               </div>
 
-              {/* Quick Stats Grid using Reusable StatCard */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+              {/* Quick Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <StatCard number="2019" label="Established" variant="light" />
                 <StatCard number="AICTE" label="Approved" variant="light" />
                 <StatCard number="BEU" label="Affiliated" variant="light" />
-                <StatCard number="300+" label="Intake/Year" variant="light" />
+                <StatCard number="360" label="Annual Intake" variant="light" />
               </div>
             </section>
 
@@ -110,17 +97,22 @@ export default function AboutCollegePage() {
             <section id="campus" className="scroll-mt-28">
               <SectionHeader title="Campus Infrastructure" icon={LuBuilding2} />
 
-              <div className="relative h-100 rounded-2xl overflow-hidden shadow-xl mb-8 group">
+              <div className="relative h-96 rounded-3xl overflow-hidden shadow-2xl mb-10 group border-4 border-white">
                 <Image
                   src="/gecl/images/college-building-main.webp"
                   alt="GEC Lakhisarai Campus View"
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="object-cover group-hover:scale-105 transition-transform duration-1000"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent flex items-end p-8">
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent flex items-end p-8">
                   <div className="text-white">
-                    <h3 className="text-xl font-bold">Shivsona Road Campus</h3>
-                    <p className="opacity-90">Located in Kharsari, Chandwara</p>
+                    <span className="inline-block px-3 py-1 bg-gecl-accent text-white text-[10px] font-bold uppercase tracking-widest rounded-full mb-3">
+                      Campus Main View
+                    </span>
+                    <h3 className="text-2xl font-bold">Shivsona Road Campus</h3>
+                    <p className="opacity-90 flex items-center gap-2 text-sm mt-1">
+                      <LuMapPin size={14} /> Kharsari, Chandwara, Lakhisarai
+                    </p>
                   </div>
                 </div>
               </div>
@@ -129,97 +121,102 @@ export default function AboutCollegePage() {
                 <FeatureItem
                   icon={LuBookOpen}
                   title="Central Library"
-                  text="Home to over 21,000+ technical books, digital journals, and a spacious reading room with Wi-Fi connectivity."
+                  text="Equipped with 21,000+ volumes, NDL access, and digital journals. A dedicated study zone for 150+ students."
                 />
                 <FeatureItem
                   icon={LuWifi}
-                  title="Smart Campus"
-                  text="High-speed internet access across academic blocks, administrative buildings, and computer centers."
+                  title="Fiber-Optic WiFi"
+                  text="High-speed internet connectivity across all academic blocks and administrative centers for seamless research."
                 />
                 <FeatureItem
                   icon={LuHouse}
-                  title="Hostels"
-                  text="Separate, secure hostels for Boys and Girls with mess facilities, ensuring a comfortable stay for outstation students."
+                  title="Residential Facility"
+                  text="Separate high-security hostels for Boys and Girls with modern mess facilities and 24/7 power backup."
                 />
                 <FeatureItem
                   icon={LuCoffee}
                   title="Student Amenities"
-                  text="Includes a canteen, common rooms, sports grounds, and language labs for soft-skills training."
+                  text="Vibrant canteen, lush green grounds for sports, and specialized language labs for professional development."
                 />
               </div>
             </section>
 
             {/* 3. ACADEMIC DEPARTMENTS */}
-            <section
-              id="departments"
-              className="scroll-mt-28 bg-white p-8 rounded-2xl border border-slate-100 shadow-lg"
-            >
-              <div className="flex items-center gap-4 mb-8">
-                <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
-                  <LuGraduationCap className="w-8 h-8" />
+            <section id="departments" className="scroll-mt-28">
+              <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-slate-100 shadow-xl">
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="p-4 bg-indigo-50 rounded-2xl text-indigo-600 shadow-inner">
+                    <LuGraduationCap className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+                      Departments & Intake
+                    </h2>
+                    <p className="text-slate-500 text-sm">
+                      Undergraduate B.Tech degree programs
+                    </p>
+                  </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gecl-primary">
-                  Departments & Intake
-                </h2>
-              </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b-2 border-slate-100 text-sm font-bold text-slate-500 uppercase tracking-wider">
-                      <th className="py-4 pr-4">Course Name (B.Tech)</th>
-                      <th className="py-4 px-4 text-center">Annual Intake</th>
-                      <th className="py-4 px-4">Focus Areas</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-slate-700 divide-y divide-slate-100">
-                    <TableRow
-                      name="Civil Engineering"
-                      intake="120"
-                      focus="Structural, Geotechnical, Surveying"
-                    />
-                    <TableRow
-                      name="Computer Science (Data Science)"
-                      intake="60"
-                      focus="Big Data, Analytics, Python"
-                    />
-                    <TableRow
-                      name="Computer Science (AI)"
-                      intake="60"
-                      focus="Neural Networks, Robotics, AI"
-                    />
-                    <TableRow
-                      name="Mechanical Engineering"
-                      intake="60"
-                      focus="Thermodynamics, CAD/CAM"
-                    />
-                    <TableRow
-                      name="Electrical Engineering"
-                      intake="60"
-                      focus="Power Systems, Circuits, IoT"
-                    />
-                  </tbody>
-                </table>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-100 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                        <th className="py-4 pr-4">B.Tech Specialization</th>
+                        <th className="py-4 px-4 text-center">Annual Seats</th>
+                        <th className="py-4 pl-4 text-right">
+                          Key Faculty Lab
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-slate-700 divide-y divide-slate-50">
+                      <TableRow
+                        name="Civil Engineering"
+                        intake="120"
+                        focus="Concrete Tech Lab"
+                      />
+                      <TableRow
+                        name="Computer Science (AI)"
+                        intake="60"
+                        focus="NVIDIA GPU Lab"
+                      />
+                      <TableRow
+                        name="Computer Science (Data Science)"
+                        intake="60"
+                        focus="Analytics Center"
+                      />
+                      <TableRow
+                        name="Mechanical Engineering"
+                        intake="60"
+                        focus="Central Workshop"
+                      />
+                      <TableRow
+                        name="Electrical Engineering"
+                        intake="60"
+                        focus="Power Systems Lab"
+                      />
+                    </tbody>
+                  </table>
+                </div>
+                <div className="mt-8 pt-8 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-4">
+                  <p className="text-xs text-slate-400 italic">
+                    * Current seat matrix approved by AICTE & BEU Patna.
+                  </p>
+                  <Link
+                    href="/admissions/seat-intake"
+                    className="text-indigo-600 font-bold text-sm flex items-center gap-2 hover:gap-3 transition-all"
+                  >
+                    View Detailed Seat Matrix <LuArrowRight size={14} />
+                  </Link>
+                </div>
               </div>
-              <p className="mt-4 text-sm text-slate-500 italic">
-                * Intake figures based on AICTE approval.
-              </p>
             </section>
 
             {/* 4. LOCATION MAP */}
             <section id="location" className="scroll-mt-28">
-              <SectionHeader title="Location" icon={LuMapPin} />
+              <SectionHeader title="Reach Our Campus" icon={FaMapLocationDot} />
 
-              <div className="bg-slate-100 rounded-2xl h-80 flex items-center justify-center border border-slate-200 relative overflow-hidden">
-                {/* Embed Google Map here in production */}
-                <iframe
-                  title="Government Engineering College Lakhisarai Location"
-                  src="https://www.google.com/maps?q=Government%20Engineering%20College%20Lakhisarai&output=embed"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="w-full h-full border-0"
-                />
-
+              <div className="bg-slate-200 rounded-3xl h-96 border-4 border-white shadow-xl relative overflow-hidden mt-8">
                 <iframe
                   src="https://www.google.com/maps?q=Government%20Engineering%20College%20Lakhisarai&output=embed"
                   width="100%"
@@ -227,82 +224,82 @@ export default function AboutCollegePage() {
                   style={{ border: 0 }}
                   allowFullScreen={true}
                   loading="lazy"
-                  title="GEC Lakhisarai Location"
-                  className="absolute inset-0 w-full h-full grayscale hover:grayscale-0 transition-all duration-500"
+                  title="GEC Lakhisarai Location Map"
+                  className="grayscale hover:grayscale-0 transition-all duration-700"
                 ></iframe>
               </div>
-              <p className="mt-4 flex items-start gap-2 text-slate-600">
-                <LuMapPin className="w-5 h-5 text-gecl-accent flex-shrink-0 mt-1" />
-                <span>
-                  <strong>Address:</strong> Shivsona Road, Kharsari, Chandwara,
-                  Dist: Lakhisarai, Bihar - 811306
-                </span>
-              </p>
             </section>
           </main>
 
           {/* --- SIDEBAR --- */}
           <aside className="lg:w-1/4 space-y-8">
-            <div className="sticky top-28">
-              {/* 2. REUSABLE SIDEBAR NAVIGATION */}
+            <div className="sticky top-28 space-y-8">
               <SidebarNavigation
-                title="In This Section"
+                title="About Section"
                 links={[
-                  { label: "History & Inception", href: "#history" },
-                  { label: "Campus & Infrastructure", href: "#campus" },
-                  { label: "Departments", href: "#departments" },
-                  { label: "Location Map", href: "#location" },
+                  { label: "About College", href: "/about/college" },
+                  { label: "Administration", href: "/about/administration" },
+                  { label: "Vision & Mission", href: "/about/vision-mission" },
+                  { label: "Contact Us", href: "/contact" },
                 ]}
               />
 
-              {/* 3. REUSABLE SIDEBAR WIDGET (Principal) */}
               <SidebarWidget
-                title="Principal"
+                title="College Leadership"
                 variant="default"
-                className="text-center p-0"
+                className="text-center"
               >
-                <div className="w-20 h-20 bg-slate-200 rounded-full mx-auto mb-4 overflow-hidden border-2 border-gecl-accent mt-2">
+                <div className="w-24 h-24 bg-slate-100 rounded-full mx-auto mb-4 overflow-hidden border-2 border-gecl-accent relative">
                   <Image
                     src="/gecl/images/principal-bimlesh-kumar.webp"
-                    alt="Principal"
-                    width={80}
-                    height={80}
-                    className="object-cover w-full h-full"
+                    alt="Dr. Bimlesh Kumar"
+                    fill
+                    className="object-cover"
                   />
                 </div>
-                <h4 className="font-bold text-gecl-primary">
-                  Dr. Bimlesh Kumar
-                </h4>
-                <p className="text-xs text-slate-500 mb-4">
+                <h4 className="font-bold text-slate-800">Dr. Bimlesh Kumar</h4>
+                <p className="text-[10px] uppercase font-black text-slate-400 mb-4 tracking-widest">
                   Principal, GEC Lakhisarai
                 </p>
                 <Link
                   href="/about/principal-message"
-                  className="text-sm font-semibold text-gecl-accent hover:underline"
+                  className="inline-flex items-center gap-2 text-xs font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full hover:bg-indigo-600 hover:text-white transition-all"
                 >
-                  Read Message →
+                  Principal's Message <LuArrowRight size={12} />
                 </Link>
               </SidebarWidget>
 
-              {/* 4. REUSABLE SIDEBAR WIDGET (AICTE) */}
-              <SidebarWidget
-                title={
-                  <div className="flex items-center gap-2 text-blue-800">
-                    <LuAward className="w-5 h-5" /> Approved By
+              <SidebarWidget title="Affiliation" variant="info">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <LuAward className="text-indigo-600 shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">
+                        AICTE Approved
+                      </p>
+                      <p className="text-[10px] text-slate-500">
+                        Ministry of Education, GoI
+                      </p>
+                    </div>
                   </div>
-                }
-                variant="info"
-              >
-                <div className="text-center">
-                  <p className="text-lg font-bold text-blue-900">AICTE</p>
-                  <p className="text-xs text-blue-600">New Delhi</p>
+                  <div className="flex items-center gap-3">
+                    <FaBuildingColumns className="text-indigo-600 shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">
+                        BEU Affiliated
+                      </p>
+                      <p className="text-[10px] text-slate-500">
+                        Bihar Engineering University
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </SidebarWidget>
             </div>
           </aside>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -317,14 +314,19 @@ function TableRow({
   focus: string;
 }) {
   return (
-    <tr className="hover:bg-slate-50 transition-colors">
-      <td className="py-4 pr-4 font-medium text-slate-800">{name}</td>
-      <td className="py-4 px-4 text-center">
-        <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+    <tr className="hover:bg-slate-50/50 transition-colors group">
+      <td className="py-5 pr-4 font-bold text-slate-800 flex items-center gap-3">
+        <div className="w-1.5 h-6 bg-slate-100 group-hover:bg-indigo-500 rounded-full transition-colors"></div>
+        {name}
+      </td>
+      <td className="py-5 px-4 text-center">
+        <span className="inline-block px-4 py-1 bg-emerald-50 text-emerald-700 text-xs font-black rounded-full border border-emerald-100">
           {intake}
         </span>
       </td>
-      <td className="py-4 px-4 text-sm text-slate-500">{focus}</td>
+      <td className="py-5 pl-4 text-right text-sm font-medium text-slate-500">
+        {focus}
+      </td>
     </tr>
   );
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Breadcrumb } from "@/gecl/components/ui/";
 import {
   LuScale,
   LuClock,
@@ -12,32 +11,45 @@ import {
   LuArrowRight,
   LuSchool,
 } from "react-icons/lu";
-import { FaExclamationTriangle } from "react-icons/fa";
-import { FaCheckCircle } from "react-icons/fa";
+
+import {
+  FaExclamationTriangle,
+  FaCheckCircle,
+  FaClipboardCheck,
+} from "react-icons/fa";
+
+// Import Reusable Components
+import {
+  PageHero,
+  SectionHeader,
+  SidebarNavigation,
+  SidebarWidget,
+  FeatureItem,
+} from "@/gecl/components/ui";
+
 // --- SEO METADATA ---
 export const metadata: Metadata = {
-  title: "Rules & Regulations | Government Engineering College, Lakhisarai",
+  title: "Rules & Regulations | Student Code of Conduct | GEC Lakhisarai",
   description:
-    "Official code of conduct, academic regulations, attendance policy (75%), and anti-ragging guidelines for students of GEC Lakhisarai.",
+    "Official code of conduct, academic regulations, attendance policy (75%), and anti-ragging guidelines for students of Government Engineering College Lakhisarai.",
   keywords: [
     "GEC Lakhisarai Rules",
-    "Engineering College Attendance Policy Bihar",
-    "Anti-Ragging Affidavit GEC",
+    "Attendance Policy Bihar Engineering",
+    "Anti-Ragging Regulations",
     "Student Code of Conduct",
-    "BEU Exam Regulations",
+    "BEU Patna Exam Rules",
   ],
   openGraph: {
     title: "Rules & Regulations | GEC Lakhisarai",
-    description:
-      "Guidelines for maintaining discipline and academic excellence on campus.",
-    url: "/academics/rules-regulations",
+    description: "Official guidelines for discipline and academic excellence.",
+    url: "https://geclakhisarai.ac.in/academics/rules-regulations",
     type: "article",
     images: [
       {
         url: "/gecl/images/students-discipline.webp",
         width: 1200,
         height: 630,
-        alt: "GEC Lakhisarai Students",
+        alt: "GEC Lakhisarai Discipline and Conduct",
       },
     ],
   },
@@ -45,35 +57,17 @@ export const metadata: Metadata = {
 
 export default function RulesPage() {
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
-      {/* --- HERO SECTION --- */}
-      <section className="relative bg-gecl-primary text-white py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,#1e293b,#0f172a)]"></div>
-        {/* Background Pattern */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
-              <LuScale className="w-6 h-6 text-gecl-secondary" />
-            </span>
-            <span className="font-bold text-gecl-secondary tracking-wide uppercase text-sm">
-              Student Handbook
-            </span>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-bold font-display mb-4 tracking-tight">
-            Rules & Regulations
-          </h1>
-          <p className="text-lg text-slate-300 max-w-3xl leading-relaxed">
-            To ensure a conducive environment for learning, GEC Lakhisarai
-            mandates strict adherence to the following code of conduct and
-            academic policies.
-          </p>
-        </div>
-      </section>
-
-      <Breadcrumb
-        items={[
+    <main className="bg-slate-50 min-h-screen font-sans text-slate-800 pb-16">
+      {/* ================= HERO SECTION ================= */}
+      <PageHero
+        title="Rules & Regulations"
+        badge="Institutional Policy"
+        icon={<LuScale />}
+        description="To ensure a conducive environment for learning, GEC Lakhisarai mandates strict adherence to the following code of conduct and academic policies."
+        image="/gecl/images/students-discipline.webp"
+        className="bg-indigo-950" // Formal/Legal Theme
+        themeColor="text-indigo-400"
+        breadcrumbItems={[
           { label: "Home", href: "/" },
           { label: "Academics", href: "/academics" },
           { label: "Rules & Regulations" },
@@ -83,42 +77,47 @@ export default function RulesPage() {
       <div className="container mx-auto px-4 py-12 lg:py-16">
         <div className="flex flex-col lg:flex-row gap-12">
           {/* --- MAIN CONTENT --- */}
-          <main className="lg:w-3/4 space-y-12">
+          <div className="lg:w-3/4 space-y-16">
             {/* 1. GENERAL CONDUCT */}
             <section id="general" className="scroll-mt-28">
               <SectionHeader icon={LuSchool} title="General Code of Conduct" />
 
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
-                <div className="flex flex-col md:flex-row gap-8 items-start">
-                  <div className="flex-1 space-y-4">
-                    <RuleItem
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 mt-6">
+                <div className="flex flex-col md:flex-row gap-10 items-start">
+                  <div className="flex-1 space-y-6">
+                    <FeatureItem
+                      icon={FaCheckCircle}
                       title="Identity Card"
-                      desc="Students must carry their Identity Card at all times on campus. Entry to labs and library will be denied without it."
+                      text="Students must carry their Identity Card at all times. Entry to labs and library will be denied without a valid ID."
                     />
-                    <RuleItem
+                    <FeatureItem
+                      icon={FaCheckCircle}
                       title="Dress Code"
-                      desc="Students are expected to wear formal/decent attire. The college uniform (if prescribed for specific batches) is mandatory during workshops and exams."
+                      text="Students are expected to wear formal/decent attire. Prescribed uniforms are mandatory during workshops and examinations."
                     />
-                    <RuleItem
+                    <FeatureItem
+                      icon={FaCheckCircle}
                       title="Campus Timings"
-                      desc="Academic hours are from 10:00 AM to 05:00 PM. Loitering in corridors during class hours is strictly prohibited."
+                      text="Academic hours are from 10:00 AM to 05:00 PM. Punctuality is expected for all lectures and lab sessions."
                     />
-                    <RuleItem
-                      title="Mobile Phones"
-                      desc="Use of mobile phones is strictly prohibited inside classrooms, laboratories, and the library."
+                    <FeatureItem
+                      icon={FaCheckCircle}
+                      title="Digital Discipline"
+                      text="Use of mobile phones is strictly prohibited inside classrooms, laboratories, and the library."
                     />
                   </div>
-                  {/* Image Context */}
-                  <div className="md:w-1/3 w-full">
-                    <div className="relative aspect-[4/5] rounded-lg overflow-hidden shadow-md">
+
+                  {/* Visual Context */}
+                  <div className="md:w-1/3 w-full shrink-0">
+                    <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-lg border-4 border-white group">
                       <Image
-                        src="/gecl/images/students-discipline.webp"
-                        alt="Disciplined Students"
+                        src="/gecl/images/campus/college-building.webp"
+                        alt="Disciplined Campus Life"
                         fill
-                        className="object-cover hover:scale-105 transition-transform duration-500"
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                        <p className="text-white text-xs font-medium">
+                      <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/80 via-transparent to-transparent flex items-end p-6">
+                        <p className="text-white text-xs font-semibold leading-relaxed">
                           "Discipline is the bridge between goals and
                           accomplishment."
                         </p>
@@ -136,54 +135,67 @@ export default function RulesPage() {
                 title="Attendance & Academic Policy"
               />
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-8 mt-6">
                 {/* 75% Rule Card */}
-                <div className="bg-red-50 rounded-xl p-6 border border-red-100">
-                  <div className="flex items-center gap-3 mb-3">
-                    <LuFileWarning className="w-8 h-8 text-red-600" />
+                <div className="bg-red-50 rounded-2xl p-6 border border-red-100 shadow-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-3 bg-red-600 text-white rounded-xl shadow-md">
+                      <LuFileWarning className="w-6 h-6" />
+                    </div>
                     <h3 className="text-lg font-bold text-red-900">
-                      75% Attendance Mandatory
+                      75% Mandatory Rule
                     </h3>
                   </div>
                   <p className="text-slate-700 text-sm leading-relaxed mb-4">
                     As per Bihar Engineering University (BEU) ordinances, a
                     student must secure a minimum of{" "}
                     <strong className="text-red-700">75% attendance</strong> in
-                    both theory and practical classes to be eligible for
-                    End-Semester Examinations.
+                    every subject to be eligible for exams.
                   </p>
-                  <ul className="text-sm text-red-800 space-y-2 list-disc list-inside">
-                    <li>
-                      Shortage &lt; 10% may be condoned on medical grounds.
+                  <ul className="text-sm text-red-800 space-y-2">
+                    <li className="flex gap-2">
+                      <span className="shrink-0">•</span> Shortage up to 10% may
+                      be condoned only on genuine medical grounds.
                     </li>
-                    <li>Students below 65% will be detained (Year Back).</li>
+                    <li className="flex gap-2 font-bold">
+                      <span className="shrink-0">•</span> Students below 65%
+                      will be detained (Year Back).
+                    </li>
                   </ul>
                 </div>
 
                 {/* Evaluation Card */}
-                <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
-                  <div className="flex items-center gap-3 mb-3">
-                    <FaCheckCircle className="w-8 h-8 text-blue-600" />
-                    <h3 className="text-lg font-bold text-blue-900">
+                <div className="bg-indigo-50 rounded-2xl p-6 border border-indigo-100 shadow-sm">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-3 bg-indigo-600 text-white rounded-xl shadow-md">
+                      <FaClipboardCheck className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-lg font-bold text-indigo-900">
                       Evaluation System
                     </h3>
                   </div>
-                  <p className="text-slate-700 text-sm leading-relaxed mb-4">
-                    Academic performance is evaluated through continuous
-                    internal assessment and end-semester exams.
+                  <p className="text-slate-700 text-sm leading-relaxed mb-6">
+                    Continuous internal assessment is combined with end-semester
+                    results.
                   </p>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between bg-white p-2 rounded border border-blue-100">
-                      <span>Mid-Semester Exam</span>
-                      <span className="font-bold">20 Marks</span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center bg-white/80 p-3 rounded-xl border border-indigo-100 text-sm">
+                      <span className="font-medium">Mid-Semester Exam</span>
+                      <span className="font-bold text-indigo-700">
+                        20 Marks
+                      </span>
                     </div>
-                    <div className="flex justify-between bg-white p-2 rounded border border-blue-100">
-                      <span>Class Test/Assignment</span>
-                      <span className="font-bold">10 Marks</span>
+                    <div className="flex justify-between items-center bg-white/80 p-3 rounded-xl border border-indigo-100 text-sm">
+                      <span className="font-medium">
+                        Class Test / Assignments
+                      </span>
+                      <span className="font-bold text-indigo-700">
+                        10 Marks
+                      </span>
                     </div>
-                    <div className="flex justify-between bg-white p-2 rounded border border-blue-100">
-                      <span>End-Semester Exam</span>
-                      <span className="font-bold">70 Marks</span>
+                    <div className="flex justify-between items-center bg-indigo-600 p-3 rounded-xl text-white text-sm shadow-md">
+                      <span className="font-bold">End-Semester Exam</span>
+                      <span className="font-black">70 Marks</span>
                     </div>
                   </div>
                 </div>
@@ -192,201 +204,111 @@ export default function RulesPage() {
 
             {/* 3. ANTI-RAGGING */}
             <section id="ragging" className="scroll-mt-28">
-              <SectionHeader
-                icon={LuShieldAlert}
-                title="Anti-Ragging Policy (Zero Tolerance)"
-              />
+              <SectionHeader icon={LuShieldAlert} title="Anti-Ragging Policy" />
 
-              <div className="bg-white rounded-xl shadow-sm border-l-4 border-red-500 p-6 md:p-8">
-                <p className="text-lg text-slate-800 font-medium mb-4">
-                  Ragging in any form is strictly prohibited within and outside
-                  the college campus.
-                </p>
-                <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                  GEC Lakhisarai strictly follows the{" "}
-                  <strong>AICTE Notification F.No.37-3/Legal/AICTE/2009</strong>
-                  . Any student found guilty of ragging will face severe
-                  disciplinary action, including:
+              <div className="bg-white rounded-2xl shadow-md border-l-8 border-red-600 p-6 md:p-10 mt-6">
+                <div className="flex items-center gap-2 text-red-600 font-black uppercase tracking-tighter text-sm mb-4">
+                  <FaExclamationTriangle /> Zero Tolerance Policy
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4">
+                  Ragging is a punishable offence.
+                </h3>
+                <p className="text-slate-600 text-base leading-relaxed mb-8">
+                  GEC Lakhisarai follows strict AICTE and UGC regulations. Any
+                  student found guilty will face immediate expulsion and
+                  criminal proceedings (FIR).
                 </p>
 
-                <div className="grid sm:grid-cols-2 gap-4 mb-8">
-                  <PenaltyItem text="Suspension from attending classes and academic privileges." />
-                  <PenaltyItem text="Withholding/withdrawing scholarship/fellowship and other benefits." />
-                  <PenaltyItem text="Debarring from appearing in any test/examination." />
-                  <PenaltyItem text="Rustication from the institution for periods ranging from 1 to 4 semesters." />
-                  <PenaltyItem text="Expulsion from the institution and consequent debarring from admission to any other institution." />
-                  <PenaltyItem text="Lodging of FIR with the Police." />
+                <div className="grid sm:grid-cols-2 gap-4 mb-10">
+                  <PenaltyItem text="Immediate Suspension from classes." />
+                  <PenaltyItem text="Cancellation of Admission." />
+                  <PenaltyItem text="Withholding of Degree/Placements." />
+                  <PenaltyItem text="Debarring from Exams." />
+                  <PenaltyItem text="Rustication from 1 to 4 Semesters." />
+                  <PenaltyItem text="Filing of criminal FIR." />
                 </div>
 
                 <div className="flex flex-wrap gap-4">
                   <Link
                     href="/academics/anti-ragging"
-                    className="px-5 py-2.5 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 transition-colors shadow-lg shadow-red-200"
+                    className="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-200"
                   >
-                    Report an Incident
+                    Anti-Ragging Committee
                   </Link>
                   <a
                     href="#"
-                    className="px-5 py-2.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-200 transition-colors border border-slate-200 flex items-center gap-2"
+                    className="flex items-center gap-2 px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl border border-slate-200 hover:bg-slate-200 transition-all"
                   >
-                    <LuDownload className="w-4 h-4" /> Download Affidavit Format
+                    <LuDownload /> Download Affidavit
                   </a>
                 </div>
               </div>
             </section>
-
-            {/* 4. EXAMINATION RULES */}
-            <section id="exams" className="scroll-mt-28">
-              <SectionHeader icon={LuFileWarning} title="Examination Rules" />
-
-              <div className="relative rounded-xl overflow-hidden bg-slate-900 text-slate-300">
-                <div className="absolute inset-0 opacity-20">
-                  <Image
-                    src="/gecl/images/exam-hall.webp"
-                    fill
-                    className="object-cover"
-                    alt="Exam Hall"
-                  />
-                </div>
-                <div className="relative z-10 p-6 md:p-8 grid md:grid-cols-2 gap-8">
-                  <div>
-                    <h3 className="text-white text-xl font-bold mb-4">
-                      Unfair Means (UFM)
-                    </h3>
-                    <ul className="space-y-3 text-sm">
-                      <li className="flex gap-2">
-                        <span className="text-red-400">✖</span> Possession of
-                        chits, notes, or books during exam.
-                      </li>
-                      <li className="flex gap-2">
-                        <span className="text-red-400">✖</span> Writing on
-                        desks, question papers, or body parts.
-                      </li>
-                      <li className="flex gap-2">
-                        <span className="text-red-400">✖</span> Disobeying the
-                        invigilator's instructions.
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="text-white text-xl font-bold mb-4">
-                      Instructions
-                    </h3>
-                    <ul className="space-y-3 text-sm">
-                      <li className="flex gap-2">
-                        <span className="text-green-400">✔</span> Report to the
-                        exam hall 15 minutes before time.
-                      </li>
-                      <li className="flex gap-2">
-                        <span className="text-green-400">✔</span> Bring your own
-                        calculator (non-programmable).
-                      </li>
-                      <li className="flex gap-2">
-                        <span className="text-green-400">✔</span> Check seating
-                        plan displayed on notice board.
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </main>
+          </div>
 
           {/* --- SIDEBAR --- */}
-          <aside className="lg:w-1/4 space-y-8">
-            <div className="sticky top-28">
-              {/* Navigation Widget */}
-              <div className="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
-                <div className="bg-gecl-primary p-4">
-                  <h3 className="text-white font-bold flex items-center gap-2">
-                    <LuBookOpen className="text-gecl-secondary" />
-                    Quick Navigation
-                  </h3>
-                </div>
-                <nav className="p-2 flex flex-col gap-1">
-                  <SidebarLink href="#general" label="General Conduct" />
-                  <SidebarLink href="#attendance" label="Attendance Policy" />
-                  <SidebarLink href="#ragging" label="Anti-Ragging" />
-                  <SidebarLink href="#exams" label="Exam Rules" />
-                  <div className="h-px bg-slate-100 my-2"></div>
-                  <SidebarLink
-                    href="/academics/calendar"
-                    label="Academic Calendar"
-                  />
-                  <SidebarLink href="/hostel/rules" label="Hostel Rules" />
-                </nav>
-              </div>
+          <aside className="lg:w-1/4">
+            <div className="sticky top-28 space-y-8">
+              <SidebarNavigation
+                title="Rules Hub"
+                links={[
+                  { label: "General Conduct", href: "#general" },
+                  { label: "Attendance Policy", href: "#attendance" },
+                  { label: "Anti-Ragging Cell", href: "#ragging" },
+                  { label: "Exam Hall Rules", href: "#exams" },
+                  { label: "Academic Calendar", href: "/academics/calendar" },
+                ]}
+              />
 
-              {/* Download Handbook Widget */}
-              <div className="bg-gecl-surface rounded-xl shadow-md border border-gecl-border p-6 text-center">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-gecl-primary mx-auto mb-4 shadow-sm border border-slate-100">
-                  <LuBookOpen className="w-6 h-6" />
+              <SidebarWidget title="Download Center">
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                      <LuBookOpen className="w-7 h-7" />
+                    </div>
+                    <h4 className="font-bold text-slate-800 text-sm">
+                      Student Handbook
+                    </h4>
+                    <p className="text-[10px] text-slate-500 mb-4 px-4 leading-tight">
+                      Contains detailed campus, hostel, and library bye-laws.
+                    </p>
+                    <button className="w-full py-3 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md flex items-center justify-center gap-2">
+                      <LuDownload /> Download Handbook PDF
+                    </button>
+                  </div>
                 </div>
-                <h4 className="font-bold text-gecl-primary mb-2">
-                  Student Handbook
-                </h4>
-                <p className="text-xs text-slate-600 mb-4">
-                  Download the complete rule book including hostel and library
-                  bye-laws.
-                </p>
-                <button className="w-full py-2.5 bg-gecl-primary text-white text-sm font-bold rounded-lg hover:bg-gecl-primary/90 transition-colors shadow-lg shadow-blue-900/10 flex items-center justify-center gap-2">
-                  <LuDownload className="w-4 h-4" /> Download PDF
-                </button>
-              </div>
+              </SidebarWidget>
             </div>
           </aside>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
-// --- HELPER COMPONENTS ---
+// --- LOCAL HELPER COMPONENTS ---
 
-function SectionHeader({ icon: Icon, title }: { icon: any; title: string }) {
+function PenaltyItem({ text }: { text: string }) {
   return (
-    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
-      <div className="p-2 bg-slate-100 rounded-lg text-slate-600">
-        <Icon className="w-6 h-6" />
-      </div>
-      <h2 className="text-2xl font-bold text-gecl-primary">{title}</h2>
+    <div className="flex gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100 items-start">
+      <div className="mt-1 flex-shrink-0 w-2 h-2 rounded-full bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.4)]"></div>
+      <p className="text-xs font-bold text-slate-700 leading-tight">{text}</p>
     </div>
   );
 }
 
 function RuleItem({ title, desc }: { title: string; desc: string }) {
   return (
-    <div className="flex gap-3">
-      <div className="flex-shrink-0 mt-1">
-        <FaCheckCircle className="w-5 h-5 text-gecl-primary" />
+    <div className="flex gap-4">
+      <div className="shrink-0 mt-1">
+        <FaCheckCircle className="w-5 h-5 text-indigo-600" />
       </div>
       <div>
-        <h4 className="font-bold text-slate-800 text-sm md:text-base">
+        <h4 className="font-bold text-slate-900 text-sm md:text-base leading-none mb-1.5">
           {title}
         </h4>
-        <p className="text-sm text-slate-600 leading-snug">{desc}</p>
+        <p className="text-sm text-slate-500 leading-relaxed">{desc}</p>
       </div>
     </div>
-  );
-}
-
-function PenaltyItem({ text }: { text: string }) {
-  return (
-    <div className="flex gap-3 bg-red-50 p-3 rounded-lg border border-red-100 items-start">
-      <FaExclamationTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-      <p className="text-xs font-medium text-red-800 leading-tight">{text}</p>
-    </div>
-  );
-}
-
-function SidebarLink({ href, label }: { href: string; label: string }) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-lg transition-all text-slate-600 hover:bg-slate-50 hover:text-gecl-primary hover:pl-5"
-    >
-      {label}
-      <LuArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100" />
-    </Link>
   );
 }

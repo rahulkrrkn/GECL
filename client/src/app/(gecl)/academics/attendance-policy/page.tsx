@@ -8,8 +8,9 @@ import {
   LuFingerprint,
   LuMapPin,
 } from "react-icons/lu";
-import { FaCheckCircle } from "react-icons/fa";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { FaClipboardUser } from "react-icons/fa6";
+import { FaExclamationTriangle, FaCheckCircle } from "react-icons/fa"; // Corrected import
+
 // Import Reusable Components
 import {
   PageHero,
@@ -22,21 +23,22 @@ import {
 
 // --- SEO METADATA ---
 export const metadata: Metadata = {
-  title: "Attendance Policy | Government Engineering College, Lakhisarai",
+  title: "Attendance Policy | 75% Rule & Biometric | GEC Lakhisarai",
   description:
-    "Official attendance guidelines for B.Tech students. Minimum 75% attendance is mandatory. Attendance records are maintained offline by the Academic Cell.",
+    "Official attendance guidelines for B.Tech students at GEC Lakhisarai. Learn about the mandatory 75% attendance rule, Aadhaar-enabled biometric system, and medical condonation process.",
   keywords: [
     "GEC Lakhisarai Attendance Rules",
     "BEU Bihar Attendance Policy",
     "75% Attendance Rule Engineering",
-    "Offline Attendance Verification",
-    "Examination Eligibility Criteria",
+    "Biometric Attendance System",
+    "Medical Leave Condonation",
+    "Student Eligibility for Exams",
   ],
   openGraph: {
     title: "Attendance Policy | GEC Lakhisarai",
     description:
-      "Understand the mandatory 75% attendance rule and manual verification process.",
-    url: "/academics/attendance-policy",
+      "Understand the mandatory 75% attendance rule and biometric verification process.",
+    url: "https://geclakhisarai.ac.in/academics/attendance-policy",
     type: "article",
     images: [
       {
@@ -51,13 +53,16 @@ export const metadata: Metadata = {
 
 export default function AttendancePolicyPage() {
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
-      {/* 1. REUSABLE HERO SECTION */}
+    <div className="bg-slate-50 min-h-screen font-sans text-slate-800 pb-16">
+      {/* ================= HERO SECTION ================= */}
       <PageHero
         title="Attendance Policy"
-        description="Regular class attendance is the foundation of academic success. GEC Lakhisarai strictly adheres to the university's attendance norms."
         badge="Academic Regulations"
+        icon={<FaClipboardUser />}
+        description="Regular class attendance is the foundation of academic success. GEC Lakhisarai strictly adheres to the university's attendance norms to ensure quality education."
         image="/gecl/images/classroom-lecture.webp"
+        className="bg-teal-950" // Official/Academic Theme
+        themeColor="text-teal-400"
         breadcrumbItems={[
           { label: "Home", href: "/" },
           { label: "Academics", href: "/academics" },
@@ -74,10 +79,10 @@ export default function AttendancePolicyPage() {
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="bg-slate-50 p-6 border-b border-slate-200 flex items-center gap-4">
                   <div className="p-3 bg-red-100 text-red-600 rounded-full">
-                    <FaExclamationTriangle className="w-8 h-8" />
+                    <FaExclamationTriangle className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-slate-800">
+                    <h2 className="text-xl md:text-2xl font-bold text-slate-800">
                       The 75% Mandatory Rule
                     </h2>
                     <p className="text-slate-500 text-sm">
@@ -89,7 +94,7 @@ export default function AttendancePolicyPage() {
                 <div className="p-6 md:p-8 space-y-6">
                   <p className="text-lg text-slate-700 leading-relaxed">
                     Every student is required to attend at least{" "}
-                    <strong className="text-red-700">
+                    <strong className="text-red-700 bg-red-50 px-2 rounded">
                       75% of the total classes held
                     </strong>{" "}
                     in each subject (Theory, Practical, and Sessional)
@@ -132,11 +137,12 @@ export default function AttendancePolicyPage() {
                 icon={LuFingerprint}
               />
 
-              <div className="flex flex-col md:flex-row gap-8 items-center">
-                <div className="md:w-1/3 relative h-64 w-full rounded-xl overflow-hidden shadow-md">
+              <div className="bg-white rounded-xl border border-slate-200 p-6 mt-6 flex flex-col md:flex-row gap-8 items-center">
+                <div className="md:w-1/3 relative h-56 w-full rounded-xl overflow-hidden shadow-md border border-slate-100">
+                  {/* Placeholder for actual image */}
                   <Image
                     src="/gecl/images/biometric-attendance.webp"
-                    alt="Biometric Attendance"
+                    alt="Student using Biometric Device"
                     fill
                     className="object-cover"
                   />
@@ -150,11 +156,20 @@ export default function AttendancePolicyPage() {
                     </strong>
                     .
                   </p>
-                  <ul className="space-y-3">
-                    <FeatureItem text="Students must punch in/out daily using the biometric devices installed in the Academic Block." />
-                    <FeatureItem text="Manual registers are maintained as a backup by respective faculty members." />
-                    <FeatureItem text="Attendance data is compiled monthly by the Academic Cell for eligibility calculation." />
-                  </ul>
+                  <div className="space-y-3">
+                    <FeatureItem
+                      icon={FaCheckCircle}
+                      text="Students must punch in/out daily using the biometric devices installed in the Academic Block."
+                    />
+                    <FeatureItem
+                      icon={FaCheckCircle}
+                      text="Manual registers are maintained as a backup by respective faculty members."
+                    />
+                    <FeatureItem
+                      icon={FaCheckCircle}
+                      text="Attendance data is compiled monthly by the Academic Cell for eligibility calculation."
+                    />
+                  </div>
                 </div>
               </div>
             </section>
@@ -166,21 +181,21 @@ export default function AttendancePolicyPage() {
                 icon={LuActivity}
               />
 
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 md:p-8">
-                <h3 className="text-xl font-bold text-blue-900 mb-4">
+              <div className="bg-teal-50 border border-teal-100 rounded-xl p-6 md:p-8 mt-6">
+                <h3 className="text-xl font-bold text-teal-900 mb-4">
                   Relaxation up to 10%
                 </h3>
-                <p className="text-slate-700 mb-6">
+                <p className="text-teal-800 mb-6">
                   The Principal may condone a shortage of attendance up to{" "}
                   <strong>10%</strong> (i.e., attendance between 65% and 75%)
                   only on genuine medical grounds or participation in authorized
                   extracurricular activities (NSS/Sports/NCC).
                 </p>
 
-                <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wide mb-3">
+                <h4 className="font-bold text-teal-900 text-sm uppercase tracking-wide mb-3">
                   Procedure to Apply:
                 </h4>
-                <ol className="list-decimal list-inside space-y-2 text-slate-700 text-sm">
+                <ol className="list-decimal list-inside space-y-2 text-teal-800 text-sm marker:font-bold">
                   <li>
                     Submit a formal application to the HOD within{" "}
                     <strong>3 days</strong> of returning to college.
@@ -203,7 +218,7 @@ export default function AttendancePolicyPage() {
                 title="Frequently Asked Questions"
                 icon={FaCheckCircle}
               />
-              <div className="space-y-4">
+              <div className="space-y-4 mt-6">
                 <AccordionItem
                   question="How can I check my current attendance?"
                   answer="Attendance records are maintained offline. You must visit your Department's HOD Office or contact your Class Coordinator to verify your monthly attendance status."
@@ -226,22 +241,21 @@ export default function AttendancePolicyPage() {
 
           {/* --- SIDEBAR --- */}
           <aside className="lg:w-1/4 space-y-8">
-            <div className="sticky top-28">
+            <div className="sticky top-28 space-y-8">
               {/* 2. REUSABLE SIDEBAR WIDGET (Check Attendance) */}
               <SidebarWidget
                 title="Check Attendance"
-                variant="default" // Using default style, can switch to 'info' if you prefer blue
-                className="bg-gecl-primary text-white border-none" // Custom override for primary color theme
+                className="bg-teal-900 text-white border-none"
               >
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                  <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/20">
                     <LuFileText className="w-8 h-8 text-white" />
                   </div>
-                  <p className="text-blue-200 text-xs mb-4">
+                  <p className="text-teal-200 text-xs mb-4">
                     Offline Verification Only
                   </p>
                   <div className="bg-white/10 p-3 rounded-lg border border-white/20 flex items-start gap-3 text-left">
-                    <LuMapPin className="w-5 h-5 text-gecl-accent mt-0.5 flex-shrink-0" />
+                    <LuMapPin className="w-5 h-5 text-teal-300 mt-0.5 flex-shrink-0" />
                     <div className="text-xs text-white">
                       <strong>Academic Block, 1st Floor</strong>
                       <br />

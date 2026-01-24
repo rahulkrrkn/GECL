@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     siteName: "GEC Lakhisarai Official Portal",
     images: [
       {
-        url: "/gecl/images/college/gecl-campus.webp", // Ensure this path exists or use a placeholder
+        url: "/gecl/images/college/gecl-campus.webp",
         width: 1200,
         height: 630,
         alt: "GEC Lakhisarai Campus",

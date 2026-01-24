@@ -11,19 +11,19 @@ import {
   FaDownload,
   FaArrowRight,
   FaBullhorn,
+  FaCheckCircle,
 } from "react-icons/fa";
 import * as motion from "framer-motion/client";
 
 // ✅ Shared Components
 import {
   PageHero,
-  Breadcrumb,
   SectionHeader,
   SidebarNavigation,
   SidebarWidget,
   StatCard,
-  FeatureItem,
   FileCard,
+  ImageCard,
 } from "@/gecl/components/ui";
 
 export const metadata: Metadata = {
@@ -46,151 +46,134 @@ const AdmissionsPage = () => {
 
   return (
     <main className="bg-gecl-background min-h-screen pb-16">
-      {/* ✅ Hero Section */}
+      {/* ================= HERO SECTION ================= */}
       <PageHero
         title="Admissions 2025"
+        badge="Join GECL"
+        icon={<FaUniversity />}
         description="Join one of Bihar's premier engineering institutes. Your journey to innovation and excellence begins with GECL."
         image="/gecl/images/campus/gecl-campus-main.webp"
+        className="bg-indigo-950" // Formal Academic Theme
+        themeColor="text-indigo-400"
         breadcrumbItems={breadcrumbItems}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* ==================== Main Content ==================== */}
-          <div className="lg:col-span-2 space-y-12">
-            {/* 1. Quick Access Cards (The "Dashboard") */}
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Link href="/admissions/how-to-apply" className="group">
-                <motion.div
-                  whileHover={{ y: -5 }}
-                  className="bg-gecl-primary text-white p-6 rounded-xl shadow-md h-full flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="bg-white/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                      <FaUserGraduate className="text-2xl" />
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">How to Apply</h3>
-                    <p className="text-blue-100 text-sm">
-                      Step-by-step guide to UGEAC registration, choice filling,
-                      and reporting.
-                    </p>
-                  </div>
-                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold group-hover:gap-3 transition-all">
-                    Start Process <FaArrowRight />
-                  </div>
-                </motion.div>
-              </Link>
-
-              <Link href="/admissions/fee-structure" className="group">
-                <motion.div
-                  whileHover={{ y: -5 }}
-                  className="bg-white border border-gecl-border p-6 rounded-xl shadow-sm h-full flex flex-col justify-between hover:border-gecl-accent hover:shadow-md transition"
-                >
-                  <div>
-                    <div className="bg-orange-50 w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-orange-600">
-                      <FaFileInvoiceDollar className="text-2xl" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gecl-primary mb-2">
-                      Fee Structure
-                    </h3>
-                    <p className="text-gecl-text-muted text-sm">
-                      Transparent breakdown of academic and hostel fees for
-                      2025-26.
-                    </p>
-                  </div>
-                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-gecl-accent group-hover:gap-3 transition-all">
-                    Check Fees <FaArrowRight />
-                  </div>
-                </motion.div>
-              </Link>
-
-              <Link href="/admissions/seat-intake" className="group">
-                <motion.div
-                  whileHover={{ y: -5 }}
-                  className="bg-white border border-gecl-border p-6 rounded-xl shadow-sm h-full flex flex-col justify-between hover:border-gecl-accent hover:shadow-md transition"
-                >
-                  <div>
-                    <div className="bg-blue-50 w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-blue-600">
-                      <FaChartLine className="text-2xl" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gecl-primary mb-2">
-                      Seat Matrix
-                    </h3>
-                    <p className="text-gecl-text-muted text-sm">
-                      View approved intake for Civil, CSE(AI), and other
-                      branches.
-                    </p>
-                  </div>
-                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-gecl-accent group-hover:gap-3 transition-all">
-                    View Seats <FaArrowRight />
-                  </div>
-                </motion.div>
-              </Link>
-
-              <Link href="/admissions/eligibility" className="group">
-                <motion.div
-                  whileHover={{ y: -5 }}
-                  className="bg-white border border-gecl-border p-6 rounded-xl shadow-sm h-full flex flex-col justify-between hover:border-gecl-accent hover:shadow-md transition"
-                >
-                  <div>
-                    <div className="bg-green-50 w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-green-600">
-                      <FaUniversity className="text-2xl" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gecl-primary mb-2">
-                      Eligibility
-                    </h3>
-                    <p className="text-gecl-text-muted text-sm">
-                      JEE Main criteria, age limit, and domicile requirements.
-                    </p>
-                  </div>
-                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-gecl-accent group-hover:gap-3 transition-all">
-                    Check Rules <FaArrowRight />
-                  </div>
-                </motion.div>
-              </Link>
-            </section>
-
-            {/* 2. About GECL */}
+          <div className="lg:col-span-2 space-y-16">
+            {/* 1. Admission Dashboard (Grid of ImageCards) */}
             <section>
-              <SectionHeader title="About GECL" icon={FaUniversity} />
-              <p className="mt-4 text-sm text-gecl-text-muted leading-relaxed">
-                Established by the Government of Bihar, GECL offers high-quality
-                technical education at an affordable cost. With new
-                infrastructure, modern labs for AI/Data Science, and a dedicated
-                placement cell, we are shaping the future of engineering in the
-                region.
+              <SectionHeader title="Admission Dashboard" icon={FaBullhorn} />
+              <p className="text-gecl-text-muted mb-6 -mt-4 ml-1">
+                Everything you need to secure your seat.
               </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* How to Apply */}
+                <Link href="/admissions/how-to-apply" className="group">
+                  <ImageCard
+                    src="/gecl/images/admissions/ugeac-counselling.webp"
+                    alt="Counseling Process"
+                    variant="stack"
+                    title="How to Apply"
+                    subTitle="Step-by-step UGEAC guide"
+                    aspectRatio="video"
+                  />
+                </Link>
+
+                {/* Fee Structure */}
+                <Link href="/admissions/fee-structure" className="group">
+                  <ImageCard
+                    src="/gecl/images/admissions/document-verification.webp"
+                    alt="Fee Payment"
+                    variant="stack"
+                    title="Fee Structure"
+                    subTitle="Academic & Hostel Fees"
+                    aspectRatio="video"
+                  />
+                </Link>
+
+                {/* Seat Matrix */}
+                <Link href="/admissions/seat-intake" className="group">
+                  <ImageCard
+                    src="/gecl/images/campus/seminar-hall.webp"
+                    alt="Seat Capacity"
+                    variant="stack"
+                    title="Seat Intake"
+                    subTitle="Branch-wise Capacity"
+                    aspectRatio="video"
+                  />
+                </Link>
+
+                {/* Eligibility */}
+                <Link href="/admissions/eligibility" className="group">
+                  <ImageCard
+                    src="/gecl/images/campus/gecl-campus-main.webp"
+                    alt="Eligibility Rules"
+                    variant="stack"
+                    title="Eligibility Criteria"
+                    subTitle="JEE Main & Domicile Rules"
+                    aspectRatio="video"
+                  />
+                </Link>
+              </div>
             </section>
 
-            {/* 3. Why Join GECL? */}
-            <section>
-              <SectionHeader title="Why Choose GECL?" icon={FaUniversity} />
-              <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* 2. Why Choose GECL? */}
+            <section className="bg-indigo-50 border border-indigo-100 rounded-2xl p-8">
+              <h3 className="text-2xl font-bold text-gecl-primary mb-6 text-center">
+                Why Choose GECL Lakhisarai?
+              </h3>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <StatCard number="360" label="Annual Intake" variant="light" />
                 <StatCard number="₹3K" label="Annual Fee" variant="light" />
                 <StatCard number="100%" label="Govt. Funded" variant="light" />
-                <StatCard number="AI/ML" label="New Branches" variant="light" />
+                <StatCard
+                  number="AI & DS"
+                  label="New Branches"
+                  variant="light"
+                />
               </div>
-              <p className="mt-4 text-sm text-gecl-text-muted leading-relaxed">
-                Established by the Government of Bihar, GECL offers high-quality
-                technical education at an affordable cost. With new
-                infrastructure, modern labs for AI/Data Science, and a dedicated
-                placement cell, we are shaping the future of engineering in the
-                region.
-              </p>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <FaCheckCircle className="text-indigo-600 mt-1 shrink-0" />
+                  <p className="text-sm text-gecl-text-muted">
+                    <strong>Affordable Education:</strong> High-quality
+                    technical education at a nominal government fee structure.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <FaCheckCircle className="text-indigo-600 mt-1 shrink-0" />
+                  <p className="text-sm text-gecl-text-muted">
+                    <strong>Modern Infrastructure:</strong> State-of-the-art
+                    labs for CSE (AI/Data Science), Civil, and Mechanical
+                    engineering.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <FaCheckCircle className="text-indigo-600 mt-1 shrink-0" />
+                  <p className="text-sm text-gecl-text-muted">
+                    <strong>Placement Cell:</strong> Dedicated cell working to
+                    bridge the gap between industry and academia.
+                  </p>
+                </div>
+              </div>
             </section>
 
-            {/* 4. Scholarship Promo */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+            {/* 3. Financial Aid Banner */}
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
               <div className="flex items-start gap-4">
-                <div className="bg-white p-3 rounded-full shadow-sm text-blue-600 shrink-0">
-                  <FaHandHoldingUsd className="text-2xl" />
+                <div className="bg-white/20 p-4 rounded-full backdrop-blur-sm shrink-0">
+                  <FaHandHoldingUsd className="text-3xl text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-blue-900 text-lg">
+                  <h3 className="font-bold text-xl mb-1">
                     Financial Aid Available
                   </h3>
-                  <p className="text-sm text-blue-800 mt-1 max-w-md">
+                  <p className="text-blue-50 text-sm max-w-md opacity-90">
                     Don't let finances hold you back. We support MNSSBY Student
                     Credit Card, Post Matric Scholarship, and AICTE Pragati
                     schemes.
@@ -199,56 +182,43 @@ const AdmissionsPage = () => {
               </div>
               <Link
                 href="/admissions/scholarships"
-                className="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-700 transition whitespace-nowrap"
+                className="px-6 py-3 bg-white text-emerald-700 text-sm font-bold rounded-lg shadow-md hover:bg-emerald-50 transition whitespace-nowrap"
               >
-                Explore Scholarships
+                View Scholarships
               </Link>
             </div>
           </div>
 
           {/* ==================== Sidebar ==================== */}
           <div className="lg:col-span-1 space-y-8">
+            <SidebarNavigation
+              title="Admissions"
+              links={[
+                { label: "Admission Home", href: "/admissions", active: true },
+                { label: "How to Apply", href: "/admissions/how-to-apply" },
+                { label: "Fee Structure", href: "/admissions/fee-structure" },
+                { label: "Seat Intake", href: "/admissions/seat-intake" },
+                { label: "Lateral Entry", href: "/admissions/lateral-entry" },
+                { label: "FAQ", href: "/admissions/faq" },
+              ]}
+            />
+
             <SidebarWidget title="Admission Helpdesk">
-              <div className="bg-white p-4 rounded-lg border border-gecl-border text-center">
+              <div className="bg-white p-5 rounded-lg border border-gecl-border text-center">
                 <p className="text-sm text-gecl-text-muted mb-3">
                   For queries related to UGEAC counseling and reporting:
                 </p>
-                <p className="font-bold text-gecl-primary text-lg">
+                <p className="font-bold text-gecl-primary text-xl mb-1">
                   06346-29xxxx
                 </p>
-                <p className="text-sm text-gecl-accent font-medium mb-4">
+                <p className="text-xs text-gecl-accent font-medium mb-4 break-words">
                   admission@geclakhisarai.ac.in
                 </p>
                 <Link
                   href="/admissions/contact"
-                  className="text-xs underline text-gecl-text-muted hover:text-gecl-primary"
+                  className="block w-full py-2 bg-gray-50 border border-gray-200 rounded text-xs font-bold text-gecl-text-muted hover:bg-gray-100 transition"
                 >
-                  View All Contacts
-                </Link>
-              </div>
-            </SidebarWidget>
-
-            <SidebarWidget title="Important Links">
-              <div className="space-y-3">
-                <Link
-                  href="/admissions/required-documents"
-                  className="flex items-center gap-3 p-3 bg-white border border-gecl-border rounded-lg hover:border-gecl-accent group transition"
-                >
-                  <FaDownload className="text-gecl-text-muted group-hover:text-gecl-accent" />
-                  <span className="text-sm font-medium text-gecl-primary">
-                    Document Checklist
-                  </span>
-                </Link>
-                <Link
-                  href="/admissions/faq"
-                  className="flex items-center gap-3 p-3 bg-white border border-gecl-border rounded-lg hover:border-gecl-accent group transition"
-                >
-                  <div className="text-gecl-text-muted group-hover:text-gecl-accent font-bold">
-                    ?
-                  </div>
-                  <span className="text-sm font-medium text-gecl-primary">
-                    FAQs
-                  </span>
+                  View Contact Details
                 </Link>
               </div>
             </SidebarWidget>

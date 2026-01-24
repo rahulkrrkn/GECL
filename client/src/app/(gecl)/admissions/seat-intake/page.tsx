@@ -4,15 +4,17 @@ import { Metadata } from "next";
 import {
   FaChartPie,
   FaUsers,
-  FaUniversity,
-  FaInfoCircle,
-  FaExclamationTriangle,
   FaLaptopCode,
-  FaCogs,
   FaBolt,
   FaBuilding,
   FaDatabase,
-} from "react-icons/fa";
+} from "react-icons/fa6"; // Updated imports
+import {
+  FaUniversity,
+  FaInfoCircle,
+  FaExclamationTriangle,
+  FaCogs,
+} from "react-icons/fa"; // Updated imports
 import * as motion from "framer-motion/client";
 
 // ✅ Shared Components
@@ -46,10 +48,15 @@ const SeatIntakePage = () => {
 
   return (
     <main className="bg-gecl-background min-h-screen pb-16">
+      {/* ================= HERO SECTION ================= */}
       <PageHero
         title="Seat Intake Capacity"
-        description="Department-wise breakdown of approved seats for the Academic Session 2025-2026."
+        badge="AICTE Approved"
+        icon={<FaChartPie />}
+        description="Department-wise breakdown of approved seats for the Academic Session 2025-2026. Includes regular and lateral entry quotas."
         image="/gecl/images/campus/gecl-campus-main.webp"
+        className="bg-blue-950" // Custom Theme
+        themeColor="text-blue-400"
         breadcrumbItems={breadcrumbItems}
       />
 
@@ -61,10 +68,10 @@ const SeatIntakePage = () => {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gecl-surface p-6 rounded-xl shadow-sm border border-gecl-border"
+              className="bg-white p-6 rounded-xl shadow-sm border border-gecl-border"
             >
               <div className="flex items-start gap-3">
-                <FaInfoCircle className="text-gecl-primary mt-1 shrink-0" />
+                <FaInfoCircle className="text-gecl-primary mt-1 shrink-0 text-xl" />
                 <div>
                   <h3 className="text-lg font-bold text-gecl-primary mb-1">
                     AICTE Approved Intake
@@ -88,23 +95,25 @@ const SeatIntakePage = () => {
                 title="B.Tech Seat Matrix (1st Year)"
                 icon={FaUsers}
               />
-              <div className="bg-gecl-surface rounded-xl shadow-sm border border-gecl-border overflow-hidden mt-4">
+              <div className="bg-white rounded-xl shadow-sm border border-gecl-border overflow-hidden mt-4">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-gecl-primary text-white text-sm uppercase">
-                        <th className="p-4 font-semibold">Branch Name</th>
+                      <tr className="bg-blue-900 text-white text-sm uppercase">
+                        <th className="p-4 font-semibold rounded-tl-xl">
+                          Branch Name
+                        </th>
                         <th className="p-4 font-semibold text-center">
                           Approved Intake
                         </th>
-                        <th className="p-4 font-semibold text-center">
+                        <th className="p-4 font-semibold text-center rounded-tr-xl">
                           Duration
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gecl-border text-sm text-gecl-text-primary">
+                    <tbody className="divide-y divide-gray-100 text-sm text-gecl-text-primary">
                       {/* Civil - Usually highest intake in older GECs */}
-                      <tr className="hover:bg-gray-50">
+                      <tr className="hover:bg-blue-50/50 transition-colors">
                         <td className="p-4 flex items-center gap-3 font-medium">
                           <div className="bg-orange-100 text-orange-700 p-2 rounded-lg">
                             <FaBuilding />
@@ -120,7 +129,7 @@ const SeatIntakePage = () => {
                       </tr>
 
                       {/* CSE (AI) */}
-                      <tr className="bg-blue-50/50 hover:bg-blue-50">
+                      <tr className="hover:bg-blue-50/50 transition-colors">
                         <td className="p-4 flex items-center gap-3 font-medium">
                           <div className="bg-blue-100 text-blue-700 p-2 rounded-lg">
                             <FaLaptopCode />
@@ -136,7 +145,7 @@ const SeatIntakePage = () => {
                       </tr>
 
                       {/* CSE (Data Science) */}
-                      <tr className="hover:bg-gray-50">
+                      <tr className="hover:bg-blue-50/50 transition-colors">
                         <td className="p-4 flex items-center gap-3 font-medium">
                           <div className="bg-purple-100 text-purple-700 p-2 rounded-lg">
                             <FaDatabase />
@@ -152,7 +161,7 @@ const SeatIntakePage = () => {
                       </tr>
 
                       {/* Mechanical */}
-                      <tr className="hover:bg-gray-50">
+                      <tr className="hover:bg-blue-50/50 transition-colors">
                         <td className="p-4 flex items-center gap-3 font-medium">
                           <div className="bg-gray-100 text-gray-700 p-2 rounded-lg">
                             <FaCogs />
@@ -168,7 +177,7 @@ const SeatIntakePage = () => {
                       </tr>
 
                       {/* Electrical */}
-                      <tr className="hover:bg-gray-50">
+                      <tr className="hover:bg-blue-50/50 transition-colors">
                         <td className="p-4 flex items-center gap-3 font-medium">
                           <div className="bg-yellow-100 text-yellow-700 p-2 rounded-lg">
                             <FaBolt />
@@ -184,7 +193,7 @@ const SeatIntakePage = () => {
                       </tr>
 
                       {/* Total */}
-                      <tr className="bg-gecl-nav-bg text-white font-bold border-t-2 border-gecl-accent">
+                      <tr className="bg-blue-50 font-bold text-blue-900 border-t-2 border-blue-100">
                         <td className="p-4">Total Capacity</td>
                         <td className="p-4 text-center text-lg">360</td>
                         <td className="p-4"></td>
@@ -236,7 +245,7 @@ const SeatIntakePage = () => {
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gecl-surface p-4 rounded-lg border border-gecl-border">
+                <div className="bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
                   <h4 className="font-bold text-gecl-primary mb-2">
                     Vertical Reservation
                   </h4>
@@ -248,7 +257,7 @@ const SeatIntakePage = () => {
                     <li>Economically Weaker Section (EWS)</li>
                   </ul>
                 </div>
-                <div className="bg-gecl-surface p-4 rounded-lg border border-gecl-border">
+                <div className="bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
                   <h4 className="font-bold text-gecl-primary mb-2">
                     Horizontal Reservation
                   </h4>
@@ -300,7 +309,7 @@ const SeatIntakePage = () => {
 
             <SidebarWidget title="Downloads">
               <FileCard
-                title="Official Seat Matrix 2024"
+                title="Official Seat Matrix"
                 subtitle="PDF Reference (BCECEB)"
                 viewLink="#"
                 downloadLink="#"

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import {
   LuTarget,
   LuCompass,
@@ -7,55 +8,48 @@ import {
   LuUsers,
   LuBookOpen,
   LuBuilding2,
+  LuGem,
+  LuShieldCheck,
+  LuLeaf,
+  LuArrowRight,
+  LuAward,
 } from "react-icons/lu";
+import { FaQuoteLeft } from "react-icons/fa6";
 
 // Import Reusable Components
 import {
   PageHero,
   SectionHeader,
   SidebarNavigation,
-  FeatureItem,
+  SidebarWidget,
 } from "@/gecl/components/ui";
 
 // --- SEO METADATA ---
 export const metadata: Metadata = {
-  title: "Vision & Mission | Government Engineering College, Lakhisarai",
+  title: "Vision & Mission | Our Guiding Principles | GEC Lakhisarai",
   description:
-    "Explore the Vision and Mission of GEC Lakhisarai. We are committed to providing quality technical education, fostering innovation, and developing socially responsible engineers.",
+    "Discover the Vision and Mission of GEC Lakhisarai. Committed to technical excellence, innovation, and developing ethically strong engineers for Bihar and the nation.",
   keywords: [
     "GEC Lakhisarai Vision",
     "GEC Lakhisarai Mission",
-    "Engineering College Bihar Values",
-    "Technical Education Lakhisarai",
-    "GEC Vision Statement",
+    "Technical Education Bihar",
+    "Engineering College Values",
+    "Institutional Goals Lakhisarai",
   ],
-  openGraph: {
-    title: "Vision & Mission | GEC Lakhisarai",
-    description:
-      "Our roadmap to excellence in technical education and nation-building.",
-    url: "https://www.geclakhisarai.ac.in/about/vision-mission",
-    type: "website",
-    images: [
-      {
-        url: "/gecl/images/campus-overview.webp",
-        width: 1200,
-        height: 630,
-        alt: "GEC Lakhisarai Campus Vision",
-      },
-    ],
-  },
 };
 
 export default function VisionMissionPage() {
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
-      {/* 1. REUSABLE HERO SECTION */}
+    <main className="bg-slate-50 min-h-screen font-sans text-slate-800 pb-20">
+      {/* 1. HERO SECTION */}
       <PageHero
         title="Vision & Mission"
         description="Laying the foundation for a technically advanced and ethically strong society through excellence in engineering education."
         badge="Our Guiding Principles"
-        // Optional: Add a subtle background image if available
-        // image="/gecl/images/vision-bg.webp"
+        icon={<LuCompass />}
+        image="/gecl/images/campus/college-building.webp"
+        className="bg-indigo-950"
+        themeColor="text-indigo-400"
         breadcrumbItems={[
           { label: "Home", href: "/" },
           { label: "About", href: "/about" },
@@ -66,37 +60,38 @@ export default function VisionMissionPage() {
       <div className="container mx-auto px-4 py-16">
         <div className="flex flex-col lg:flex-row gap-16">
           {/* --- MAIN CONTENT --- */}
-          <main className="lg:w-2/3 space-y-20">
+          <div className="lg:w-2/3 space-y-24">
             {/* 1. VISION SECTION */}
             <section id="vision" className="scroll-mt-28">
               <SectionHeader title="Our Vision" icon={LuTarget} />
 
-              <div className="relative group rounded-2xl overflow-hidden shadow-2xl mb-8">
-                <div className="absolute inset-0 bg-gradient-to-r from-gecl-primary/90 to-gecl-primary/40 z-10"></div>
+              <div className="relative group rounded-[2.5rem] overflow-hidden shadow-2xl mt-8 mb-10 border-4 border-white">
+                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900 via-indigo-900/60 to-transparent z-10"></div>
                 <Image
                   src="/gecl/images/vision-future.webp"
-                  alt="Future of Engineering at GEC Lakhisarai"
+                  alt="Vision of GEC Lakhisarai"
                   width={800}
-                  height={400}
-                  className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-700"
+                  height={450}
+                  className="w-full h-[400px] object-cover group-hover:scale-110 transition-transform duration-[2000ms]"
                 />
-                <div className="absolute inset-0 z-20 flex items-center justify-center p-8 text-center">
-                  <p className="text-2xl md:text-3xl font-serif text-white font-medium italic leading-relaxed">
-                    "To become a center of excellence in technical education,
-                    fostering innovation, research, and human values to empower
-                    students to meet global challenges."
+                <div className="absolute inset-0 z-20 flex flex-col justify-center p-10 md:p-16">
+                  <FaQuoteLeft className="text-indigo-400/40 text-6xl mb-6" />
+                  <p className="text-2xl md:text-4xl font-black text-white italic leading-tight tracking-tight">
+                    To become a center of excellence in technical education,
+                    fostering innovation and human values to empower students to
+                    meet global challenges.
                   </p>
                 </div>
               </div>
 
-              <div className="prose prose-lg text-slate-600">
-                <p>
+              <div className="prose prose-lg text-slate-600 border-l-4 border-indigo-600 pl-6 bg-white p-8 rounded-r-2xl shadow-sm">
+                <p className="leading-relaxed">
                   At Government Engineering College, Lakhisarai, we envision a
                   future where our graduates are not just job seekers but job
                   creators. Established under the{" "}
-                  <strong>Saat Nishchay Program</strong> of the Bihar
-                  Government, our goal is to bridge the gap between rural talent
-                  and global technology standards.
+                  <strong>Saat Nishchay Program</strong>
+                  of the Bihar Government, our goal is to bridge the gap between
+                  rural talent and global technology standards.
                 </p>
               </div>
             </section>
@@ -105,7 +100,7 @@ export default function VisionMissionPage() {
             <section id="mission" className="scroll-mt-28">
               <SectionHeader title="Our Mission" icon={LuCompass} />
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-8 mt-10">
                 <MissionCard
                   icon={LuBookOpen}
                   title="Academic Excellence"
@@ -116,7 +111,7 @@ export default function VisionMissionPage() {
                   icon={LuLightbulb}
                   title="Innovation & Research"
                   desc="To provide a dynamic environment that emphasizes open-ended design, problem-solving, and critical thinking skills."
-                  variant="green"
+                  variant="emerald"
                 />
                 <MissionCard
                   icon={LuUsers}
@@ -128,52 +123,71 @@ export default function VisionMissionPage() {
                   icon={LuBuilding2}
                   title="Infrastructure"
                   desc="To provide state-of-the-art laboratories, workshops, and libraries that facilitate practical learning and skill development."
-                  variant="purple"
+                  variant="indigo"
                 />
               </div>
             </section>
 
-            {/* 3. CORE VALUES IMAGE BREAK */}
-            <section className="relative h-96 rounded-3xl overflow-hidden shadow-2xl my-12">
-              <Image
-                src="/gecl/images/values-community.webp"
-                alt="Community and Values at GEC Lakhisarai"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gecl-primary/80 flex flex-col items-center justify-center text-center p-8">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            {/* 3. CORE VALUES SECTION */}
+            <section className="bg-white rounded-[3rem] p-10 md:p-16 border border-slate-100 shadow-xl relative overflow-hidden">
+              <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-60"></div>
+
+              <div className="relative z-10 text-center mb-12">
+                <span className="text-indigo-600 font-black text-xs uppercase tracking-[0.3em] mb-3 block">
+                  Foundation
+                </span>
+                <h2 className="text-3xl md:text-5xl font-black text-slate-900">
                   Our Core Values
                 </h2>
-                <div className="flex flex-wrap justify-center gap-4">
-                  {[
-                    "Integrity",
-                    "Excellence",
-                    "Innovation",
-                    "Discipline",
-                    "Sustainability",
-                  ].map((val) => (
-                    <span
-                      key={val}
-                      className="px-6 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full font-medium transition-transform hover:scale-105"
-                    >
-                      {val}
-                    </span>
-                  ))}
-                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 relative z-10">
+                <ValueItem
+                  icon={LuShieldCheck}
+                  title="Integrity"
+                  desc="Adherence to high moral standards."
+                />
+                <ValueItem
+                  icon={LuGem}
+                  title="Excellence"
+                  desc="Continuous pursuit of quality."
+                />
+                <ValueItem
+                  icon={LuLightbulb}
+                  title="Innovation"
+                  desc="Encouraging creative solutions."
+                />
+                <ValueItem
+                  icon={LuAward}
+                  title="Discipline"
+                  desc="Consistency in conduct & study."
+                />
+                <ValueItem
+                  icon={LuLeaf}
+                  title="Sustainability"
+                  desc="Commitment to environment."
+                />
+                <ValueItem
+                  icon={LuUsers}
+                  title="Inclusivity"
+                  desc="Opportunities for all sectors."
+                />
               </div>
             </section>
-          </main>
+          </div>
 
-          {/* --- SIDEBAR NAVIGATION --- */}
+          {/* --- SIDEBAR --- */}
           <aside className="lg:w-1/3 space-y-8">
-            <div className="sticky top-24">
-              {/* 2. REUSABLE SIDEBAR NAVIGATION */}
+            <div className="sticky top-28 space-y-8">
               <SidebarNavigation
-                title="About GEC Lakhisarai"
+                title="About Section"
                 links={[
-                  { label: "History", href: "/about/college" },
-                  { label: "Vision & Mission", href: "/about/vision-mission" },
+                  { label: "History of College", href: "/about/college" },
+                  {
+                    label: "Vision & Mission",
+                    href: "/about/vision-mission",
+                    active: true,
+                  },
                   {
                     label: "Principal's Message",
                     href: "/about/principal-message",
@@ -182,74 +196,79 @@ export default function VisionMissionPage() {
                 ]}
               />
 
-              {/* Quick Contact Widget (Using standard SidebarWidget pattern if desired, or custom as below for CTA) */}
-              <div className="bg-gecl-surface rounded-2xl shadow-lg border border-gecl-border p-6">
-                <h4 className="font-bold text-gecl-primary mb-2">
-                  Join Our Journey
+              <SidebarWidget title="Institutional Pledge" variant="default">
+                <div className="text-center p-4">
+                  <p className="text-sm text-slate-600 italic leading-relaxed">
+                    "We pledge to uphold the dignity of our profession and
+                    contribute to the growth of Bihar through innovation and
+                    hard work."
+                  </p>
+                  <div className="w-10 h-1 bg-indigo-600 mx-auto mt-4 rounded-full"></div>
+                </div>
+              </SidebarWidget>
+
+              <div className="bg-indigo-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full"></div>
+                <h4 className="text-xl font-bold mb-4 relative z-10">
+                  Join Our Mission
                 </h4>
-                <p className="text-sm text-slate-600 mb-4">
-                  Be a part of Bihar's growing technical ecosystem.
+                <p className="text-indigo-200 text-sm mb-6 relative z-10">
+                  Be a part of a community that is redefining technical
+                  education in Bihar.
                 </p>
-                <a
-                  href="/admissions/apply"
-                  className="block w-full text-center py-3 bg-gecl-accent hover:bg-orange-700 text-white rounded-xl font-semibold transition-colors shadow-lg shadow-orange-900/20"
+                <Link
+                  href="/admissions/how-to-apply"
+                  className="inline-flex items-center gap-2 bg-white text-indigo-900 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-indigo-50 transition-all shadow-lg"
                 >
-                  Apply for Admission
-                </a>
+                  Apply Now <LuArrowRight size={16} />
+                </Link>
               </div>
             </div>
           </aside>
         </div>
       </div>
+    </main>
+  );
+}
+
+// --- LOCAL HELPERS ---
+
+function MissionCard({ icon: Icon, title, desc, variant }: any) {
+  const themes = {
+    blue: "text-blue-600 bg-blue-50 border-blue-100",
+    emerald: "text-emerald-600 bg-emerald-50 border-emerald-100",
+    orange: "text-orange-600 bg-orange-50 border-orange-100",
+    indigo: "text-indigo-600 bg-indigo-50 border-indigo-100",
+  };
+  const currentTheme = themes[variant as keyof typeof themes];
+
+  return (
+    <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group h-full">
+      <div
+        className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 duration-500 shadow-inner ${currentTheme}`}
+      >
+        <Icon size={28} />
+      </div>
+      <h3 className="text-xl font-black text-slate-800 mb-3 leading-tight">
+        {title}
+      </h3>
+      <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
     </div>
   );
 }
 
-// --- LOCAL HELPER COMPONENT (Mission Card) ---
-interface MissionCardProps {
-  icon: any;
-  title: string;
-  desc: string;
-  variant: "blue" | "green" | "orange" | "purple";
-}
-
-function MissionCard({ icon: Icon, title, desc, variant }: MissionCardProps) {
-  const styles = {
-    blue: {
-      bg: "bg-blue-50",
-      text: "text-blue-600",
-      groupHover: "group-hover:bg-blue-600 group-hover:text-white",
-    },
-    green: {
-      bg: "bg-green-50",
-      text: "text-green-600",
-      groupHover: "group-hover:bg-green-600 group-hover:text-white",
-    },
-    orange: {
-      bg: "bg-orange-50",
-      text: "text-orange-600",
-      groupHover: "group-hover:bg-orange-600 group-hover:text-white",
-    },
-    purple: {
-      bg: "bg-purple-50",
-      text: "text-purple-600",
-      groupHover: "group-hover:bg-purple-600 group-hover:text-white",
-    },
-  };
-
-  const currentStyle = styles[variant];
-
+function ValueItem({ icon: Icon, title, desc }: any) {
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-xl transition-all hover:border-gecl-primary/20 group h-full">
-      <div
-        className={`w-14 h-14 ${currentStyle.bg} rounded-full flex items-center justify-center ${currentStyle.text} mb-6 transition-all duration-300 ${currentStyle.groupHover}`}
-      >
-        <Icon className="w-7 h-7" />
+    <div className="group text-center md:text-left">
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-4">
+        <div className="p-3 bg-slate-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+          <Icon size={20} />
+        </div>
+        <div>
+          <h4 className="font-bold text-slate-900 text-base mb-1">{title}</h4>
+          <p className="text-xs text-slate-500 leading-snug">{desc}</p>
+        </div>
       </div>
-      <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-gecl-primary transition-colors">
-        {title}
-      </h3>
-      <p className="text-slate-600 text-sm leading-relaxed">{desc}</p>
     </div>
   );
 }

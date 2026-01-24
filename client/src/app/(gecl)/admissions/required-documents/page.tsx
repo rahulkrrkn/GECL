@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Metadata } from "next";
 import {
-  FaFileAlt,
+  FaFile,
   FaIdCard,
   FaUserGraduate,
   FaFileMedical,
@@ -11,13 +11,13 @@ import {
   FaFolderOpen,
   FaDownload,
   FaCheckDouble,
-} from "react-icons/fa";
+  FaFileSignature,
+} from "react-icons/fa6"; // Updated imports
 import * as motion from "framer-motion/client";
 
 // ✅ Shared Components
 import {
   PageHero,
-  Breadcrumb,
   SectionHeader,
   SidebarNavigation,
   SidebarWidget,
@@ -45,10 +45,15 @@ const RequiredDocumentsPage = () => {
 
   return (
     <main className="bg-gecl-background min-h-screen pb-16">
+      {/* ================= HERO SECTION ================= */}
       <PageHero
         title="Required Documents"
-        description="The ultimate checklist for your physical reporting. Ensure you have all originals and photocopies ready."
+        badge="Reporting Checklist"
+        icon={<FaFolderOpen />}
+        description="The ultimate checklist for your physical reporting. Ensure you have all originals and photocopies ready to avoid any hassle."
         image="/gecl/images/admissions/document-verification.webp"
+        className="bg-blue-950" // Custom Theme
+        themeColor="text-blue-400"
         breadcrumbItems={breadcrumbItems}
       />
 
@@ -63,7 +68,7 @@ const RequiredDocumentsPage = () => {
               className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-lg shadow-sm"
             >
               <div className="flex items-start gap-4">
-                <FaFolderOpen className="text-2xl text-blue-700 mt-1 shrink-0" />
+                <FaFileSignature className="text-2xl text-blue-700 mt-1 shrink-0" />
                 <div>
                   <h3 className="text-lg font-bold text-blue-900">
                     Reporting Instruction
@@ -83,39 +88,39 @@ const RequiredDocumentsPage = () => {
             <section>
               <SectionHeader
                 title="1. Counseling & Application Documents"
-                icon={FaFileAlt}
+                icon={FaFile}
               />
-              <div className="bg-gecl-surface rounded-xl shadow-sm border border-gecl-border p-2 sm:p-4 mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FeatureItem
                   title="Part A & Part B"
                   text="Hard copy of online filled Application Form (UGEAC)."
                   icon={FaDownload}
-                  className="bg-gray-50 rounded-lg p-3"
+                  className="bg-white border border-gray-100 shadow-sm"
                 />
                 <FeatureItem
                   title="Rank Card"
                   text="UGEAC Rank Card showing your Category/UR Rank."
                   icon={FaIdCard}
-                  className="bg-gray-50 rounded-lg p-3"
+                  className="bg-white border border-gray-100 shadow-sm"
                 />
                 <FeatureItem
                   title="Seat Allotment Letter"
                   text="Provisional Seat Allotment Letter (3 Copies)."
                   icon={FaCheckDouble}
-                  className="bg-gray-50 rounded-lg p-3"
+                  className="bg-white border border-gray-100 shadow-sm"
                 />
                 <FeatureItem
                   title="Choice Slip"
                   text="Printout of filled choices (Choice Slip)."
-                  icon={FaFileAlt}
-                  className="bg-gray-50 rounded-lg p-3"
+                  icon={FaFile}
+                  className="bg-white border border-gray-100 shadow-sm"
                 />
                 <FeatureItem
                   title="Verification Slip"
                   text="Biometric Form & Check Slip (Jaanch Parchi) - 2 Copies."
-                  icon={FaFileAlt}
+                  icon={FaFile}
                   variant="warning"
-                  className="bg-yellow-50 rounded-lg p-3 md:col-span-2"
+                  className="bg-yellow-50 border border-yellow-100 shadow-sm md:col-span-2"
                 />
               </div>
             </section>
@@ -127,9 +132,9 @@ const RequiredDocumentsPage = () => {
                 icon={FaUserGraduate}
               />
               <ul className="mt-4 space-y-3">
-                <li className="flex items-start gap-3 bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
-                  <div className="bg-gecl-primary/10 p-2 rounded-full shrink-0">
-                    <FaUserGraduate className="text-gecl-primary" />
+                <li className="flex items-start gap-3 bg-white p-4 rounded-lg border border-gecl-border shadow-sm group hover:border-blue-300 transition">
+                  <div className="bg-blue-100 p-2 rounded-full shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <FaUserGraduate className="text-blue-600 group-hover:text-white" />
                   </div>
                   <div>
                     <h4 className="font-bold text-gecl-primary">
@@ -140,9 +145,9 @@ const RequiredDocumentsPage = () => {
                     </p>
                   </div>
                 </li>
-                <li className="flex items-start gap-3 bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
-                  <div className="bg-gecl-primary/10 p-2 rounded-full shrink-0">
-                    <FaUserGraduate className="text-gecl-primary" />
+                <li className="flex items-start gap-3 bg-white p-4 rounded-lg border border-gecl-border shadow-sm group hover:border-blue-300 transition">
+                  <div className="bg-blue-100 p-2 rounded-full shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <FaUserGraduate className="text-blue-600 group-hover:text-white" />
                   </div>
                   <div>
                     <h4 className="font-bold text-gecl-primary">
@@ -153,9 +158,9 @@ const RequiredDocumentsPage = () => {
                     </p>
                   </div>
                 </li>
-                <li className="flex items-start gap-3 bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
-                  <div className="bg-gecl-accent/10 p-2 rounded-full shrink-0">
-                    <FaFileAlt className="text-gecl-accent" />
+                <li className="flex items-start gap-3 bg-white p-4 rounded-lg border border-gecl-border shadow-sm group hover:border-blue-300 transition">
+                  <div className="bg-blue-100 p-2 rounded-full shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <FaFile className="text-blue-600 group-hover:text-white" />
                   </div>
                   <div>
                     <h4 className="font-bold text-gecl-primary">
@@ -167,9 +172,9 @@ const RequiredDocumentsPage = () => {
                     </p>
                   </div>
                 </li>
-                <li className="flex items-start gap-3 bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
-                  <div className="bg-gecl-accent/10 p-2 rounded-full shrink-0">
-                    <FaFileAlt className="text-gecl-accent" />
+                <li className="flex items-start gap-3 bg-white p-4 rounded-lg border border-gecl-border shadow-sm group hover:border-blue-300 transition">
+                  <div className="bg-blue-100 p-2 rounded-full shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <FaFile className="text-blue-600 group-hover:text-white" />
                   </div>
                   <div>
                     <h4 className="font-bold text-gecl-primary">
@@ -189,51 +194,51 @@ const RequiredDocumentsPage = () => {
                 title="3. Identity & Certificates"
                 icon={FaIdCard}
               />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                <div className="bg-gecl-surface p-4 rounded-lg border border-gecl-border">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                <div className="bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
                   <h5 className="font-bold text-gecl-primary flex items-center gap-2 mb-2">
-                    <FaIdCard className="text-gray-500" /> ID Proof
+                    <FaIdCard className="text-gray-400" /> ID Proof
                   </h5>
                   <p className="text-sm text-gecl-text-muted">
                     Aadhar Card (Original + Copy).
                   </p>
                 </div>
-                <div className="bg-gecl-surface p-4 rounded-lg border border-gecl-border">
+                <div className="bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
                   <h5 className="font-bold text-gecl-primary flex items-center gap-2 mb-2">
-                    <FaCamera className="text-gray-500" /> Photographs
+                    <FaCamera className="text-gray-400" /> Photographs
                   </h5>
                   <p className="text-sm text-gecl-text-muted">
                     6 Passport size photos (Same as on JEE Main Admit Card).
                   </p>
                 </div>
-                <div className="bg-gecl-surface p-4 rounded-lg border border-gecl-border">
+                <div className="bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
                   <h5 className="font-bold text-gecl-primary flex items-center gap-2 mb-2">
-                    <FaFileAlt className="text-gray-500" /> Caste Certificate
+                    <FaFile className="text-gray-400" /> Caste Certificate
                   </h5>
                   <p className="text-sm text-gecl-text-muted">
                     Issued by CO/SDO/DM (For Reserved Categories).
                   </p>
                 </div>
-                <div className="bg-gecl-surface p-4 rounded-lg border border-gecl-border">
+                <div className="bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
                   <h5 className="font-bold text-gecl-primary flex items-center gap-2 mb-2">
-                    <FaFileAlt className="text-gray-500" /> Residential
+                    <FaFile className="text-gray-400" /> Residential
                     (Domicile)
                   </h5>
                   <p className="text-sm text-gecl-text-muted">
                     Issued by CO/SDO/DM (Mandatory for Bihar Quota).
                   </p>
                 </div>
-                <div className="bg-gecl-surface p-4 rounded-lg border border-gecl-border">
+                <div className="bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
                   <h5 className="font-bold text-gecl-primary flex items-center gap-2 mb-2">
-                    <FaFileAlt className="text-gray-500" /> Income Certificate
+                    <FaFile className="text-gray-400" /> Income Certificate
                   </h5>
                   <p className="text-sm text-gecl-text-muted">
                     Current Financial Year (For EWS/TFW candidates).
                   </p>
                 </div>
-                <div className="bg-gecl-surface p-4 rounded-lg border border-gecl-border">
+                <div className="bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
                   <h5 className="font-bold text-gecl-primary flex items-center gap-2 mb-2">
-                    <FaFileMedical className="text-gray-500" /> Medical
+                    <FaFileMedical className="text-gray-400" /> Medical
                     Certificate
                   </h5>
                   <p className="text-sm text-gecl-text-muted">
@@ -269,7 +274,6 @@ const RequiredDocumentsPage = () => {
                 {
                   label: "Required Documents",
                   href: "/admissions/required-documents",
-                  active: true,
                 },
                 {
                   label: "Admission Process",
@@ -309,7 +313,7 @@ const RequiredDocumentsPage = () => {
 
             <SidebarWidget title="Photo Spec">
               <div className="bg-white p-4 rounded-lg border border-gecl-border text-center">
-                <FaCamera className="w-8 h-8 text-gecl-accent mx-auto mb-2" />
+                <FaCamera className="w-8 h-8 text-blue-500 mx-auto mb-2" />
                 <p className="text-xs text-gecl-text-muted">
                   Ensure photographs are identical to the one uploaded in your{" "}
                   <strong>JEE Main / UGEAC</strong> application. Do not bring

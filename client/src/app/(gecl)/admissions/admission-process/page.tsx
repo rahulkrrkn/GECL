@@ -11,6 +11,7 @@ import {
   FaMapMarkerAlt,
   FaBus,
   FaBed,
+  FaRoad,
 } from "react-icons/fa";
 import * as motion from "framer-motion/client";
 
@@ -25,7 +26,7 @@ import {
 } from "@/gecl/components/ui";
 
 export const metadata: Metadata = {
-  title: "Admission Process Flow 2025 | GECL Lakhisarai",
+  title: "Admission Process Flow  | GECL Lakhisarai",
   description:
     "Step-by-step admission journey for B.Tech at GECL Lakhisarai. From JEE Main/UGEAC counseling to document verification and hostel allotment.",
   openGraph: {
@@ -37,19 +38,22 @@ export const metadata: Metadata = {
 };
 
 const AdmissionProcessPage = () => {
-  const breadcrumbItems = [
-    { label: "Home", href: "/" },
-    { label: "Admissions", href: "/admissions" },
-    { label: "Admission Process", href: "/admissions/admission-process" },
-  ];
-
   return (
     <main className="bg-gecl-background min-h-screen pb-16">
+      {/* ================= HERO SECTION ================= */}
       <PageHero
         title="Admission Process"
+        badge="B.Tech Admissions"
+        icon={<FaRoad />}
         description="A comprehensive roadmap of your journey from entrance exam to your first day at Government Engineering College, Lakhisarai."
         image="/gecl/images/campus/seminar-hall.webp"
-        breadcrumbItems={breadcrumbItems}
+        className="bg-indigo-950" // Custom Theme
+        themeColor="text-indigo-400"
+        breadcrumbItems={[
+          { label: "Home", href: "/" },
+          { label: "Admissions", href: "/admissions" },
+          { label: "Admission Process", href: "/admissions/admission-process" },
+        ]}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
@@ -60,7 +64,7 @@ const AdmissionProcessPage = () => {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gecl-surface p-6 sm:p-8 rounded-xl shadow-sm border border-gecl-border"
+              className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gecl-border"
             >
               <h2 className="text-xl font-bold text-gecl-primary mb-3">
                 Your Journey Starts Here
@@ -89,8 +93,8 @@ const AdmissionProcessPage = () => {
 
               <div className="relative pl-4 sm:pl-8 border-l-2 border-gecl-border space-y-10">
                 {/* Step 1 */}
-                <div className="relative">
-                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 border-4 border-white shadow-sm text-blue-700">
+                <div className="relative group">
+                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 border-4 border-white shadow-sm text-blue-700 group-hover:scale-110 transition-transform">
                     <FaUserEdit />
                   </span>
                   <div className="bg-white p-5 rounded-lg border border-gecl-border shadow-sm hover:shadow-md transition">
@@ -107,7 +111,7 @@ const AdmissionProcessPage = () => {
                     <div className="mt-3">
                       <Link
                         href="/admissions/eligibility"
-                        className="text-sm font-medium text-gecl-accent hover:underline"
+                        className="text-sm font-bold text-gecl-accent hover:underline flex items-center gap-1"
                       >
                         Check Eligibility Criteria →
                       </Link>
@@ -116,8 +120,8 @@ const AdmissionProcessPage = () => {
                 </div>
 
                 {/* Step 2 */}
-                <div className="relative">
-                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 border-4 border-white shadow-sm text-indigo-700">
+                <div className="relative group">
+                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 border-4 border-white shadow-sm text-indigo-700 group-hover:scale-110 transition-transform">
                     <FaLaptopCode />
                   </span>
                   <div className="bg-white p-5 rounded-lg border border-gecl-border shadow-sm hover:shadow-md transition">
@@ -132,7 +136,7 @@ const AdmissionProcessPage = () => {
                     <div className="mt-3">
                       <Link
                         href="/admissions/how-to-apply"
-                        className="text-sm font-medium text-gecl-accent hover:underline"
+                        className="text-sm font-bold text-gecl-accent hover:underline flex items-center gap-1"
                       >
                         See How to Apply Guide →
                       </Link>
@@ -141,8 +145,8 @@ const AdmissionProcessPage = () => {
                 </div>
 
                 {/* Step 3 */}
-                <div className="relative">
-                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-purple-100 border-4 border-white shadow-sm text-purple-700">
+                <div className="relative group">
+                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-purple-100 border-4 border-white shadow-sm text-purple-700 group-hover:scale-110 transition-transform">
                     <FaFileContract />
                   </span>
                   <div className="bg-white p-5 rounded-lg border border-gecl-border shadow-sm hover:shadow-md transition">
@@ -161,8 +165,8 @@ const AdmissionProcessPage = () => {
                 </div>
 
                 {/* Step 4 */}
-                <div className="relative">
-                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-green-100 border-4 border-white shadow-sm text-green-700">
+                <div className="relative group">
+                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-green-100 border-4 border-white shadow-sm text-green-700 group-hover:scale-110 transition-transform">
                     <FaClipboardCheck />
                   </span>
                   <div className="bg-white p-5 rounded-lg border border-gecl-border shadow-sm hover:shadow-md transition">
@@ -179,8 +183,8 @@ const AdmissionProcessPage = () => {
                 </div>
 
                 {/* Step 5 */}
-                <div className="relative">
-                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-orange-100 border-4 border-white shadow-sm text-orange-700">
+                <div className="relative group">
+                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-orange-100 border-4 border-white shadow-sm text-orange-700 group-hover:scale-110 transition-transform">
                     <FaMapMarkerAlt />
                   </span>
                   <div className="bg-white p-5 rounded-lg border border-gecl-border shadow-sm hover:shadow-md transition">
@@ -213,8 +217,8 @@ const AdmissionProcessPage = () => {
                 </div>
 
                 {/* Step 6 */}
-                <div className="relative">
-                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-gecl-primary border-4 border-white shadow-sm text-white">
+                <div className="relative group">
+                  <span className="absolute -left-[41px] sm:-left-[49px] top-1 flex items-center justify-center w-10 h-10 rounded-full bg-gecl-primary border-4 border-white shadow-sm text-white group-hover:scale-110 transition-transform">
                     <FaUniversity />
                   </span>
                   <div className="bg-white p-5 rounded-lg border border-gecl-border shadow-sm hover:shadow-md transition">
@@ -233,7 +237,7 @@ const AdmissionProcessPage = () => {
                         <FaBed className="text-gecl-text-muted" /> Hostel Info
                       </Link>
                       <Link
-                        href="/infrastructure/library"
+                        href="/campus-life/library"
                         className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-xs font-medium hover:bg-gray-200 transition"
                       >
                         <FaIdCard className="text-gecl-text-muted" /> Library
@@ -289,7 +293,6 @@ const AdmissionProcessPage = () => {
           <div className="lg:col-span-1 space-y-8">
             <SidebarNavigation
               title="Admissions"
-              // ✅ FIXED: Removed 'active' prop to fix build error
               links={[
                 {
                   label: "Admission Process",
@@ -341,12 +344,12 @@ const AdmissionProcessPage = () => {
                   </span>
                 </Link>
                 <Link
-                  href="/infrastructure/classrooms"
+                  href="/campus-life/academic-facilities"
                   className="block p-3 bg-gray-50 rounded-lg text-center hover:bg-gray-100 transition"
                 >
                   <FaUniversity className="mx-auto text-gecl-primary mb-1" />
                   <span className="text-xs font-semibold text-gecl-text-primary">
-                    Academic
+                    Academic Facilities
                   </span>
                 </Link>
               </div>

@@ -14,7 +14,7 @@ import {
   LuDownload,
   LuArrowRight,
 } from "react-icons/lu";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaLaptopCode } from "react-icons/fa"; // Updated Icons
 
 // Import Reusable Components
 import {
@@ -39,8 +39,16 @@ export const metadata: Metadata = {
     title: "Academic Programs | GEC Lakhisarai",
     description:
       "4-Year B.Tech Degree Programs affiliated with Bihar Engineering University.",
-    url: "/academics/programs",
+    url: "https://geclakhisarai.ac.in/academics/programs",
     type: "website",
+    images: [
+      {
+        url: "/gecl/images/campus/gecl-campus-main.webp",
+        width: 1200,
+        height: 630,
+        alt: "GEC Lakhisarai Academic Block",
+      },
+    ],
   },
 };
 
@@ -106,7 +114,10 @@ export default function ProgramsPage() {
         title="Academic Programs"
         description="Comprehensive B.Tech degree programs designed to foster technical expertise and innovation."
         badge="Undergraduate Courses"
-        image="/gecl/images/college-building-main.webp"
+        icon={<LuGraduationCap />}
+        image="/gecl/images/campus/college-building-main.webp"
+        className="bg-blue-950" // Academic Theme
+        themeColor="text-blue-400"
         breadcrumbItems={[
           { label: "Home", href: "/" },
           { label: "Academics", href: "/academics" },
@@ -123,7 +134,7 @@ export default function ProgramsPage() {
                 <LuGraduationCap className="text-gecl-accent" />
                 Bachelor of Technology (B.Tech)
               </h2>
-              <p className="text-slate-600 leading-relaxed">
+              <p className="text-slate-600 leading-relaxed border-l-4 border-gecl-accent pl-4">
                 GEC Lakhisarai offers full-time, four-year B.Tech programs
                 approved by AICTE and affiliated with Bihar Engineering
                 University. Admission is conducted via UGEAC (based on JEE Mains
@@ -136,7 +147,7 @@ export default function ProgramsPage() {
               {PROGRAMS.map((program) => (
                 <div
                   key={program.id}
-                  className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col h-full"
+                  className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col h-full relative top-0 hover:-top-1"
                 >
                   {/* Image Header */}
                   <div className="relative h-48 bg-slate-200 overflow-hidden">
@@ -146,14 +157,14 @@ export default function ProgramsPage() {
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 text-white">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    <div className="absolute bottom-4 left-4 right-4 text-white">
                       <div
-                        className={`inline-flex p-2 rounded-lg mb-2 ${program.color} bg-white`}
+                        className={`inline-flex p-2 rounded-lg mb-2 shadow-sm ${program.color} bg-white`}
                       >
                         <program.icon className="w-5 h-5" />
                       </div>
-                      <h3 className="font-bold text-lg leading-tight">
+                      <h3 className="font-bold text-lg leading-tight drop-shadow-md">
                         {program.name}
                       </h3>
                     </div>
@@ -174,22 +185,22 @@ export default function ProgramsPage() {
                       </div>
                     </div>
 
-                    <p className="text-slate-600 text-sm mb-6 flex-grow">
+                    <p className="text-slate-600 text-sm mb-6 flex-grow leading-relaxed">
                       {program.desc}
                     </p>
 
                     <div className="flex items-center gap-3 mt-auto">
                       <Link
                         href={`/departments/${program.id}`}
-                        className="flex-1 py-2.5 text-center rounded-lg bg-slate-50 text-slate-700 text-sm font-semibold hover:bg-gecl-primary hover:text-white transition-colors border border-slate-200 hover:border-transparent"
+                        className="flex-1 py-2.5 text-center rounded-lg bg-gecl-primary text-white text-sm font-semibold hover:bg-gecl-primary/90 transition-colors shadow-md shadow-blue-100"
                       >
-                        Dept. Page
+                        View Details
                       </Link>
 
                       {/* Syllabus Button */}
                       <Link
                         href="/academics/syllabus"
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 text-slate-500 font-medium text-sm hover:text-gecl-accent hover:border-gecl-accent transition-colors"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 text-slate-600 font-medium text-sm hover:text-gecl-primary hover:border-gecl-primary transition-colors bg-slate-50 hover:bg-white"
                         title="View Syllabus"
                       >
                         <LuBookOpen className="w-4 h-4" /> Syllabus
@@ -202,23 +213,23 @@ export default function ProgramsPage() {
 
             {/* Additional Note */}
             <div className="mt-12 p-6 bg-blue-50 rounded-xl border border-blue-100 flex items-start gap-4">
-              <div className="p-2 bg-blue-100 rounded-full text-blue-600 mt-1">
-                <LuGraduationCap className="w-5 h-5" />
+              <div className="p-2 bg-blue-100 rounded-full text-blue-600 mt-1 shrink-0">
+                <LuGraduationCap className="w-6 h-6" />
               </div>
               <div>
                 <h4 className="font-bold text-blue-900 mb-1">
                   Admission Eligibility
                 </h4>
-                <p className="text-sm text-blue-800">
+                <p className="text-sm text-blue-800 leading-relaxed">
                   Admissions are based on the rank secured in JEE (Mains)
                   conducted by NTA, followed by counselling (UGEAC) by BCECE
                   Board, Govt. of Bihar.
                 </p>
                 <Link
                   href="/admissions/eligibility"
-                  className="text-sm font-semibold text-blue-700 hover:underline mt-2 inline-block"
+                  className="text-sm font-bold text-blue-700 hover:underline mt-2 inline-flex items-center gap-1"
                 >
-                  View Eligibility Criteria →
+                  View Eligibility Criteria <LuArrowRight className="w-3 h-3" />
                 </Link>
               </div>
             </div>
@@ -254,7 +265,6 @@ export default function ProgramsPage() {
                     Admission
                   </div>
                 }
-                variant="default" // Customize inside if needed, or create a 'custom' variant
                 className="bg-gradient-to-br from-indigo-50 to-white border-indigo-100"
               >
                 <div className="space-y-4">

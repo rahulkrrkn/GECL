@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import {
   LuShieldAlert,
   LuPhone,
@@ -9,15 +8,14 @@ import {
   LuFileWarning,
   LuDownload,
   LuUsers,
-  LuExternalLink,
-  LuMegaphone,
   LuHeartHandshake,
+  LuMegaphone,
 } from "react-icons/lu";
 import { FaExclamationTriangle } from "react-icons/fa";
 
-// Import Reusable Components
+// ✅ Shared Components
 import {
-  Breadcrumb,
+  PageHero,
   SectionHeader,
   SidebarNavigation,
   SidebarWidget,
@@ -39,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Anti-Ragging Policy | GEC Lakhisarai",
     description: "Say NO to Ragging. We are a ragging-free campus.",
-    url: "/academics/anti-ragging",
+    url: "https://geclakhisarai.ac.in/academics/anti-ragging",
     type: "website",
     images: [
       {
@@ -100,50 +98,27 @@ const COMMITTEE_MEMBERS = [
 
 export default function AntiRaggingPage() {
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
-      {/* --- HERO SECTION (Kept Original Red Theme as requested) --- */}
-      <section className="relative bg-red-700 text-white py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom_right,#991b1b,#7f1d1d)]"></div>
-        {/* Warning Pattern */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), repeating-linear-gradient(45deg, #000 25%, #222 25%, #222 75%, #000 75%, #000)",
-            backgroundSize: "20px 20px",
-          }}
-        ></div>
+    <main className="bg-slate-50 min-h-screen font-sans text-slate-800 pb-16">
+      {/* ================= HERO SECTION ================= */}
+      <PageHero
+        title="Anti-Ragging Cell"
+        badge="Zero Tolerance"
+        icon={<LuShieldAlert />}
+        description="Ragging is a criminal offence. GEC Lakhisarai is committed to creating a fearless, friendly, and conducive environment for learning."
+        image="/gecl/images/campus/college-building.webp"
+        className="bg-red-950"
+        themeColor="text-red-400"
+        breadcrumbItems={[
+          { label: "Home", href: "/" },
+          { label: "Academics", href: "/academics" },
+          { label: "Anti-Ragging" },
+        ]}
+      />
 
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-900/50 border border-red-400/50 text-red-100 text-sm font-bold mb-6 backdrop-blur-md">
-            <LuShieldAlert className="w-4 h-4" />
-            Zero Tolerance Policy
-          </div>
-          <h1 className="text-3xl md:text-5xl font-bold font-display mb-4 tracking-tight uppercase">
-            Anti-Ragging Cell
-          </h1>
-          <p className="text-lg text-red-100 max-w-2xl mx-auto font-medium">
-            Ragging is a crime. GEC Lakhisarai is committed to keeping the
-            campus ragging-free.
-          </p>
-        </div>
-      </section>
-
-      {/* Reusable Breadcrumb */}
-      <div className="sticky top-16 z-30 w-full">
-        <Breadcrumb
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Academics", href: "/academics" },
-            { label: "Anti-Ragging" },
-          ]}
-        />
-      </div>
-
-      <div className="container mx-auto px-4 py-12 lg:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         <div className="flex flex-col lg:flex-row gap-12">
           {/* --- MAIN CONTENT --- */}
-          <main className="lg:w-3/4 space-y-16">
+          <div className="lg:w-3/4 space-y-16">
             {/* 1. WHAT IS RAGGING? */}
             <section id="definition" className="scroll-mt-28">
               <SectionHeader
@@ -151,56 +126,62 @@ export default function AntiRaggingPage() {
                 icon={FaExclamationTriangle}
               />
 
-              <div className="prose prose-slate max-w-none text-slate-600 mb-8">
-                <p className="lead border-l-4 border-red-500 pl-4 py-2 bg-red-50 rounded-r-lg">
+              <div className="mt-6 mb-8 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+                <p className="text-red-900 font-medium leading-relaxed">
                   According to the UGC Regulation on Curbing the Menace of
                   Ragging in Higher Educational Institutions, 2009, ragging
                   constitutes one or more of any of the following acts:
                 </p>
               </div>
 
-              {/* Using FeatureItem for definitions for cleaner look */}
               <div className="grid md:grid-cols-2 gap-4">
                 <FeatureItem
                   variant="warning"
                   icon={FaExclamationTriangle}
-                  text="Any conduct by any student whether by words spoken or written or by an act which has the effect of teasing, treating or handling with rudeness a fresher or any other student."
+                  title="Verbal Abuse"
+                  text="Any conduct by any student whether by words spoken or written or by an act which has the effect of teasing, treating or handling with rudeness a fresher."
                 />
                 <FeatureItem
                   variant="warning"
                   icon={FaExclamationTriangle}
+                  title="Psychological Harm"
                   text="Indulging in rowdy or undisciplined activities which causes or is likely to cause annoyance, hardship, physical or psychological harm or to raise fear."
                 />
                 <FeatureItem
                   variant="warning"
                   icon={FaExclamationTriangle}
+                  title="Forced Activity"
                   text="Asking any student to do any act which such student will not in the ordinary course do and which has the effect of causing shame or embarrassment."
                 />
                 <FeatureItem
                   variant="warning"
                   icon={FaExclamationTriangle}
+                  title="Academic Disruption"
                   text="Any act that prevents, disrupts or disturbs the regular academic activity of a student."
                 />
               </div>
             </section>
 
-            {/* 2. NEW PHOTO SECTION (Campus Harmony) */}
-            <section className="relative h-72 rounded-2xl overflow-hidden shadow-lg border border-slate-200 group">
-              <Image
-                src="/gecl/images/students-harmony.webp"
-                alt="Students bonding on GEC Campus"
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-red-900/90 to-transparent flex items-center p-8">
-                <div className="text-white max-w-md">
+            {/* 2. CAMPUS HARMONY BANNER */}
+            <section className="relative h-64 md:h-72 rounded-2xl overflow-hidden shadow-lg group">
+              <div className="absolute inset-0 bg-slate-900">
+                {/* Placeholder for actual image if available */}
+                <Image
+                  src="/gecl/images/students-harmony.webp"
+                  alt="Students bonding"
+                  fill
+                  className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-red-900/90 to-transparent flex items-center p-8 md:p-12">
+                <div className="text-white max-w-lg">
                   <div className="flex items-center gap-2 mb-3 text-red-200 font-bold uppercase tracking-wider text-xs">
                     <LuHeartHandshake className="w-5 h-5" /> Campus Harmony
                   </div>
-                  <h3 className="text-2xl font-bold mb-3 font-display">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-3 font-display">
                     Build Bonds, Not Barriers
                   </h3>
-                  <p className="text-sm text-red-100 leading-relaxed">
+                  <p className="text-sm md:text-base text-red-100 leading-relaxed">
                     GEC Lakhisarai encourages a culture of friendship and
                     mentorship. Seniors are expected to guide freshers, not
                     harass them. Together, we build a family.
@@ -216,26 +197,22 @@ export default function AntiRaggingPage() {
                 icon={LuGavel}
               />
 
-              <div className="bg-slate-900 text-slate-300 rounded-xl p-8 relative overflow-hidden shadow-xl">
-                {/* Background Blob */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+              <div className="bg-slate-900 text-slate-300 rounded-2xl p-8 relative overflow-hidden shadow-xl mt-6">
+                {/* Background Decoration */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
-                <h3 className="text-white text-xl font-bold mb-6 relative z-10 flex items-center gap-2">
+                <h3 className="text-white text-lg font-bold mb-6 relative z-10 flex items-center gap-2">
                   <LuFileWarning className="text-red-500" />
                   Possible Disciplinary Actions:
                 </h3>
 
-                <div className="grid md:grid-cols-2 gap-4 relative z-10">
-                  <div className="space-y-3">
-                    <PunishmentItem text="Suspension from attending classes and academic privileges." />
-                    <PunishmentItem text="Withholding/withdrawing scholarship/fellowship and other benefits." />
-                    <PunishmentItem text="Debarring from appearing in any test/examination." />
-                  </div>
-                  <div className="space-y-3">
-                    <PunishmentItem text="Cancellation of admission." />
-                    <PunishmentItem text="Rustication from the institution for 1 to 4 semesters." />
-                    <PunishmentItem text="Filing of First Information Report (FIR) with the police." />
-                  </div>
+                <div className="grid md:grid-cols-2 gap-x-8 gap-y-4 relative z-10">
+                  <PunishmentItem text="Suspension from attending classes and academic privileges." />
+                  <PunishmentItem text="Cancellation of admission." />
+                  <PunishmentItem text="Withholding/withdrawing scholarship/fellowship and other benefits." />
+                  <PunishmentItem text="Rustication from the institution for 1 to 4 semesters." />
+                  <PunishmentItem text="Debarring from appearing in any test/examination." />
+                  <PunishmentItem text="Filing of First Information Report (FIR) with the police." />
                 </div>
               </div>
             </section>
@@ -244,7 +221,7 @@ export default function AntiRaggingPage() {
             <section id="committee" className="scroll-mt-28">
               <SectionHeader title="Anti-Ragging Committee" icon={LuUsers} />
 
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mt-6">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -269,7 +246,11 @@ export default function AntiRaggingPage() {
                           </td>
                           <td className="px-6 py-4">
                             <span
-                              className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${member.role === "Chairman" ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700"}`}
+                              className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                                member.role === "Chairman"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-blue-100 text-blue-700"
+                              }`}
                             >
                               {member.role}
                             </span>
@@ -287,42 +268,35 @@ export default function AntiRaggingPage() {
 
             {/* 5. ONLINE AFFIDAVIT */}
             <section id="affidavit" className="scroll-mt-28">
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-                <div className="p-4 bg-white rounded-full shadow-md text-blue-600">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                <div className="p-4 bg-white rounded-full shadow-md text-blue-600 shrink-0">
                   <LuDownload className="w-8 h-8" />
                 </div>
                 <div className="flex-grow">
                   <h3 className="text-xl font-bold text-blue-900 mb-2">
-                    Mandatory Online Affidavit
+                    Mandatory Anti-Ragging Affidavit
                   </h3>
-                  <p className="text-slate-600 text-sm mb-4">
+                  <p className="text-slate-600 text-sm mb-4 max-w-xl">
                     It is mandatory for every student and his/her parents to
                     submit an anti-ragging affidavit at the time of admission.
+                    You can download the format or fill it online.
                   </p>
                   <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                    {/* <Link
-                      href="https://www.antiragging.in/"
-                      target="_blank"
-                      className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
-                    >
-                      Fill Affidavit Online{" "}
-                      <LuExternalLink className="w-4 h-4" />
-                    </Link> */}
                     <a
                       href="#"
-                      className="flex items-center gap-2 px-6 py-3 bg-white text-slate-700 font-semibold rounded-xl border border-slate-200 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                      className="flex items-center gap-2 px-6 py-3 bg-white text-slate-700 font-bold rounded-xl border border-slate-200 hover:border-blue-400 hover:text-blue-600 hover:shadow-md transition-all"
                     >
-                      Download Format (PDF)
+                      <LuDownload className="w-4 h-4" /> Download Format (PDF)
                     </a>
                   </div>
                 </div>
               </div>
             </section>
-          </main>
+          </div>
 
           {/* --- SIDEBAR --- */}
           <aside className="lg:w-1/4 space-y-8">
-            <div className="sticky top-28">
+            <div className="sticky top-28 space-y-8">
               {/* 2. REUSABLE SIDEBAR WIDGET (Emergency) */}
               <SidebarWidget
                 title={
@@ -330,8 +304,7 @@ export default function AntiRaggingPage() {
                     <LuMegaphone className="w-5 h-5" /> Emergency Helpline
                   </span>
                 }
-                variant="alert"
-                className="animate-pulse-border border-red-200 shadow-red-100"
+                className="border-red-200 bg-red-50"
               >
                 <div className="space-y-5">
                   <div>
@@ -351,9 +324,9 @@ export default function AntiRaggingPage() {
                     </p>
                     <a
                       href="mailto:helpline@antiragging.in"
-                      className="flex items-center gap-2 font-semibold text-slate-700 hover:text-red-600 transition-colors"
+                      className="flex items-center gap-2 font-semibold text-slate-700 hover:text-red-600 transition-colors text-sm break-all"
                     >
-                      <LuMail className="w-5 h-5 text-red-500" />{" "}
+                      <LuMail className="w-4 h-4 text-red-500 shrink-0" />
                       helpline@antiragging.in
                     </a>
                   </div>
@@ -387,16 +360,16 @@ export default function AntiRaggingPage() {
           </aside>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
 // --- LOCAL HELPER COMPONENT (Punishment Item) ---
 function PunishmentItem({ text }: { text: string }) {
   return (
-    <div className="flex gap-3 bg-red-950/30 p-3 rounded-lg border border-red-500/20 items-start">
-      <div className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-red-500"></div>
-      <p className="text-sm text-red-100 leading-snug">{text}</p>
+    <div className="flex gap-3 items-start">
+      <div className="mt-1.5 flex-shrink-0 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></div>
+      <p className="text-sm text-slate-300 leading-relaxed">{text}</p>
     </div>
   );
 }

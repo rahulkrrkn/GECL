@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/gecl/images/college-building-main.jpg",
+        url: "/gecl/images/college-building-main.webp",
         width: 1200,
         height: 630,
         alt: "GEC Lakhisarai Campus",

@@ -6,18 +6,20 @@ import {
   FaUtensils,
   FaWifi,
   FaShower,
-  FaShieldAlt,
+  FaShieldCat,
   FaFileInvoiceDollar,
-  FaCheckCircle,
-  FaExclamationTriangle,
   FaUserClock,
+  FaHouseUser,
+} from "react-icons/fa6";
+import {
+  FaCheckCircle,
+  FaExclamationTriangle as FaExclamationTriangleFa,
 } from "react-icons/fa";
 import * as motion from "framer-motion/client";
 
 // ✅ Shared Components
 import {
   PageHero,
-  Breadcrumb,
   SectionHeader,
   SidebarNavigation,
   SidebarWidget,
@@ -26,14 +28,34 @@ import {
 } from "@/gecl/components/ui";
 
 export const metadata: Metadata = {
-  title: "Hostel Admission & Facilities | GECL Lakhisarai",
+  title: "Hostel Admission 2025 | Fees & Allotment | GECL Lakhisarai",
   description:
-    "Apply for hostel accommodation at Government Engineering College Lakhisarai. Check hostel fees (₹37,100), mess rules, and allotment process.",
+    "Apply for hostel accommodation at Government Engineering College Lakhisarai. Check hostel fees (₹37,100), mess rules, allotment process, and download application forms.",
+  keywords: [
+    "GECL Hostel Admission",
+    "Engineering College Hostel Bihar",
+    "Hostel Fee Structure",
+    "Mess Charges",
+    "Student Accommodation Lakhisarai",
+    "Boys Hostel GECL",
+    "Girls Hostel GECL",
+  ],
   openGraph: {
     title: "Hostel Admission - GECL Lakhisarai",
     description:
-      "Secure, affordable on-campus housing. Fee: ₹37,100/sem (approx).",
-    images: ["/gecl/images/hostel/gecl-hostel.webp"],
+      "Secure, affordable on-campus housing with 24/7 power backup and Wi-Fi. Fee: ₹37,100/sem (approx).",
+    url: "https://geclakhisarai.ac.in/admissions/hostel-admission",
+    siteName: "Government Engineering College, Lakhisarai",
+    locale: "en_IN",
+    type: "article",
+    images: [
+      {
+        url: "/gecl/images/hostel/gecl-hostel.webp",
+        width: 1200,
+        height: 630,
+        alt: "GECL Hostel Building",
+      },
+    ],
   },
 };
 
@@ -46,10 +68,15 @@ const HostelAdmissionPage = () => {
 
   return (
     <main className="bg-gecl-background min-h-screen pb-16">
+      {/* ================= HERO SECTION ================= */}
       <PageHero
         title="Hostel Admission"
-        description="Your home away from home. Secure, comfortable, and conducive environment for academic growth."
+        badge="Campus Residence"
+        icon={<FaHouseUser />}
+        description="Your home away from home. Secure, comfortable, and conducive environment for academic growth within the campus premises."
         image="/gecl/images/hostel/gecl-hostel.webp"
+        className="bg-sky-950" // Custom Theme
+        themeColor="text-sky-400"
         breadcrumbItems={breadcrumbItems}
       />
 
@@ -61,10 +88,10 @@ const HostelAdmissionPage = () => {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gecl-surface p-6 sm:p-8 rounded-xl shadow-sm border border-gecl-border"
+              className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gecl-border"
             >
               <div className="flex items-start gap-4">
-                <div className="bg-blue-100 p-3 rounded-full text-blue-700 shrink-0">
+                <div className="bg-sky-100 p-3 rounded-full text-sky-700 shrink-0">
                   <FaBed className="text-xl" />
                 </div>
                 <div>
@@ -126,44 +153,56 @@ const HostelAdmissionPage = () => {
                 .
               </p>
 
-              <div className="bg-gecl-surface rounded-xl shadow-sm border border-gecl-border overflow-hidden">
+              <div className="bg-white rounded-xl shadow-sm border border-gecl-border overflow-hidden">
                 <table className="w-full text-left border-collapse text-sm">
-                  <thead className="bg-gecl-accent text-white">
+                  <thead className="bg-sky-900 text-white">
                     <tr>
-                      <th className="p-3 font-semibold">Component</th>
-                      <th className="p-3 font-semibold">Type</th>
-                      <th className="p-3 font-semibold text-right">Amount</th>
+                      <th className="p-4 font-semibold rounded-tl-xl">
+                        Component
+                      </th>
+                      <th className="p-4 font-semibold">Type</th>
+                      <th className="p-4 font-semibold text-right rounded-tr-xl">
+                        Amount
+                      </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gecl-border text-gecl-text-primary">
-                    <tr>
-                      <td className="p-3">Registration Fee</td>
-                      <td className="p-3 text-gecl-text-muted">One Time</td>
-                      <td className="p-3 text-right">₹ 500</td>
+                  <tbody className="divide-y divide-gray-100 text-gecl-text-primary">
+                    <tr className="hover:bg-sky-50/50 transition-colors">
+                      <td className="p-4">Registration Fee</td>
+                      <td className="p-4 text-gecl-text-muted">One Time</td>
+                      <td className="p-4 text-right font-medium">₹ 500</td>
                     </tr>
-                    <tr>
-                      <td className="p-3">Caution Money</td>
-                      <td className="p-3 text-gecl-text-muted">Refundable</td>
-                      <td className="p-3 text-right">₹ 1,500</td>
+                    <tr className="hover:bg-sky-50/50 transition-colors">
+                      <td className="p-4">Caution Money</td>
+                      <td className="p-4 text-gecl-text-muted">Refundable</td>
+                      <td className="p-4 text-right font-medium">₹ 1,500</td>
                     </tr>
-                    <tr>
-                      <td className="p-3">Maintenance</td>
-                      <td className="p-3 text-gecl-text-muted">1 Year</td>
-                      <td className="p-3 text-right">₹ 14,400</td>
+                    <tr className="hover:bg-sky-50/50 transition-colors">
+                      <td className="p-4">Maintenance</td>
+                      <td className="p-4 text-gecl-text-muted">1 Year</td>
+                      <td className="p-4 text-right font-medium">₹ 14,400</td>
                     </tr>
-                    <tr>
-                      <td className="p-3">Mess Advance</td>
-                      <td className="p-3 text-gecl-text-muted">6 Months</td>
-                      <td className="p-3 text-right">₹ 20,700</td>
+                    <tr className="hover:bg-sky-50/50 transition-colors">
+                      <td className="p-4">Mess Advance</td>
+                      <td className="p-4 text-gecl-text-muted">6 Months</td>
+                      <td className="p-4 text-right font-medium">₹ 20,700</td>
                     </tr>
-                    <tr className="bg-gray-50 font-bold text-gecl-primary">
-                      <td className="p-3" colSpan={2}>
+                    <tr className="bg-sky-50 font-bold text-sky-900 border-t-2 border-sky-100">
+                      <td className="p-4" colSpan={2}>
                         Total Amount
                       </td>
-                      <td className="p-3 text-right">₹ 37,100</td>
+                      <td className="p-4 text-right text-lg">₹ 37,100</td>
                     </tr>
                   </tbody>
                 </table>
+              </div>
+              <div className="mt-3 text-right">
+                <Link
+                  href="/admissions/fee-structure"
+                  className="text-sm font-bold text-sky-600 hover:underline"
+                >
+                  View Complete Fee Details →
+                </Link>
               </div>
             </section>
 
@@ -205,28 +244,36 @@ const HostelAdmissionPage = () => {
             <section>
               <SectionHeader title="Facilities Provided" icon={FaWifi} />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                <div className="text-center p-4 bg-white border border-gecl-border rounded-lg shadow-sm hover:border-gecl-accent transition">
-                  <FaBed className="mx-auto text-2xl text-gecl-primary mb-2" />
-                  <p className="text-sm font-semibold">Furnished Rooms</p>
+                <div className="text-center p-4 bg-white border border-gecl-border rounded-lg shadow-sm hover:border-gecl-accent transition group">
+                  <FaBed className="mx-auto text-2xl text-gecl-primary mb-2 group-hover:text-sky-600 transition-colors" />
+                  <p className="text-sm font-semibold text-gray-700">
+                    Furnished Rooms
+                  </p>
                 </div>
-                <div className="text-center p-4 bg-white border border-gecl-border rounded-lg shadow-sm hover:border-gecl-accent transition">
-                  <FaWifi className="mx-auto text-2xl text-gecl-primary mb-2" />
-                  <p className="text-sm font-semibold">High-Speed WiFi</p>
+                <div className="text-center p-4 bg-white border border-gecl-border rounded-lg shadow-sm hover:border-gecl-accent transition group">
+                  <FaWifi className="mx-auto text-2xl text-gecl-primary mb-2 group-hover:text-sky-600 transition-colors" />
+                  <p className="text-sm font-semibold text-gray-700">
+                    High-Speed WiFi
+                  </p>
                 </div>
-                <div className="text-center p-4 bg-white border border-gecl-border rounded-lg shadow-sm hover:border-gecl-accent transition">
-                  <FaShower className="mx-auto text-2xl text-gecl-primary mb-2" />
-                  <p className="text-sm font-semibold">RO Water & Cooler</p>
+                <div className="text-center p-4 bg-white border border-gecl-border rounded-lg shadow-sm hover:border-gecl-accent transition group">
+                  <FaShower className="mx-auto text-2xl text-gecl-primary mb-2 group-hover:text-sky-600 transition-colors" />
+                  <p className="text-sm font-semibold text-gray-700">
+                    RO Water & Cooler
+                  </p>
                 </div>
-                <div className="text-center p-4 bg-white border border-gecl-border rounded-lg shadow-sm hover:border-gecl-accent transition">
-                  <FaShieldAlt className="mx-auto text-2xl text-gecl-primary mb-2" />
-                  <p className="text-sm font-semibold">24x7 Security</p>
+                <div className="text-center p-4 bg-white border border-gecl-border rounded-lg shadow-sm hover:border-gecl-accent transition group">
+                  <FaShieldCat className="mx-auto text-2xl text-gecl-primary mb-2 group-hover:text-sky-600 transition-colors" />
+                  <p className="text-sm font-semibold text-gray-700">
+                    24x7 Security
+                  </p>
                 </div>
               </div>
             </section>
 
             {/* Critical Warning */}
-            <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <FaExclamationTriangle className="text-red-600 mt-1 shrink-0" />
+            <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm">
+              <FaExclamationTriangleFa className="text-red-600 mt-1 shrink-0" />
               <div>
                 <h4 className="font-bold text-red-800 text-sm">
                   Anti-Ragging Compliance
@@ -237,6 +284,12 @@ const HostelAdmissionPage = () => {
                   will be lodged. An Anti-Ragging Affidavit (Hostel) must be
                   signed by parents.
                 </p>
+                <Link
+                  href="/campus-life/health-safety"
+                  className="text-xs font-bold text-red-800 underline mt-2 inline-block"
+                >
+                  Read Anti-Ragging Policy
+                </Link>
               </div>
             </div>
           </div>
@@ -249,7 +302,6 @@ const HostelAdmissionPage = () => {
                 {
                   label: "Hostel Admission",
                   href: "/admissions/hostel-admission",
-                  active: true,
                 },
                 { label: "Fee Structure", href: "/admissions/fee-structure" },
                 {
@@ -279,13 +331,13 @@ const HostelAdmissionPage = () => {
                 <FileCard
                   title="Mess Menu (Veg/Non-Veg)"
                   subtitle="Weekly Chart"
-                  viewLink="#"
+                  viewLink="/campus-life/food"
                 />
               </div>
             </SidebarWidget>
 
             <SidebarWidget title="Hostel Contacts">
-              <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+              <div className="p-4 bg-gray-50 rounded-lg space-y-3 border border-gray-100">
                 <div>
                   <p className="text-xs text-gecl-text-muted uppercase font-bold">
                     Boy's Hostel Warden

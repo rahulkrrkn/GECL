@@ -2,19 +2,19 @@ import React from "react";
 import Link from "next/link";
 import { Metadata } from "next";
 import {
-  FaQuestionCircle,
-  FaUniversity,
+  FaSchool,
   FaBed,
-  FaFileAlt,
+  FaFile,
   FaHeadset,
-  FaSearch,
-} from "react-icons/fa";
+  FaCircleQuestion,
+} from "react-icons/fa6";
+import { FaQuestionCircle } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import * as motion from "framer-motion/client";
 
 // ✅ Shared Components
 import {
   PageHero,
-  Breadcrumb,
   SectionHeader,
   SidebarNavigation,
   SidebarWidget,
@@ -41,10 +41,15 @@ const FaqPage = () => {
 
   return (
     <main className="bg-gecl-background min-h-screen pb-16">
+      {/* ================= HERO SECTION ================= */}
       <PageHero
         title="Frequently Asked Questions"
+        badge="Help Center"
+        icon={<FaCircleQuestion />}
         description="Got questions about admission, fees, or campus life? Find clear answers here."
         image="/gecl/images/campus/gecl-campus-main.webp"
+        className="bg-emerald-950" // Custom Theme
+        themeColor="text-emerald-400"
         breadcrumbItems={breadcrumbItems}
       />
 
@@ -69,7 +74,7 @@ const FaqPage = () => {
             <section id="general">
               <SectionHeader
                 title="General & Admission Process"
-                icon={FaUniversity}
+                icon={FaSchool}
               />
               <div className="mt-4 bg-gecl-surface rounded-xl shadow-sm border border-gecl-border divide-y divide-gecl-border">
                 <AccordionItem
@@ -116,7 +121,7 @@ const FaqPage = () => {
 
             {/* 3. Documents & Reporting */}
             <section id="documents">
-              <SectionHeader title="Documents & Reporting" icon={FaFileAlt} />
+              <SectionHeader title="Documents & Reporting" icon={FaFile} />
               <div className="mt-4 bg-gecl-surface rounded-xl shadow-sm border border-gecl-border divide-y divide-gecl-border">
                 <AccordionItem
                   question="What if I don't have my CLC/Migration Certificate?"
@@ -146,7 +151,7 @@ const FaqPage = () => {
                 (10:00 AM - 4:00 PM).
               </p>
               <Link
-                href="/admissions/contact"
+                href="/contact"
                 className="inline-block px-6 py-2 bg-gecl-primary text-white text-sm font-semibold rounded-md hover:bg-gecl-accent transition"
               >
                 Contact Admission Cell

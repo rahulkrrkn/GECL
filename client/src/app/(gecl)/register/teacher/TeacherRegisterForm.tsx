@@ -784,7 +784,7 @@ export default function TeacherRegisterForm() {
                       onChange={(v: string) =>
                         handleChange("specialization", v)
                       }
-                      placeholder="e.g. AI/ML, Structural Eng."
+                      placeholder="e.g. AI, Structural Eng."
                       error={errors.specialization}
                     />
                   </div>

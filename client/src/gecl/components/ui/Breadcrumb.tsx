@@ -25,7 +25,7 @@ export default function Breadcrumb({
       aria-label="Breadcrumb"
       className={cn(
         // Layout & Positioning (Sticky bar below navbar)
-        "w-full sticky top-12.5 z-20",
+        "w-full sticky top-12.5 z-50",
         "border-b border-slate-200 bg-white/80 backdrop-blur-md",
         "transition-all duration-200",
         className,
