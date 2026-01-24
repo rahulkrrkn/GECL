@@ -37,21 +37,21 @@ import {
 // ----------------------------
 const DESIGNATIONS = [
   "Assistant Professor",
-  "Associate Professor",
   "Professor",
   "Guest Faculty",
-  "Lab Assistant",
+  // "Lab Assistant",
 ];
 
 const BRANCH_OPTIONS = [
-  { label: "Computer Science & Engg. (CSE)", value: "CSE" },
+  // { label: "Computer Science & Engg. (CSE)", value: "CSE" },
   { label: "Civil Engineering (CE)", value: "CE" },
   { label: "Mechanical Engineering (ME)", value: "ME" },
   { label: "Electrical Engineering (EE)", value: "EE" },
-  { label: "Electronics & Comm. (ECE)", value: "ECE" },
+  // { label: "Electronics & Comm. (ECE)", value: "ECE" },
   { label: "CSE - Data Science", value: "CSE-DS" },
   { label: "CSE - AI", value: "CSE-AI" },
-  { label: "Electrical & Electronics (EEE)", value: "EEE" },
+  { label: "Applied Science (AS)", value: "AS" },
+  // { label: "Electrical & Electronics (EEE)", value: "EEE" },
 ];
 
 // ----------------------------

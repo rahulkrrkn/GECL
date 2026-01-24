@@ -245,7 +245,7 @@ export default function LoginPage() {
       );
 
       if (res.success) {
-        const token = res.data.GECL_ACCESS_TOKEN;
+        const token = res.GECL_ACCESS_TOKEN;
         if (token) {
           handleLoginSuccess(token);
         }
@@ -318,8 +318,8 @@ export default function LoginPage() {
       );
 
       if (res.success) {
-        if (res.data.GECL_ACCESS_TOKEN) {
-          handleLoginSuccess(res.data.GECL_ACCESS_TOKEN);
+        if (res.GECL_ACCESS_TOKEN) {
+          handleLoginSuccess(res.GECL_ACCESS_TOKEN);
         }
       } else {
         handleApiError(res);

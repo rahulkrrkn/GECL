@@ -5,6 +5,7 @@ import { api } from "../services/api/axiosInstance";
 // Backend response type
 // --------------------
 export type BackendResponse<T> = {
+  GECL_ACCESS_TOKEN?: string;
   success: boolean;
   statusCode: number;
   status: string;

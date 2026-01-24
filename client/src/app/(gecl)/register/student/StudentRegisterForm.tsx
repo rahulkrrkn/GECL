@@ -431,8 +431,6 @@ export default function StudentRegisterForm() {
 
     setLoading(true);
     try {
-      console.log("registrationKey", registrationKey);
-
       const data = new FormData();
       // Identity
       data.append("fullName", formData.fullName);

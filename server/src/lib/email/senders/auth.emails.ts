@@ -6,7 +6,7 @@ export async function sendEmailOtp(to: string, otp: string) {
   const html = otpEmailTemplate({
     brandName: "RahulKrRKN",
     logoUrl:
-      "https://www.rahulkrrkn.com/gecl/government-engineering-college-lakhisarai-logo.webp",
+      "/gecl/government-engineering-college-lakhisarai-logo.webp",
     otp,
     supportEmail: "rahulkrrkn@gmail.com",
   });

@@ -97,7 +97,9 @@ export const employeeRegistrationSchema = z.object({
   experienceYears: z.coerce.number().min(0).optional().nullable(),
 
   branches: z
-    .array(z.enum(["CSE", "ECE", "EE", "ME", "CE", "CSE-AI", "CSE-DS", "EEE"]))
+    .array(
+      z.enum(["CSE", "ECE", "EE", "ME", "CE", "CSE-AI", "CSE-DS", "EEE", "AS"]),
+    )
     .optional()
     .nullable(),
 

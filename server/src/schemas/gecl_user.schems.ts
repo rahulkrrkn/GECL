@@ -73,7 +73,7 @@ export const GeclUserSchema = new Schema(
 
       branch: {
         type: String,
-        enum: ["CSE", "ECE", "EE", "ME", "CE", "CSE-AI", "CSE-DS", "EEE"],
+        enum: ["CSE", "ECE", "EE", "ME", "CE", "CSE-AI", "CSE-DS", "EEE", "AS"],
         default: null,
         index: true,
       },
@@ -123,7 +123,7 @@ export const GeclUserSchema = new Schema(
 
       departments: {
         type: [String],
-        enum: ["CSE", "ECE", "EE", "ME", "CE", "CSE-AI", "CSE-DS", "EEE"],
+        enum: ["CSE", "ECE", "EE", "ME", "CE", "CSE-AI", "CSE-DS", "EEE", "AS"],
         default: [],
         index: true,
       },
