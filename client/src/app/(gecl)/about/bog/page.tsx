@@ -226,7 +226,7 @@ export default function AdministrationFullTree() {
                     <FaMicrochip size={28} />
                   </div>
                   <h4 className="text-xl font-black text-slate-800 leading-tight">
-                    Prof. [Name]
+                    Prof. Phool Kumari
                   </h4>
                   <p className="text-xs text-blue-600 font-black uppercase tracking-tighter mt-1 mb-6">
                     Computer Science (AI)
@@ -235,7 +235,7 @@ export default function AdministrationFullTree() {
                     href="mailto:hod.ai@gecl.ac.in"
                     className="text-[11px] font-bold text-slate-400 hover:text-blue-600 flex items-center gap-2 transition-colors"
                   >
-                    <LuMail size={14} /> hod.ai@gecl.ac.in
+                    <LuMail size={14} /> phoolkumari.cusb@gmail.com
                   </a>
                 </div>
 

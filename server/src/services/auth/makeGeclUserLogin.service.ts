@@ -94,6 +94,7 @@ export const makeGeclUserLogin = async ({
   if (!user.personType) {
     return { ok: false as const, code: "GECL_PROFILE_NOT_FOUND" };
   }
+  console.log("user", user);
 
   // 1) build redis cache for page access
   try {
