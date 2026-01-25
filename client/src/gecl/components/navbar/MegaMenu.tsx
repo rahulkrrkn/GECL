@@ -45,7 +45,7 @@ export const MegaMenu = ({
         // BORDERS
         "border border-white/10",
         "border-t-[3px] border-t-gecl-accent",
-        "z-50 overflow-hidden",
+        "z-99 overflow-hidden",
       )}
     >
       <div className="p-8">

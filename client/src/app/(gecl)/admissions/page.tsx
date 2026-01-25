@@ -3,13 +3,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 import {
   FaUniversity,
-  FaUserGraduate,
-  FaChartLine,
-  FaCalendarAlt,
-  FaFileInvoiceDollar,
   FaHandHoldingUsd,
-  FaDownload,
-  FaArrowRight,
   FaBullhorn,
   FaCheckCircle,
 } from "react-icons/fa";

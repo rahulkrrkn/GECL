@@ -29,7 +29,7 @@ export const Navbar = () => {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50",
+          "fixed top-0 left-0 right-0 z-99",
           "transition-all duration-300 ease-in-out",
           // Always Navy Background
           "bg-gecl-nav-bg",
@@ -49,7 +49,8 @@ export const Navbar = () => {
               >
                 <span className="text-white font-display font-bold text-xl">
                   <Image
-                    src="/gecl/images/college/gec-lakhisarai-logo-circular-1.png"
+                    className="rounded"
+                    src="/gecl/images/college/gec-lakhisarai-logo-circular.webp"
                     alt="GEC Lakhisarai official rectangle logo"
                     width={220}
                     height={60}

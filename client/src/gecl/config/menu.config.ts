@@ -25,23 +25,25 @@ import {
   FaCircleQuestion,
   FaFutbol,
   FaUtensils,
-  FaVirus,
+  FaHeartPulse,
   FaUsers,
-  FaBook,
-  FaMicroscope,
-  FaChalkboardUser,
-  FaUserTie,
+  FaBookOpen,
   FaFlask,
-  FaBridge,
+  FaChalkboardUser,
+  FaBridgeWater,
   FaRobot,
   FaDatabase,
   FaBolt,
-  FaGears,
+  FaGear,
   FaBriefcase,
-  FaDiagramProject,
-  FaMagnifyingGlass,
-  FaImages,
-  FaPhone,
+  FaSitemap,
+  FaImage,
+  FaBuilding,
+  FaBus,
+  FaWifi,
+  FaUserTie,
+  FaTimeline,
+  FaFilePdf,
 } from "react-icons/fa6";
 
 // ✅ Roles (Updated)
@@ -89,17 +91,7 @@ export const menuConfig: MenuItem[] = [
       {
         label: "About College",
         href: "/about/college",
-        icon: FaBuildingColumns,
-      },
-      {
-        label: "Board of Governors (BOG)",
-        href: "/about/bog",
-        icon: FaUsers,
-      },
-      {
-        label: "Vision & Mission",
-        href: "/about/vision-mission",
-        icon: FaBullseye,
+        icon: FaBuilding,
       },
       {
         label: "Principal's Message",
@@ -107,9 +99,19 @@ export const menuConfig: MenuItem[] = [
         icon: FaQuoteLeft,
       },
       {
+        label: "Vision & Mission",
+        href: "/about/vision-mission",
+        icon: FaBullseye,
+      },
+      {
         label: "Administration",
         href: "/about/administration",
         icon: FaUsersGear,
+      },
+      {
+        label: "Board of Governors (BOG)",
+        href: "/about/bog",
+        icon: FaUsers,
       },
     ],
   },
@@ -121,24 +123,24 @@ export const menuConfig: MenuItem[] = [
     icon: FaGraduationCap,
     children: [
       {
-        label: "Syllabus",
-        href: "/academics/syllabus",
-        icon: FaBook,
-      },
-      {
-        label: "Class Routine",
-        href: "/academics/timetable",
-        icon: FaBarsProgress,
-      },
-      {
-        label: "Programs",
+        label: "Programs Offered",
         href: "/academics/programs",
         icon: FaLayerGroup,
       },
       {
-        label: "Calendar",
+        label: "Syllabus",
+        href: "/academics/syllabus",
+        icon: FaBookOpen,
+      },
+      {
+        label: "Academic Calendar",
         href: "/academics/calendar",
         icon: FaCalendarDays,
+      },
+      {
+        label: "Class Routine",
+        href: "/academics/timetable",
+        icon: FaTimeline,
       },
       {
         label: "Rules & Regulations",
@@ -146,14 +148,53 @@ export const menuConfig: MenuItem[] = [
         icon: FaScaleBalanced,
       },
       {
+        label: "Attendance Policy",
+        href: "/academics/attendance-policy",
+        icon: FaClipboardUser,
+      },
+      {
         label: "Anti-Ragging",
         href: "/academics/anti-ragging",
         icon: FaShieldHalved,
       },
+    ],
+  },
+
+  // ✅ Departments (Branch-wise)
+  {
+    label: "Departments",
+    href: "/departments",
+    icon: FaBuildingColumns,
+    children: [
       {
-        label: "Attendance Policy",
-        href: "/academics/attendance-policy",
-        icon: FaClipboardUser,
+        label: "Civil Engineering",
+        href: "/departments/civil",
+        icon: FaBridgeWater,
+      },
+      {
+        label: "Computer Science (AI)",
+        href: "/departments/cse-ai",
+        icon: FaRobot,
+      },
+      {
+        label: "Computer Science (Data Science)",
+        href: "/departments/cse-ds",
+        icon: FaDatabase,
+      },
+      {
+        label: "Electrical Engineering",
+        href: "/departments/electrical",
+        icon: FaBolt,
+      },
+      {
+        label: "Mechanical Engineering",
+        href: "/departments/mechanical",
+        icon: FaGear,
+      },
+      {
+        label: "Applied Science & Humanities",
+        href: "/departments/applied-science",
+        icon: FaFlask,
       },
     ],
   },
@@ -165,14 +206,19 @@ export const menuConfig: MenuItem[] = [
     icon: FaUserPlus,
     children: [
       {
-        label: "Eligibility",
+        label: "Admission Process",
+        href: "/admissions/admission-process",
+        icon: FaBarsProgress,
+      },
+      {
+        label: "Eligibility Criteria",
         href: "/admissions/eligibility",
         icon: FaListCheck,
       },
       {
-        label: "How to Apply",
-        href: "/admissions/how-to-apply",
-        icon: FaLaptopFile,
+        label: "Seat Intake",
+        href: "/admissions/seat-intake",
+        icon: FaChair,
       },
       {
         label: "Fee Structure",
@@ -185,9 +231,9 @@ export const menuConfig: MenuItem[] = [
         icon: FaHandHoldingDollar,
       },
       {
-        label: "Required Documents",
-        href: "/admissions/required-documents",
-        icon: FaFileContract,
+        label: "Lateral Entry (LE)",
+        href: "/admissions/lateral-entry",
+        icon: FaArrowRightToBracket,
       },
       {
         label: "Hostel Admission",
@@ -195,19 +241,9 @@ export const menuConfig: MenuItem[] = [
         icon: FaBed,
       },
       {
-        label: "Admission Process",
-        href: "/admissions/admission-process",
-        icon: FaBarsProgress,
-      },
-      {
-        label: "Lateral Entry (LE)",
-        href: "/admissions/lateral-entry",
-        icon: FaArrowRightToBracket,
-      },
-      {
-        label: "Seat Intake",
-        href: "/admissions/seat-intake",
-        icon: FaChair,
+        label: "Required Documents",
+        href: "/admissions/required-documents",
+        icon: FaFileContract,
       },
       {
         label: "FAQ",
@@ -217,116 +253,100 @@ export const menuConfig: MenuItem[] = [
     ],
   },
 
-  // ✅ Departments (Branch-wise)
-  {
-    label: "Departments",
-    href: "/departments",
-    icon: FaBuildingColumns,
-    children: [
-      //     // ✅ Applied Science
-      {
-        label: "Applied Science",
-        href: "/departments/applied-science",
-        icon: FaFlask,
-      },
-
-      // ✅ Civil Engineering
-      {
-        label: "Civil Engineering",
-        href: "/departments/civil",
-        icon: FaBridge,
-      },
-
-      // ✅ CSE - AI
-      {
-        label: "CSE (AI)",
-        href: "/departments/cse-ai",
-        icon: FaRobot,
-      },
-
-      // ✅ CSE - DS
-      {
-        label: "CSE (DS)",
-        href: "/departments/cse-ds",
-        icon: FaDatabase,
-      },
-
-      // ✅ Electrical Engineering
-      {
-        label: "Electrical Engineering",
-        href: "/departments/electrical",
-        icon: FaBolt,
-      },
-
-      // ✅ Mechanical Engineering
-      {
-        label: "Mechanical Engineering",
-        href: "/departments/mechanical",
-        icon: FaGears,
-      },
-    ],
-  },
-
   // ✅ Campus Life
   {
     label: "Campus Life",
     href: "/campus-life",
-    icon: FaBuildingColumns,
+    icon: FaBuildingColumns, // Or FaCity
     children: [
-      {
-        label: "Hostel",
-        href: "/campus-life/hostel",
-        icon: FaBed,
-      },
       {
         label: "Academic Facilities",
         href: "/campus-life/academic-facilities",
         icon: FaGraduationCap,
       },
       {
-        label: "Sports",
-        href: "/campus-life/sports",
-        icon: FaFutbol,
+        label: "Hostel Facilities",
+        href: "/campus-life/hostel",
+        icon: FaBed,
       },
       {
-        label: "Food",
+        label: "Central Library",
+        href: "/campus-life/library",
+        icon: FaBookOpen,
+      },
+      {
+        label: "Laboratories",
+        href: "/campus-life/labs",
+        icon: FaFlask,
+      },
+      {
+        label: "Canteen & Mess",
         href: "/campus-life/food",
         icon: FaUtensils,
       },
       {
-        label: "Health & Safety",
-        href: "/campus-life/health-safety",
-        icon: FaVirus,
+        label: "Sports & Fitness",
+        href: "/campus-life/sports",
+        icon: FaFutbol,
       },
       {
         label: "Clubs & Events",
         href: "/campus-life/clubs-events",
         icon: FaUsers,
       },
+      // {
+      //   label: "Transport",
+      //   href: "/campus-life/transport",
+      //   icon: FaBus,
+      // },
       {
-        label: "Library",
-        href: "/campus-life/library",
-        icon: FaBook,
+        label: "Health & Safety",
+        href: "/campus-life/health-safety",
+        icon: FaHeartPulse,
       },
-      {
-        label: "Labs",
-        href: "/campus-life/labs",
-        icon: FaMicroscope,
-      },
+      // {
+      //   label: "Wi-Fi & IT",
+      //   href: "/campus-life/wifi",
+      //   icon: FaWifi,
+      // },
     ],
   },
 
-  // ✅ All Links
+  // ✅ Placements
+  // {
+  //   label: "Placements",
+  //   href: "/placements",
+  //   icon: FaBriefcase,
+  //   children: [
+  //     {
+  //       label: "Training & Placement Cell",
+  //       href: "/placements/tpo-cell",
+  //       icon: FaUserTie,
+  //     },
+  //     {
+  //       label: "Placement Records",
+  //       href: "/placements/records",
+  //       icon: FaListCheck,
+  //     },
+  //     {
+  //       label: "Our Recruiters",
+  //       href: "/placements/recruiters",
+  //       icon: FaHandHoldingDollar,
+  //     },
+  //   ],
+  // },
+
+  // ---------------- DEV / ADMIN TOOLS ----------------
   {
-    roles: ["teacher", "principal", "guest"],
-    label: "All Links",
+    roles: ["teacher", "principal", "admin", "super-admin"],
+    label: "Quick Links",
     href: "/links",
-    icon: FaHouse,
+    icon: FaSitemap,
   },
   {
-    roles: ["teacher", "guest"],
-    label: "All Images",
-    href: "/images",
-    icon: FaHouse,
+    roles: ["teacher", "admin", "super-admin"],
+    label: "Asset Gallery",
+    href: "/gallery/tracker",
+    icon: FaImage,
   },
 ];

@@ -28,7 +28,7 @@ export const DropdownMenu = ({ items, isOpen, onClose }: DropdownMenuProps) => {
         // BORDERS: Subtle white border for definition + Saffron Top
         "border border-white/10",
         "border-t-[3px] border-t-gecl-accent",
-        "py-2 z-50 overflow-hidden",
+        "py-2 z-99 overflow-hidden",
       )}
     >
       {items.map((item) => {

@@ -61,7 +61,7 @@ const PROGRAMS = [
     duration: "4 Years",
     icon: LuBuilding,
     color: "text-orange-600 bg-orange-50",
-    image: "/gecl/images/dept-civil.webp",
+    image: "/gecl/images/departments/dept-civil.webp",
     desc: "Focuses on infrastructure development, structural engineering, surveying, and sustainable construction practices.",
   },
   {
@@ -71,7 +71,7 @@ const PROGRAMS = [
     duration: "4 Years",
     icon: LuCpu,
     color: "text-blue-600 bg-blue-50",
-    image: "/gecl/images/dept-cse-ai.webp",
+    image: "/gecl/images/departments/dept-cse-ai.webp",
     desc: "Advanced curriculum covering Neural Networks, Deep Learning, Robotics, and intelligent system design.",
   },
   {
@@ -81,7 +81,7 @@ const PROGRAMS = [
     duration: "4 Years",
     icon: LuBookOpen,
     color: "text-indigo-600 bg-indigo-50",
-    image: "/gecl/images/dept-cse-ds.webp",
+    image: "/gecl/images/departments/dept-cse-ds.webp",
     desc: "Specialized program in Big Data Analytics, Statistical Modeling, and Data Visualization techniques.",
   },
   {
@@ -91,7 +91,7 @@ const PROGRAMS = [
     duration: "4 Years",
     icon: LuSettings,
     color: "text-slate-600 bg-slate-100",
-    image: "/gecl/images/dept-mech.webp",
+    image: "/gecl/images/departments/dept-mech.webp",
     desc: "Covers Thermodynamics, Fluid Mechanics, CAD/CAM, and modern manufacturing processes.",
   },
   {
@@ -101,7 +101,7 @@ const PROGRAMS = [
     duration: "4 Years",
     icon: LuZap,
     color: "text-yellow-600 bg-yellow-50",
-    image: "/gecl/images/dept-ee.webp",
+    image: "/gecl/images/departments/dept-ee.webp",
     desc: "Studies in Power Systems, Control Systems, IoT, and renewable energy technologies.",
   },
 ];

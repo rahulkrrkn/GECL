@@ -7,7 +7,7 @@ export const EmailService = {
     console.log("Email", "html");
     // console.log("Email", html);
 
-    // await provider.send({ to, subject, html });
+    await provider.send({ to, subject, html });
   },
 
   // async sendVerificationEmail(to: string, link: string, name?: string) {

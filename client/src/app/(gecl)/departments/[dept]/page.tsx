@@ -217,7 +217,7 @@ export default async function DepartmentHomePage({
           </p>
         </div>
         <Link
-          href="https://beupatna.ac.in"
+          href="https://beu-bih.ac.in/"
           target="_blank"
           className="relative z-10 px-6 py-3 bg-white text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-yellow-400 transition-colors flex items-center gap-2"
         >

@@ -149,11 +149,7 @@ export default function AttendancePolicyPage() {
                 <div className="md:w-2/3">
                   <p className="text-slate-600 mb-4 leading-relaxed">
                     To ensure transparency and accuracy, GEC Lakhisarai has
-                    implemented a{" "}
-                    <strong>
-                      Aadhaar-enabled Biometric Attendance System (AEBAS)
-                    </strong>
-                    .
+                    implemented a <strong>Biometric Attendance System</strong>.
                   </p>
                   <div className="space-y-3">
                     <FeatureItem

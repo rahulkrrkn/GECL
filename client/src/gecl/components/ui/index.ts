@@ -11,3 +11,4 @@ export { default as AccordionItem } from "./AccordionItem";
 export { default as FeatureItem } from "./FeatureItem";
 export { default as StatCard } from "./StatCard";
 export { default as ImageCard } from "./ImageCard";
+export { default as ContentProtection } from "./ContentProtection";
