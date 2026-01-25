@@ -104,7 +104,9 @@ export function sendCookie(
   };
 
   if (!isDev) {
-    cookieOptions.domain = process.env.CLIENT_URL as string || "http://rahulkrrkn.com";
+    console.log("All Good");
+
+    cookieOptions.domain = process.env.CLIENT_URL || "http://rahulkrrkn.com";
   }
 
   res.cookie(nameOfCookie, data as string, cookieOptions);
