@@ -30,23 +30,25 @@ export const GeclUserSchema = new Schema(
     },
 
     // update
-    role: {
-      type: String,
-      enum: [
-        "student",
-        "hod",
-        "teacher",
-        "vice_principal",
-        "principal",
-        "librarian",
-        "tpo",
-        "alumni",
-        "staff",
-        "admin",
-      ],
-      required: true,
-      index: true,
-    },
+    role: [
+      {
+        type: String,
+        enum: [
+          "student",
+          "hod",
+          "teacher",
+          "vice_principal",
+          "principal",
+          "librarian",
+          "tpo",
+          "alumni",
+          "staff",
+          "admin",
+        ],
+        required: true,
+        index: true,
+      },
+    ],
     status: {
       type: String,
       enum: ["pending", "active", "rejected", "blocked", "unverified"],

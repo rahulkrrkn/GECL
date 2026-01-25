@@ -21,6 +21,7 @@ import {
   studentRegistrationMainCtrl,
 } from "../controllers/auth/studentRegistration.ctrl.js";
 import { refreshAccessToken } from "../controllers/auth/refreshToken.ctrl.js";
+import { geclLogout } from "../controllers/auth/logout.ctrl.js";
 
 const auth = Router();
 
@@ -89,4 +90,10 @@ auth.post(
 
 // auth.post("/registration/teacher", validateBody(login.teacherRegistrationSchema), teacherRegistrationMainCtrl);
 
+// =======================
+// Logout Routes
+// =======================
+
+auth.post("/logout", geclLogout);
+auth.get("/logout", geclLogout);
 export default auth;

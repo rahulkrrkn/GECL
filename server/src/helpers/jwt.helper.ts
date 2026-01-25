@@ -3,7 +3,7 @@ import jwt, { type Secret, type SignOptions } from "jsonwebtoken";
 export type AccessTokenPayload = {
   userId: string;
   email: string;
-  role: string; // ✅ added
+  role: string[]; // ✅ added
 };
 
 const ACCESS_TOKEN_SECRET: Secret = process.env

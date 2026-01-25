@@ -7,6 +7,9 @@ import { formatZodError } from "../errors/zodFormatter.err.js";
 export const validateBody =
   <T>(schema: ZodSchema<T>): RequestHandler =>
   (req, _res, next) => {
+    console.log("req", req.header);
+    console.log("req2", req.headers);
+
     const result = schema.safeParse(req.body);
     console.log("Request Body :", req.body);
     console.log("Request Body  result:", result);

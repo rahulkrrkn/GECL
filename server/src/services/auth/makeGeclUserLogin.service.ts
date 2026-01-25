@@ -8,6 +8,7 @@ import { getRedis } from "../../config/redis.config.js";
 
 import { getGeclRefreshSessionFUIConn } from "../../models/gecl_refreshSession.model.js";
 import { getGeclUserFUIConn } from "../../models/gecl_user.model.js";
+import { json } from "zod";
 
 // ==============================
 // Types
@@ -31,7 +32,7 @@ async function buildGeclPageAccessCache({
   pageAccess,
 }: {
   userId: string;
-  role: string;
+  role: string[];
   pageAccess?: any;
 }) {
   const ACCESS_MIN = Number(process.env.GECL_JWT_ACCESS_EXPIRES_MIN || 15);
@@ -94,7 +95,9 @@ export const makeGeclUserLogin = async ({
   if (!user.personType) {
     return { ok: false as const, code: "GECL_PROFILE_NOT_FOUND" };
   }
-  console.log("user", user);
+  if (user.role.length === 0) {
+    return { ok: false as const, code: "GECL_ROLE_NOT_FOUND" };
+  }
 
   // 1) build redis cache for page access
   try {
@@ -124,6 +127,7 @@ export const makeGeclUserLogin = async ({
   const REFRESH_DAYS = Number(
     process.env.GECL_REFRESH_SESSION_EXPIRES_DAYS || 7,
   );
+  const ACCESS_MIN = Number(process.env.GECL_JWT_ACCESS_EXPIRES_MIN) || 15;
 
   const RefreshSession = await getGeclRefreshSessionFUIConn();
 
@@ -167,10 +171,20 @@ export const makeGeclUserLogin = async ({
     JSON.stringify({ sid: session._id.toString(), rt: refreshToken }),
     24 * REFRESH_DAYS,
   );
-
+  // console.log("user", user);
   // 7) set response token
   res.locals.publicData = res.locals.publicData || {};
-  res.locals.publicData.GECL_ACCESS_TOKEN = accessToken;
+  const accessTokenData: any = {
+    token: accessToken,
+    expiresAt: new Date(Date.now() + ACCESS_MIN * 60 * 1000),
+    allow: user.pageAccess?.allow ?? [],
+    deny: user.pageAccess?.deny ?? [],
+    allowExtra: user.pageAccess?.allowExtra ?? [],
+    role: user.role,
+    personType: user.personType,
+  };
+
+  res.locals.publicData.GECL_ACCESS_TOKEN = accessTokenData;
 
   return { ok: true as const, code: "LOGIN_SUCCESS" };
 };

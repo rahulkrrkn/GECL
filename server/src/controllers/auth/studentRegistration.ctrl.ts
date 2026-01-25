@@ -202,7 +202,7 @@ export async function studentRegistrationMainCtrl(req: Request, res: Response) {
     mobile,
     email: normalizedEmail,
     passwordHash: await bcrypt.hash(password, 10),
-    role: "student",
+    role: ["student"],
     personType: "student",
     userName: regNo,
     profilePicUrl: profilePic,
@@ -350,7 +350,7 @@ export async function employeeRegistrationMainCtrl(
     email: normalizedEmail,
     passwordHash: await bcrypt.hash(password, 10),
 
-    role,
+    role : [role],
     personType: "employee",
 
     profilePicUrl: profilePic,
