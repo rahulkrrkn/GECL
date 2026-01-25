@@ -1,15 +1,12 @@
-// File: src/app/(gecl)/login/LoginPage.tsx
-
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
 import { useApi } from "@/gecl/hooks/useApi";
-// IMPORT TYPES FROM API REQUEST
 import type { ApiFailure } from "@/gecl/utils/apiRequest";
 import { FcGoogle } from "react-icons/fc";
 import {
@@ -25,24 +22,26 @@ import {
   FiCheckCircle,
 } from "react-icons/fi";
 
-// ----------------------------
-// API Response Data Types
-// ----------------------------
-// Only define the 'Success' data shape here.
-// Failure is handled by ApiFailure type.
-
+// ✅ Updated Interface to be flexible (String OR Object)
 interface LoginData {
   user: { id: string; email: string; role: string };
-  GECL_ACCESS_TOKEN: string;
+  GECL_ACCESS_TOKEN:
+    | string
+    | {
+        token: string;
+        expiresAt: string;
+        allow: string[];
+        deny: string[];
+        allowExtra: string[];
+        role: string[];
+        personType: string;
+      };
 }
 
 interface OtpSentData {
   email: string;
 }
 
-// ----------------------------
-// Zod Schemas (No Changes)
-// ----------------------------
 const emailSchema = z.string().email("Please enter a valid email address");
 const passwordSchema = z.string().min(1, "Password is required");
 
@@ -60,9 +59,6 @@ const otpVerifySchema = z.object({
   otp: z.string().length(6, "OTP must be exactly 6 digits"),
 });
 
-// ----------------------------
-// Components (No Changes)
-// ----------------------------
 function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
@@ -148,9 +144,18 @@ export default function LoginPage() {
 
   const collegeName = "Government Engineering College";
   const collegeLocation = "Lakhisarai";
-  // Ensure this image exists in your public folder
   const imagePath =
     "/gecl/images/college/gecl-government-engineering-college-lakhisarai.webp";
+
+  useEffect(() => {
+    const hasToken = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("GECL_ACCESS_TOKEN="));
+
+    if (hasToken) {
+      router.replace("/");
+    }
+  }, [router]);
 
   const title = useMemo(() => {
     if (tab === "password") return "Welcome Back";
@@ -181,8 +186,6 @@ export default function LoginPage() {
     setServerError(null);
   }
 
-  // --- Centralized Error Mapper ---
-  // FIXED: Now accepts ApiFailure type
   const handleApiError = (res: ApiFailure) => {
     const code = res.code || "UNKNOWN";
     const msg = res.message || "An unexpected error occurred.";
@@ -195,26 +198,27 @@ export default function LoginPage() {
       code === "AUTH_USER_NOT_FOUND" ||
       code === "AUTH_INVALID_EMAIL"
     ) {
-      newErrors.identifier = msg; // Password login
-      newErrors.email = msg; // OTP login
+      newErrors.identifier = msg;
+      newErrors.email = msg;
     } else if (code === "AUTH_PASSWORD_MISMATCH") {
       newErrors.password = msg;
     } else if (code === "AUTH_ACCOUNT_PENDING") {
       setServerError("Your account is pending approval from the admin.");
     } else {
-      setServerError(msg); // General error
+      setServerError(msg);
     }
 
     setErrors((prev) => ({ ...prev, ...newErrors }));
   };
 
-  const handleLoginSuccess = (token: string) => {
-    localStorage.setItem("GECL_ACCESS_TOKEN", token);
-    document.cookie = `GECL_ACCESS_TOKEN=${token}; path=/; max-age=86400; SameSite=Strict; Secure`;
-    router.push("/");
-  };
+  // ✅ FIXED: Now accepts 'string' OR '{ token: string }'
+  const handleLoginSuccess = (data: string | { token: string }) => {
+    // Check if data is string or object and extract token accordingly
+    const tokenVal = typeof data === "string" ? data : data.token;
 
-  // --- Handlers ---
+    document.cookie = `GECL_ACCESS_TOKEN=${tokenVal}; path=/; max-age=86400; SameSite=Strict; Secure`;
+    window.location.href = "/";
+  };
 
   async function handlePasswordLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -234,7 +238,6 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      // Pass the LoginData Type here
       const res = await request<LoginData>(
         {
           method: "POST",
@@ -245,12 +248,12 @@ export default function LoginPage() {
       );
 
       if (res.success) {
+        // Pass whatever data format comes back
         const token = res.GECL_ACCESS_TOKEN;
         if (token) {
           handleLoginSuccess(token);
         }
       } else {
-        // TypeScript knows res is ApiFailure here
         handleApiError(res);
       }
     } finally {
@@ -342,7 +345,6 @@ export default function LoginPage() {
     }, 1000);
   }
 
-  // --- UI ---
   return (
     <main
       className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
@@ -407,7 +409,6 @@ export default function LoginPage() {
               <p className="text-slate-400 text-sm">{subtitle}</p>
             </div>
 
-            {/* General Error Alert */}
             <AnimatePresence>
               {serverError && (
                 <GeneralError
@@ -417,7 +418,6 @@ export default function LoginPage() {
               )}
             </AnimatePresence>
 
-            {/* Tabs */}
             <div className="flex p-1 mb-8 bg-slate-950/50 rounded-xl border border-slate-800/50">
               {(["password", "otp"] as Tab[]).map((t) => (
                 <button
@@ -437,7 +437,6 @@ export default function LoginPage() {
             </div>
 
             <AnimatePresence mode="wait">
-              {/* PASSWORD LOGIN */}
               {tab === "password" && (
                 <motion.form
                   key="password-form"
@@ -641,6 +640,7 @@ export default function LoginPage() {
                 </motion.div>
               )}
             </AnimatePresence>
+
             {/* Footer / Social */}
             <div className="mt-8 pt-6 border-t border-slate-800">
               <button

@@ -318,11 +318,13 @@ export const menuConfig: MenuItem[] = [
 
   // ✅ All Links
   {
+    roles: ["teacher", "principal", "guest"],
     label: "All Links",
     href: "/links",
     icon: FaHouse,
   },
   {
+    roles: ["teacher", "guest"],
     label: "All Images",
     href: "/images",
     icon: FaHouse,

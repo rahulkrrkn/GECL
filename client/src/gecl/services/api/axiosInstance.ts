@@ -2,27 +2,46 @@ import axios, {
   AxiosError,
   AxiosHeaders,
   type AxiosInstance,
-  type AxiosRequestConfig,
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from "axios";
 
 const TOKEN_KEY = "GECL_ACCESS_TOKEN";
 
-// ADDED: Exported so you can use it in your UI (e.g., Logout button)
-export const tokenService = {
-  getAccessToken(): string | null {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(TOKEN_KEY);
-  },
+type StoredTokenData = {
+  token: string;
+  expiresAt?: string;
+  allow?: string[];
+  deny?: string[];
+  allowExtra?: string[];
+  role?: string[];
+  personType?: string;
+};
 
-  setAccessToken(token: string): void {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(TOKEN_KEY, token);
+export const tokenService = {
+  getTokenData(): StoredTokenData | null {
+    if (typeof window === "undefined") return null;
+
+    const raw = localStorage.getItem(TOKEN_KEY);
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw) as StoredTokenData;
+    } catch {
+      return null;
     }
   },
 
-  removeAccessToken(): void {
+  getAccessToken(): string | null {
+    return this.getTokenData()?.token ?? null;
+  },
+
+  setTokenData(data: StoredTokenData): void {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(TOKEN_KEY, JSON.stringify(data));
+  },
+
+  removeTokenData(): void {
     if (typeof window !== "undefined") {
       localStorage.removeItem(TOKEN_KEY);
     }
@@ -30,8 +49,8 @@ export const tokenService = {
 };
 
 type GeclResponse = {
-  GECL_ACCESS_TOKEN?: string;
-  GECL_ACCESS_TOKEN_EXPIRE?: boolean;
+  GECL_ACCESS_TOKEN?: StoredTokenData;
+  GECL_IS_ACCESS_TOKEN_EXPIRED?: boolean;
   message?: string;
   status?: string;
 };
@@ -40,7 +59,6 @@ type RetryAxiosRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 };
 
-// FIXED: Removed trailing slash
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "https://api.gecl.rahulkrrkn.com";
 
@@ -57,10 +75,7 @@ api.interceptors.request.use(
     const token = tokenService.getAccessToken();
 
     if (token) {
-      // Safe header setting using AxiosHeaders class
-      if (!config.headers) {
-        config.headers = new AxiosHeaders();
-      }
+      if (!config.headers) config.headers = new AxiosHeaders();
       config.headers.set("Authorization", `Bearer ${token}`);
     }
 
@@ -93,31 +108,34 @@ const processQueue = (error: unknown, token: string | null = null): void => {
 // ---------------------------
 api.interceptors.response.use(
   (response: AxiosResponse<GeclResponse>) => {
-    const newToken = response.data?.GECL_ACCESS_TOKEN;
-    if (newToken) tokenService.setAccessToken(newToken);
+    const newTokenData = response.data?.GECL_ACCESS_TOKEN;
+
+    if (newTokenData) {
+      tokenService.setTokenData(newTokenData);
+    }
 
     return response;
   },
 
   async (error: AxiosError<GeclResponse>) => {
     const originalRequest = error.config as RetryAxiosRequestConfig | undefined;
-
     if (!originalRequest) return Promise.reject(error);
 
     const isTokenExpired =
-      error.response?.data?.GECL_ACCESS_TOKEN_EXPIRE === true ||
-      error.response?.data?.message === "GECL_ACCESS_TOKEN_EXPIRE";
+      error.response?.data?.GECL_IS_ACCESS_TOKEN_EXPIRED === true ||
+      error.response?.data?.message === "GECL_IS_ACCESS_TOKEN_EXPIRED";
 
     if (!isTokenExpired) return Promise.reject(error);
 
+    // If already retried and still failing → logout
     if (originalRequest._retry) {
-      tokenService.removeAccessToken();
+      tokenService.removeTokenData();
       return Promise.reject(error);
     }
 
     originalRequest._retry = true;
 
-    // If refresh already running -> queue request
+    // If refresh already running → queue request
     if (isRefreshing) {
       return new Promise<string>((resolve, reject) => {
         failedQueue.push({ resolve, reject });
@@ -125,7 +143,6 @@ api.interceptors.response.use(
         if (!originalRequest.headers) {
           originalRequest.headers = new AxiosHeaders();
         } else if (!(originalRequest.headers instanceof AxiosHeaders)) {
-          // Convert plain object to AxiosHeaders if necessary
           originalRequest.headers = new AxiosHeaders(originalRequest.headers);
         }
 
@@ -143,26 +160,34 @@ api.interceptors.response.use(
         { withCredentials: true },
       );
 
-      const newToken = refreshRes.data?.GECL_ACCESS_TOKEN;
+      const newTokenData = refreshRes.data?.GECL_ACCESS_TOKEN;
 
-      if (!newToken)
-        throw new Error("Refresh API did not return GECL_ACCESS_TOKEN");
+      if (!newTokenData?.token) {
+        throw new Error("Refresh API did not return a valid token");
+      }
 
-      tokenService.setAccessToken(newToken);
-      processQueue(null, newToken);
+      // Store full object
+      tokenService.setTokenData(newTokenData);
 
+      // Resolve all queued requests with ONLY token string
+      processQueue(null, newTokenData.token);
+
+      // Retry original request with new token
       if (!originalRequest.headers) {
         originalRequest.headers = new AxiosHeaders();
       } else if (!(originalRequest.headers instanceof AxiosHeaders)) {
         originalRequest.headers = new AxiosHeaders(originalRequest.headers);
       }
 
-      originalRequest.headers.set("Authorization", `Bearer ${newToken}`);
+      originalRequest.headers.set(
+        "Authorization",
+        `Bearer ${newTokenData.token}`,
+      );
 
       return api(originalRequest);
     } catch (refreshError: unknown) {
       processQueue(refreshError, null);
-      tokenService.removeAccessToken();
+      tokenService.removeTokenData();
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

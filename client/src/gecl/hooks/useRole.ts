@@ -4,10 +4,18 @@ import {
   type MenuItem,
   type UserRole,
 } from "@/gecl/config/menu.config";
+import { useApi } from "@/gecl/hooks/useApi";
+const TOKEN_KEY = "GECL_ACCESS_TOKEN";
 
-interface TokenPayload {
-  role: UserRole;
-}
+type StoredTokenData = {
+  token: string;
+  expiresAt?: string;
+  allow?: string[];
+  deny?: string[];
+  allowExtra?: string[];
+  role?: UserRole[] | string[];
+  personType?: string;
+};
 
 const ALL_ROLES: UserRole[] = [
   "guest",
@@ -28,69 +36,117 @@ const isValidRole = (role: unknown): role is UserRole =>
   typeof role === "string" && ALL_ROLES.includes(role as UserRole);
 
 const normalizeRole = (role: unknown): UserRole => {
-  if (role === "super_admin") return "super-admin"; // optional support
+  if (role === "super_admin") return "super-admin";
   return isValidRole(role) ? role : "guest";
 };
 
-const getInitialRole = (): UserRole => {
-  if (typeof window === "undefined") return "guest";
+const normalizeRoles = (roles: unknown): UserRole[] => {
+  if (!roles) return ["guest"];
+
+  if (typeof roles === "string") {
+    const r = normalizeRole(roles);
+    return r === "guest" ? ["guest"] : [r];
+  }
+
+  // If backend sends role: ["teacher","principal"]
+  if (Array.isArray(roles)) {
+    const cleaned = roles.map(normalizeRole).filter((r) => r !== "guest");
+
+    return cleaned.length ? cleaned : ["guest"];
+  }
+
+  return ["guest"];
+};
+
+const getInitialRoles = (): UserRole[] => {
+  if (typeof window === "undefined") return ["guest"];
 
   try {
-    const token = localStorage.getItem("GECL_ACCESS_TOKEN");
-    if (!token) return "guest";
+    const raw = localStorage.getItem(TOKEN_KEY);
+    if (!raw) return ["guest"];
 
-    const payload: TokenPayload = JSON.parse(token);
-    return normalizeRole(payload?.role);
+    const tokenData: StoredTokenData = JSON.parse(raw);
+    return normalizeRoles(tokenData?.role);
   } catch {
-    return "guest";
+    return ["guest"];
   }
 };
 
 export const useRole = () => {
-  const [role, setRole] = useState<UserRole>(() => getInitialRole());
-  const [isLoading] = useState(false); // ✅ kept (for future async auth)
+  const { request } = useApi();
+  // ✅ now role is array internally
+  const [roles, setRoles] = useState<UserRole[]>(() => getInitialRoles());
+  const [isLoading] = useState(false);
 
+  // ✅ menu shows items for ANY role (teacher + principal both)
   const filteredMenu = useMemo(() => {
-    const filterByRole = (items: MenuItem[]): MenuItem[] => {
+    const filterByRoles = (items: MenuItem[]): MenuItem[] => {
       return items
-        .filter((item) => !item.roles || item.roles.includes(role))
+        .filter((item) => {
+          // public item
+          if (!item.roles || item.roles.length === 0) return true;
+
+          // show if user has at least one role that matches
+          return item.roles.some((r) => roles.includes(r));
+        })
         .map((item) => ({
           ...item,
-          children: item.children ? filterByRole(item.children) : undefined,
+          children: item.children ? filterByRoles(item.children) : undefined,
         }));
     };
 
-    return filterByRole(menuConfig);
-  }, [role]);
+    return filterByRoles(menuConfig);
+  }, [roles]);
 
+  // ✅ keep same API for Navbar
+
+  const logout = async () => {
+    // request;
+    const res = await request(
+      {
+        method: "GET",
+        url: "/auth/logout",
+      },
+      { showMsg: false, showErrorMsg: false, showSuccessMsg: true },
+    );
+    if (res.success) {
+      localStorage.removeItem(TOKEN_KEY);
+      document.cookie =
+        "GECL_ACCESS_TOKEN=; path=/; max-age=0; SameSite=Strict; Secure";
+      localStorage.removeItem(TOKEN_KEY);
+      setRoles(["guest"]);
+    } else {
+      alert("Failed to logout");
+    }
+  };
+
+  // Optional: if you still use login() anywhere for testing
   const login = (newRole: UserRole) => {
     if (typeof window === "undefined") return;
 
     const safeRole = normalizeRole(newRole);
 
-    localStorage.setItem(
-      "GECL_ACCESS_TOKEN",
-      JSON.stringify({ role: safeRole }),
-    );
+    // ⚠️ Don't destroy your token object, update safely
+    const raw = localStorage.getItem(TOKEN_KEY);
+    const existing = raw ? (JSON.parse(raw) as StoredTokenData) : null;
 
-    setRole(safeRole);
+    const updated: StoredTokenData = {
+      ...(existing ?? ({} as StoredTokenData)),
+      token: existing?.token ?? "",
+      role: [safeRole],
+    };
+
+    localStorage.setItem(TOKEN_KEY, JSON.stringify(updated));
+    setRoles([safeRole]);
   };
 
-  const logout = () => {
-    if (typeof window === "undefined") return;
-
-    localStorage.removeItem("GECL_ACCESS_TOKEN");
-    setRole("guest");
-  };
-
-  const isAuthenticated = role !== "guest";
+  const isAuthenticated = !roles.includes("guest");
 
   return {
-    role,
-    isLoading,
     filteredMenu,
-    login,
-    logout,
     isAuthenticated,
+    logout,
+    isLoading,
+    login, // kept so your current code doesn't break anywhere
   };
 };
