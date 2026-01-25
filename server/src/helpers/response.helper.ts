@@ -104,12 +104,10 @@ export function sendCookie(
   };
 
   if (!isDev) {
-    console.log("All Good");
-
-    cookieOptions.domain = process.env.CLIENT_URL || "http://rahulkrrkn.com";
+    cookieOptions.domain = process.env.COOKIE_DOMAIN || "rahulkrrkn.com";
   }
 
-  res.cookie(nameOfCookie, data as string, cookieOptions);
+  res.cookie(nameOfCookie, data, cookieOptions);
 }
 
 /* =======================
@@ -132,7 +130,7 @@ export function clearCookie(
   };
 
   if (!isDev) {
-    cookieOptions.domain = ".cartify.rahulkrrkn.com";
+    cookieOptions.domain = process.env.COOKIE_DOMAIN || "rahulkrrkn.com";
   }
 
   res.clearCookie(nameOfCookie, cookieOptions);
