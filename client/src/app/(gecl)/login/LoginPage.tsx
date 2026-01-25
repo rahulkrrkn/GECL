@@ -21,6 +21,7 @@ import {
   FiMapPin,
   FiCheckCircle,
 } from "react-icons/fi";
+import GoogleAccountLogin from "./GoogleAccountLogin";
 
 // ✅ Updated Interface to be flexible (String OR Object)
 interface LoginData {
@@ -403,12 +404,10 @@ export default function LoginPage() {
         <section className="relative">
           <div className="relative bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl p-8 sm:p-10 overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-tr from-transparent via-blue-500/50 to-transparent" />
-
             <div className="mb-8 text-center lg:text-left">
               <h2 className="text-3xl font-bold text-white mb-2">{title}</h2>
               <p className="text-slate-400 text-sm">{subtitle}</p>
             </div>
-
             <AnimatePresence>
               {serverError && (
                 <GeneralError
@@ -417,7 +416,6 @@ export default function LoginPage() {
                 />
               )}
             </AnimatePresence>
-
             <div className="flex p-1 mb-8 bg-slate-950/50 rounded-xl border border-slate-800/50">
               {(["password", "otp"] as Tab[]).map((t) => (
                 <button
@@ -435,7 +433,6 @@ export default function LoginPage() {
                 </button>
               ))}
             </div>
-
             <AnimatePresence mode="wait">
               {tab === "password" && (
                 <motion.form
@@ -640,16 +637,14 @@ export default function LoginPage() {
                 </motion.div>
               )}
             </AnimatePresence>
-
+      
+            
             {/* Footer / Social */}
             <div className="mt-8 pt-6 border-t border-slate-800">
-              <button
-                type="button"
-                className="w-full bg-slate-800/50 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white font-medium h-11 rounded-xl transition-all flex items-center justify-center gap-3"
-              >
-                <FcGoogle className="text-xl" />
-                <span>Continue with Google</span>
-              </button>
+              {/* ✅ UPDATED: Use the new Component */}
+              <div className="w-full ">
+                <GoogleAccountLogin onSuccess={handleLoginSuccess} />
+              </div>
 
               <div className="mt-6 space-y-3 text-center">
                 <p className="text-xs text-slate-500">
