@@ -20,7 +20,15 @@ export const GeclRefreshSessionSchema = new Schema(
     // ==============================
     loginMethod: {
       type: String,
-      enum: ["email-password", "mobile-password", "email-otp", "refresh-token"],
+      enum: [
+        "email-password",
+        "mobile-password",
+        "email-otp",
+        "refresh-token",
+        "google",
+        "google-sub",
+        "google-email",
+      ],
       required: true,
       index: true,
     },

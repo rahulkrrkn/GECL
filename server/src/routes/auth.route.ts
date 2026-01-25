@@ -10,6 +10,7 @@ import {
   geclEmailVerifyOtp,
   geclIdPasswordLogin,
 } from "../controllers/auth/login.crtl.js";
+import { geclGoogleAccountLogin } from "../controllers/auth/geclGoogleAccountLogin.ctrl.js";
 
 import {
   studentRegSendOtp,
@@ -41,6 +42,11 @@ auth.post(
   "/login/password",
   validateBody(login.loginWithPassword),
   geclIdPasswordLogin,
+);
+auth.post(
+  "/login/google",
+  validateBody(login.loginWithGoogleAccount),
+  geclGoogleAccountLogin,
 );
 
 auth.post("/refresh", refreshAccessToken);

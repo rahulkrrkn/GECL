@@ -13,7 +13,13 @@ import { json } from "zod";
 // ==============================
 // Types
 // ==============================
-type LoginMethod = "email-password" | "mobile-password" | "email-otp";
+type LoginMethod  =
+  | "email-password"
+  | "mobile-password"
+  | "email-otp"
+  | "google"
+  | "google-sub"
+  | "google-email";
 
 // ==============================
 // Redis Keys (GECL: prefix)

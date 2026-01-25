@@ -13,6 +13,7 @@ export const GeclUserSchema = new Schema(
       lowercase: true,
       trim: true,
     },
+    googleSub: { type: String, default: null, trim: true },
 
     mobile: { type: String, default: null, trim: true },
 

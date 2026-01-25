@@ -130,7 +130,7 @@ export function clearCookie(
   };
 
   if (!isDev) {
-    cookieOptions.domain = process.env.COOKIE_DOMAIN || "rahulkrrkn.com";
+    cookieOptions.domain = process.env.COOKIE_DOMAIN0 || "rahulkrrkn.com";
   }
 
   res.clearCookie(nameOfCookie, cookieOptions);
