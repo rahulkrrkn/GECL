@@ -50,8 +50,8 @@ export async function studentRegSendOtp(req: Request, res: Response) {
   }
 
   // TODO: Replace with random OTP in production
-  const otp = "123456";
-  // const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  // const otp = "123456";
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
   await saveOtp({
     channel: "email",

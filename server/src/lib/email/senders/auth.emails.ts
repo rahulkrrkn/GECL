@@ -12,3 +12,4 @@ export async function sendEmailOtp(to: string, otp: string) {
   });
   await EmailService.sendRaw(to, "RahulKrRKN - Verify Your Email", html);
 }
+ 
