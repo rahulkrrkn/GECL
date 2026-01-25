@@ -459,7 +459,7 @@ export default function LoginPage() {
                           errors.identifier &&
                             "border-red-500/50 focus:border-red-500 focus:shadow-[0_0_20px_-5px_rgba(239,68,68,0.3)]",
                         )}
-                        placeholder="student@gecl.ac.in"
+                        placeholder="rahulkrrkn@gmail.com"
                       />
                     </div>
                     <FieldError id="identifier" errors={errors} />
@@ -548,7 +548,7 @@ export default function LoginPage() {
                               errors.email &&
                                 "border-red-500/50 focus:border-red-500 focus:shadow-[0_0_20px_-5px_rgba(239,68,68,0.3)]",
                             )}
-                            placeholder="student@gecl.ac.in"
+                            placeholder="rahulkrrkn@gmail.com"
                           />
                         </div>
                         <FieldError id="email" errors={errors} />
@@ -637,8 +637,7 @@ export default function LoginPage() {
                 </motion.div>
               )}
             </AnimatePresence>
-      
-            
+
             {/* Footer / Social */}
             <div className="mt-8 pt-6 border-t border-slate-800">
               {/* ✅ UPDATED: Use the new Component */}

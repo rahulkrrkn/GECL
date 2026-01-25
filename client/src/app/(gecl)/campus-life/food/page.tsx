@@ -82,7 +82,6 @@ const foodData = {
       dinner: "Roti, Rice, Salad, Paneer / Chicken (2 pcs)",
     },
   ],
-  // Placeholder for Girls Mess (Standard Practice: Similar to Boys unless specified)
   messGirls: [
     {
       day: "Monday",

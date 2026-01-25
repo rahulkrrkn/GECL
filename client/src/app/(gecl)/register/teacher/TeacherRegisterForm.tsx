@@ -674,7 +674,7 @@ export default function TeacherRegisterForm() {
                     icon={<FiUser />}
                     value={formData.fullName}
                     onChange={(v: string) => handleChange("fullName", v)}
-                    placeholder="Prof. John Doe"
+                    placeholder="Prof. Rahul Kumar"
                     error={errors.fullName}
                   />
                   <Input
@@ -682,7 +682,7 @@ export default function TeacherRegisterForm() {
                     icon={<FiMail />}
                     value={formData.email}
                     onChange={(v: string) => handleChange("email", v)}
-                    placeholder="john.doe@gmail.com"
+                    placeholder="rahulkrrkn@gmail.com"
                     error={errors.email}
                   />
                   <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs text-slate-400">
@@ -753,7 +753,7 @@ export default function TeacherRegisterForm() {
                       icon={<FiPhone />}
                       value={formData.mobile}
                       onChange={(v: string) => handleChange("mobile", v)}
-                      placeholder="9876543210"
+                      placeholder="8877788288"
                       inputMode="numeric"
                       error={errors.mobile}
                     />

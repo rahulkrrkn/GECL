@@ -72,7 +72,7 @@
 //       </div>
 //       <Input
 //         label="Email"
-//         placeholder="rahul@example.com"
+//         placeholder="rahulkrrkn@gmail.com"
 //         status="error"
 //         message="Email is required"
 //         required

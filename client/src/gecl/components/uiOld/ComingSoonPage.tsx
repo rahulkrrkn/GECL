@@ -119,7 +119,7 @@ export default function ComingSoonPage() {
                   <input
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your@email.com"
+                    placeholder="rahulkrrkn@gmail.com"
                     className="h-11 w-full rounded-xl border border-gecl-border bg-gecl-surface px-3 text-sm text-gecl-text-primary outline-none transition placeholder:text-gecl-text-muted focus:ring-4 focus:ring-gecl-accent/30"
                   />
 

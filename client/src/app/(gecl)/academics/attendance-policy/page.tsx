@@ -139,7 +139,6 @@ export default function AttendancePolicyPage() {
 
               <div className="bg-white rounded-xl border border-slate-200 p-6 mt-6 flex flex-col md:flex-row gap-8 items-center">
                 <div className="md:w-1/3 relative h-56 w-full rounded-xl overflow-hidden shadow-md border border-slate-100">
-                  {/* Placeholder for actual image */}
                   <Image
                     src="/gecl/images/biometric-attendance.webp"
                     alt="Student using Biometric Device"

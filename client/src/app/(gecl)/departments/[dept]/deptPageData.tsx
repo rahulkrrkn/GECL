@@ -77,7 +77,7 @@ export const DEPT_DATA: Record<string, any> = {
   },
   mechanical: {
     name: "Mechanical Engineering",
-    hod: "Faculty In-Charge", // Placeholder if exact name rotates
+    hod: "Faculty In-Charge",
     role: "Head of Department",
     vision:
       "To shape mechanical engineers who can innovate in manufacturing, thermal, and design domains.",

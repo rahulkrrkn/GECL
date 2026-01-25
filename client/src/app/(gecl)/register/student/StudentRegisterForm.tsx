@@ -573,7 +573,7 @@ export default function StudentRegisterForm() {
                     icon={<FiMail />}
                     value={formData.email}
                     onChange={(v: string) => handleChange("email", v)}
-                    placeholder="rahul@gmail.com"
+                    placeholder="rahulkrrkn@gmail.com"
                     error={errors.email}
                   />
                   <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs text-slate-400">
@@ -643,7 +643,7 @@ export default function StudentRegisterForm() {
                     icon={<FiPhone />}
                     value={formData.mobile}
                     onChange={(v: string) => handleChange("mobile", v)}
-                    placeholder="9876543210"
+                    placeholder="8877788288"
                     inputMode="numeric"
                     error={errors.mobile}
                   />
@@ -654,7 +654,7 @@ export default function StudentRegisterForm() {
                     icon={<FiHash />}
                     value={formData.regNo}
                     onChange={(v: string) => handleChange("regNo", v)}
-                    placeholder="221051290XX"
+                    placeholder="25151158XXX"
                     error={errors.regNo}
                   />
 

@@ -165,7 +165,6 @@ export default function AntiRaggingPage() {
             {/* 2. CAMPUS HARMONY BANNER */}
             <section className="relative h-64 md:h-72 rounded-2xl overflow-hidden shadow-lg group">
               <div className="absolute inset-0 bg-slate-900">
-                {/* Placeholder for actual image if available */}
                 <Image
                   src="/gecl/images/students-harmony.webp"
                   alt="Students bonding"
