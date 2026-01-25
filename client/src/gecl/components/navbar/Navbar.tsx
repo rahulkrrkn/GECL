@@ -36,7 +36,7 @@ export const Navbar = () => {
           isScrolled ? "shadow-md py-1" : "py-3 sm:py-2",
         )}
       >
-        <div className="container mx-auto px-4 lg:px-6">
+        <div className="container mx-auto pl-4 pr-0 lg:pl-6 lg:pr-2">
           <div className="flex items-center justify-between gap-4">
             {/* --- LEFT: Logo --- */}
             <Link href="/" className="flex items-center gap-3 group shrink-0">

@@ -46,6 +46,8 @@ interface DataProps {
 export default function ClubsEventsContent({ data }: { data: DataProps }) {
   return (
     <main className="bg-slate-50 min-h-screen font-sans">
+      {/* 👆 ADDED: overflow-x-hidden to body to prevent animation scrollbars */}
+
       {/* ================= HERO SECTION ================= */}
       <PageHero
         title="Clubs & Events"
@@ -63,7 +65,7 @@ export default function ClubsEventsContent({ data }: { data: DataProps }) {
       />
 
       {/* ================= 1. CLUBS GRID ================= */}
-      <section className="max-w-7xl mx-auto px-6 py-20 relative z-20">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 relative z-20">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-slate-800 mb-4 drop-shadow-sm">
             Active Student Bodies
@@ -83,7 +85,7 @@ export default function ClubsEventsContent({ data }: { data: DataProps }) {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="bg-linear-to-br from-pink-600 to-violet-600 rounded-2xl p-8 text-white flex flex-col justify-center items-center text-center shadow-xl transform hover:-translate-y-2 transition duration-300"
+            className="bg-gradient-to-br from-pink-600 to-violet-600 rounded-2xl p-6 sm:p-8 text-white flex flex-col justify-center items-center text-center shadow-xl transform hover:-translate-y-2 transition duration-300"
           >
             <h3 className="text-2xl font-bold mb-2">Have an Idea?</h3>
             <p className="text-sm mb-6 opacity-90">
@@ -101,8 +103,8 @@ export default function ClubsEventsContent({ data }: { data: DataProps }) {
       </section>
 
       {/* ================= 2. TECHNICAL WORKSHOPS ================= */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-16 sm:py-20 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <EventSectionLayout
             data={data.technicalEvents}
             type="tech"
@@ -112,8 +114,8 @@ export default function ClubsEventsContent({ data }: { data: DataProps }) {
       </section>
 
       {/* ================= 3. CULTURAL FESTS ================= */}
-      <section className="py-20 bg-pink-50/50 border-t border-pink-100">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-16 sm:py-20 bg-pink-50/50 border-t border-pink-100 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <EventSectionLayout
             data={data.culturalEvents}
             type="cultural"
@@ -123,7 +125,7 @@ export default function ClubsEventsContent({ data }: { data: DataProps }) {
       </section>
 
       {/* ================= GALLERY CTA ================= */}
-      <section className="py-24 bg-violet-900 text-center relative overflow-hidden">
+      <section className="py-20 sm:py-24 bg-violet-900 text-center relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-10"
           style={{
@@ -177,7 +179,7 @@ function ClubCard({ club, index }: { club: Club; index: number }) {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 group relative overflow-hidden"
+      className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 group relative overflow-hidden"
     >
       <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition text-6xl text-violet-500">
         {getIcon(club.icon)}
@@ -213,7 +215,7 @@ function EventSectionLayout({
 
   return (
     <div
-      className={`flex flex-col gap-12 lg:gap-20 items-center ${
+      className={`flex flex-col gap-10 lg:gap-20 items-center ${
         isReversed ? "lg:flex-row-reverse" : "lg:flex-row"
       }`}
     >
@@ -238,7 +240,7 @@ function EventSectionLayout({
         initial={{ opacity: 0, x: isReversed ? -50 : 50 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
-        className="flex-1 space-y-8"
+        className="flex-1 space-y-6 sm:space-y-8 w-full"
       >
         <div>
           <span
@@ -246,10 +248,11 @@ function EventSectionLayout({
           >
             {icon} {isTech ? "Innovation" : "Celebration"}
           </span>
-          <h2 className="text-4xl font-bold text-slate-900 mb-4">
+          {/* 👇 FIXED: Scaled font down for mobile */}
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             {data.title}
           </h2>
-          <p className="text-slate-600 text-lg leading-relaxed text-justify">
+          <p className="text-slate-600 text-base sm:text-lg leading-relaxed text-justify">
             {data.description}
           </p>
         </div>
@@ -268,8 +271,10 @@ function EventSectionLayout({
                   {event.date}
                 </span>
               </div>
-              <div>
-                <h4 className="font-bold text-slate-800 text-lg group-hover:text-slate-900">
+
+              {/* 👇 FIXED: Added min-w-0 and flex-1 for text truncation to work in flexbox */}
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-slate-800 text-lg group-hover:text-slate-900 truncate">
                   {event.title}
                 </h4>
                 <p className="text-sm text-slate-500 line-clamp-2">
