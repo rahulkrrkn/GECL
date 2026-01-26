@@ -28,19 +28,23 @@ const AUDIENCE_ENUM = ["PUBLIC", "STUDENTS", "FACULTY", "STAFF"] as const;
 
 const STATUS_ENUM = ["DRAFT", "PUBLISHED", "ARCHIVED"] as const;
 
+/* ================= PAGINATION ================= */
+export const getAllNoticesSchema = z
+  .object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+  })
+  .strict();
 /* ================= CREATE NOTICE ================= */
 export const createNoticeSchema = z
   .object({
     title: z
       .string()
-      .min(3, "Title must be at least 3 characters")
+      .min(5, "Title must be at least 5 characters")
       .max(200, "Title is too long")
       .trim(),
 
-    content: z
-      .string()
-      .min(10, "Content must be at least 10 characters")
-      .trim(),
+    content: z.string().min(0, "Content must be at least 10 characters").trim(),
 
     category: z
       .enum(CATEGORY_ENUM, {
@@ -117,8 +121,15 @@ export const updateNoticeSchema = z
   })
   .strict();
 
+/* ================= VIEW NOTICE ================= */
+export const getNoticeBySlugSchema = z.object({
+  slug: z.string().min(1, "Slug is required"),
+});
+
 /* ================= EXPORT GROUP ================= */
 export const noticeSchemas = {
   create: createNoticeSchema,
   update: updateNoticeSchema,
+  getAllNoticesSchema,
+  getNoticeBySlugSchema,
 };

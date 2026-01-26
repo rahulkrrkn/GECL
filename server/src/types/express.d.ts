@@ -5,8 +5,10 @@ declare global {
     interface Request {
       validatedBody?: any;
       user?: {
+        _id: string;
         userId: string;
         email: string;
+        roles: string[];
       };
     }
   }

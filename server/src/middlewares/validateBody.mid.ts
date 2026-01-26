@@ -10,9 +10,15 @@ export const validateBody =
     console.log("Request Headers :", req.headers);
 
     const result = schema.safeParse(req.body);
+    console.log("Request Body original:", req.body);
     console.log("Request Body  result:", result);
-    // console.log("Request Body  result:", result);
-
+    if (!schema) {
+      return next(
+        new Error(
+          "validateBody() schema is undefined. Check your import/export.",
+        ),
+      );
+    }
     if (!result.success) {
       return next(new ValidationError(formatZodError(result.error)));
     }

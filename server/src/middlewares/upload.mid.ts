@@ -241,6 +241,7 @@ export function createUploadMiddleware(config: UploadMiddlewareConfig) {
       }
 
       req.files = enhanced as any;
+      console.log("Files:", req.files);
       next();
     });
   };

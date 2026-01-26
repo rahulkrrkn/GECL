@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { renameToR2 } from "../services/fileRenameR2.service.js";
+import { renameToR2 } from "../services/fileUploadRenameR2.service.js";
 
 import { validateBody } from "../middlewares/validateBody.mid.js";
 import { login } from "../validations/index.js";
@@ -23,7 +23,7 @@ import {
 import {
   employeeRegistrationMainCtrl,
   studentRegistrationMainCtrl,
-} from "../controllers/auth/studentRegistration.ctrl.js";
+} from "../controllers/auth/registration.ctrl.js";
 import { refreshAccessToken } from "../controllers/auth/refreshToken.ctrl.js";
 import { geclLogout } from "../controllers/auth/logout.ctrl.js";
 
@@ -67,7 +67,7 @@ const uploadProfilePic = createUploadMiddleware({
       min: 1,
       max: 1,
       mimeTypes: [...MIME_GROUPS.images],
-      sizeInKb: 51024,
+      sizeInKb: 5024,
       folder: "profilePic",
     },
   ],

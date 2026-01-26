@@ -6,7 +6,7 @@ import { getGeclUserFUIConn } from "../../models/gecl_user.model.js";
 import { emailNormalization } from "../../utils/emailNormalization.utils.js";
 
 import { sendSuccess, sendError } from "../../helpers/response.helper.js";
-import { renameToR2 } from "../../services/fileRenameR2.service.js";
+import { renameToR2 } from "../../services/fileUploadRenameR2.service.js";
 
 function registrationKey(email: string) {
   return `GECL:VERIFY_REGISTRATION:${email}`;
@@ -350,7 +350,7 @@ export async function employeeRegistrationMainCtrl(
     email: normalizedEmail,
     passwordHash: await bcrypt.hash(password, 10),
 
-    role : [role],
+    role: [role],
     personType: "employee",
 
     profilePicUrl: profilePic,

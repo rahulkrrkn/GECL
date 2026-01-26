@@ -15,12 +15,17 @@ import {
   //   deleteNotice,
   //   getNoticeStats,
   //   getMyNotices,
-} from "../controllers/notice/notice.ctrl.js";
+} from "../controllers/notices/notice.ctrl.js";
 
 // -- Validations --
-import { noticeSchemas } from "../validations/notice.validation.js";
-import { requirePermission } from "../middlewares/permissionSystem.mdl.js";
+import { noticeSchemas } from "../validations/notice.val.js";
+import {
+  checkUser,
+  requirePermission,
+} from "../middlewares/permissionSystem.mdl.js";
 import { PERMISSIONS } from "../config/pagePermissionData.config.js";
+import { getAllNotices } from "../controllers/notices/getNotice.ctrl.js";
+import { getNoticeBySlug } from "../controllers/notices/getSingleNotice.ctrl.js";
 
 const notices = Router();
 
@@ -28,15 +33,15 @@ const notices = Router();
    UPLOAD CONFIGURATION
 =========================================== */
 const uploadAttachments = createUploadMiddleware({
-  minTotalFiles: 0,
+  minTotalFiles: 1,
   maxTotalFiles: 5,
   baseFolder: "GECL",
   fields: [
     {
       name: "attachments", // Must match Frontend FormData key
-      min: 0,
+      min: 1,
       max: 5,
-      mimeTypes: [...MIME_GROUPS.images, "application/pdf"],
+      mimeTypes: [...MIME_GROUPS.images, ...MIME_GROUPS.documents],
       sizeInKb: 10240, // 10MB limit
       folder: "notices",
     },
@@ -47,14 +52,31 @@ const uploadAttachments = createUploadMiddleware({
    PUBLIC ROUTES (View Access)
 =========================================== */
 
+/**
+ * @route   GET /api/notices
+ * @desc    Get all notices (Paginated + Search + Filter)
+ */
+notices.post(
+  "/",
+  checkUser,
+  validateBody(noticeSchemas.getAllNoticesSchema),
+  getAllNotices,
+);
+notices.get(
+  "/:slug",
+  checkUser, // Optional auth (sets req.user if token exists, passes if not)
+  // validateBody(noticeSchemas.getNoticeBySlugSchema), // Validates req.params.slug exists
+  getNoticeBySlug,
+);
+
 /* ===========================================
    PROTECTED ROUTES (Staff / Admin Only)
 =========================================== */
 notices.post(
-  "/",
+  "/create",
   requirePermission(PERMISSIONS.NOTICE.CREATE),
   uploadAttachments,
-  // validateBody(noticeSchemas.create),
+  validateBody(noticeSchemas.create),
   createNotice,
 );
 
