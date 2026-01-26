@@ -103,11 +103,6 @@ export const imageLinks = [
   "/gecl/images/departments/mechanical-engineering-hod-profile.webp",
   "/gecl/images/departments/applied-applied-science-hod-profile.webp",
   "/gecl/images/classroom-lecture.webp",
-  "/gecl/images/departments/dept-civil.webp",
-  "/gecl/images/departments/dept-cse-ai.webp",
-  "/gecl/images/departments/dept-cse-ds.webp",
-  "/gecl/images/departments/dept-ee.webp",
-  "/gecl/images/departments/dept-mech.webp",
 ];
 
 // Helper to extract category from path
