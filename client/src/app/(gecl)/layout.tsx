@@ -4,12 +4,12 @@ import { ContentProtection } from "@/gecl/components/ui";
 import type { Metadata, Viewport } from "next";
 
 // ✅ 1. Add Viewport settings to block Zooming (Page Size Change)
-// export const viewport: Viewport = {
-//   width: "device-width",
-//   initialScale: 1,
-//   maximumScale: 1,
-//   userScalable: false, // Disables pinch-to-zoom
-// };
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, // Disables pinch-to-zoom
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gecl.rahulkrrkn.com"),
@@ -41,7 +41,7 @@ export default function RootLayout({
 }) {
   return (
     <>
-      {/* <ContentProtection /> */}
+      <ContentProtection />
       <Navbar />
       <main className="select-none"> {children}</main>
       <Footer />

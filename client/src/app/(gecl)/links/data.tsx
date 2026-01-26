@@ -162,7 +162,17 @@ export const done = [
 export const dataVerified = ["/about"];
 export const imageUpload = [];
 export const finished = [];
-export const notChecked = [];
+export const notChecked = [
+  "/about/principal-message",
+  "/about/college",
+  "/about/principal-message",
+  "/notices",
+  "/gallery",
+  "/gecl/heroPage/img.jpg",
+  "/gecl/images/admin-block.webp",
+  "/gecl/images/academic-building.webp",
+  "/gecl/images/classroom-lecture.webp",
+];
 
 export const workLater = [];
 export const brokenLinks = [
