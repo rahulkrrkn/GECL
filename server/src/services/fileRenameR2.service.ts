@@ -1,7 +1,7 @@
 // src/services/fileRenameAndUpload.service.ts
 
 import { HeadObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
-import { r2 } from "../config/r2Client.js";
+import { r2 } from "../config/r2Client.config.js";
 
 type UploadedFile = Express.Multer.File & {
   folder: string;

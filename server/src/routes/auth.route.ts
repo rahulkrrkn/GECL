@@ -3,7 +3,10 @@ import { renameToR2 } from "../services/fileRenameR2.service.js";
 
 import { validateBody } from "../middlewares/validateBody.mid.js";
 import { login } from "../validations/index.js";
-import { createUploadMiddleware, MIME_GROUPS } from "../middlewares/upload.js";
+import {
+  createUploadMiddleware,
+  MIME_GROUPS,
+} from "../middlewares/upload.mid.js";
 
 import {
   geclEmailSendOtp,

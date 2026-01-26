@@ -1,5 +1,14 @@
 import { Schema, Types } from "mongoose";
-
+const WebPushSchema = new Schema(
+  {
+    endpoint: { type: String, required: true },
+    keys: {
+      p256dh: { type: String, required: true },
+      auth: { type: String, required: true },
+    },
+  },
+  { _id: false },
+);
 export const GeclUserSchema = new Schema(
   {
     // ===========================
@@ -66,6 +75,20 @@ export const GeclUserSchema = new Schema(
       enum: ["student", "employee"],
       required: true,
       index: true,
+    },
+    notification: {
+      settings: {
+        email: { type: Boolean, default: true },
+        whatsapp: { type: Boolean, default: false },
+        webPush: { type: Boolean, default: true },
+        appPush: { type: Boolean, default: false },
+        voiceCall: { type: Boolean, default: false },
+      },
+
+      tokens: {
+        fcm: { type: [String], default: [] },
+        webPush: { type: [WebPushSchema], default: [] },
+      },
     },
     // ===========================
     // STUDENT ONLY
