@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useApi } from "@/gecl/hooks/useApi";
-
+import { Notice, NoticeResponse } from "@/types/notice";
 // Define strict type for ticker items
 interface TickerNotice {
   title: string;
@@ -38,13 +38,16 @@ export const NewsTicker = () => {
     const fetchHeadlines = async () => {
       try {
         // Using POST as per your backend controller requirement
-        const res = await request<any>(
+        const res = await request<NoticeResponse["data"]>(
           {
-            method: "POST",
+            method: "GET",
             url: "/notices",
-            data: { page: 1, limit: 10 }, // Fetch latest 10 items
+            params: {
+              page: 1,
+              limit: 10,
+            },
           },
-          { showMsg: false },
+          { showMsg: false, showErrorMsg: false },
         );
 
         if (res.success && res.data?.data?.length > 0) {

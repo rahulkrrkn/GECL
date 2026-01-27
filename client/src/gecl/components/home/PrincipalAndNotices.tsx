@@ -12,7 +12,7 @@ import {
   LuFilter,
 } from "react-icons/lu";
 import { useApi } from "@/gecl/hooks/useApi";
-import { Notice } from "@/types/notice";
+import { Notice, NoticeResponse } from "@/types/notice";
 
 export const PrincipalAndNotices = () => {
   const { request } = useApi();
@@ -24,13 +24,16 @@ export const PrincipalAndNotices = () => {
   useEffect(() => {
     const fetchNotices = async () => {
       try {
-        const res = await request<any>(
+        const res = await request<NoticeResponse["data"]>(
           {
-            method: "POST",
-            url: "/notices", // Route prefix for getting list
-            data: { page: 1, limit: 5 },
+            method: "GET",
+            url: "/notices",
+            params: {
+              page: 1,
+              limit: 5,
+            },
           },
-          { showMsg: false },
+          { showMsg: false, showErrorMsg: false },
         );
 
         if (res.success && res.data) {

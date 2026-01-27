@@ -1,13 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
+import { FiLoader } from "react-icons/fi";
 
 interface PdfViewerProps {
   url: string;
   title?: string;
   className?: string;
-  /**
-   * If true, the native browser toolbar (Download/Print) will be shown.
-   * Default is false.
-   */
   downloadable?: boolean;
 }
 
@@ -17,8 +14,9 @@ export function PdfViewer({
   className = "",
   downloadable = false,
 }: PdfViewerProps) {
-  // Append parameters to hide toolbar, nav panes, and scrollbars if download is disabled
-  // Note: This relies on the browser's built-in PDF viewer respecting these params.
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Append parameters to hide toolbar
   const viewerUrl = downloadable
     ? url
     : `${url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
@@ -26,20 +24,28 @@ export function PdfViewer({
   return (
     <div
       className={`relative w-full h-full bg-slate-100 overflow-hidden rounded-lg border border-slate-200 ${className}`}
-      // Prevent right-click "Save As"
       onContextMenu={(e) => !downloadable && e.preventDefault()}
     >
+      {/* Loading Indicator */}
+      {isLoading && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white z-10">
+          <FiLoader className="w-8 h-8 text-indigo-600 animate-spin mb-2" />
+          <p className="text-sm text-slate-500 font-medium animate-pulse">
+            Loading Document...
+          </p>
+        </div>
+      )}
+
       <iframe
         src={viewerUrl}
         title={title}
-        className="w-full h-full border-none block"
+        className={`w-full h-full border-none block transition-opacity duration-300 ${
+          isLoading ? "opacity-0" : "opacity-100"
+        }`}
         allowFullScreen
+        // ✅ Hide loader when iframe finishes loading
+        onLoad={() => setIsLoading(false)}
       />
-
-      {/* Optional: Transparent overlay for extra protection (blocks direct interaction if needed) 
-          Use carefully as it might block scrolling depending on z-index strategy. 
-          Usually contextMenu prevention on parent is enough for basic protection.
-      */}
     </div>
   );
 }

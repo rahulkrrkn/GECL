@@ -35,9 +35,12 @@ export default function NoticesPage() {
         // ✅ YOUR SPECIFIC API METHOD
         const res = await request<NoticeResponse["data"]>(
           {
-            method: "POST",
-            url: "/notices", // Route prefix for getting list
-            data: { page, limit },
+            method: "GET",
+            url: "/notices",
+            params: {
+              page,
+              limit,
+            },
           },
           { showMsg: false, showErrorMsg: false },
         );
