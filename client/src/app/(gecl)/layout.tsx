@@ -12,7 +12,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://gecl.rahulkrrkn.com"),
+  metadataBase: new URL("https://geclakhisarai.com"),
   title: {
     default:
       "Government Engineering College Lakhisarai | Engineering College in Bihar",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "GEC Lakhisarai",
     description: "Official details of GEC Lakhisarai.",
-    url: "https://gecl.rahulkrrkn.com",
+    url: "https://geclakhisarai.com",
     siteName: "GEC Lakhisarai",
     locale: "en_IN",
     type: "website",
