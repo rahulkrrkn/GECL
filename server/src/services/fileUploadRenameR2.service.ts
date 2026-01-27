@@ -62,7 +62,7 @@ async function getUniqueKey(params: {
 }
 
 function buildPublicUrl(key: string) {
-  const base = (process.env.R2_PUBLIC_URL || "").replace(/\/$/, "");
+  const base = (process.env.GECL_R2_PUBLIC_URL || "").replace(/\/$/, "");
   return `${base}/${key}`;
 }
 
@@ -70,7 +70,7 @@ export async function renameToR2(params: {
   req: Express.Request;
   fileNames?: FileNamesPayload;
 }) {
-  const bucket = process.env.R2_BUCKET_NAME as string;
+  const bucket = process.env.GECL_R2_BUCKET_NAME as string;
   const filesByField = params.req.files as Record<string, any[]>;
   // const { filesByField } = params;
   const fileNames = params.fileNames || {};
@@ -141,7 +141,7 @@ export async function renameToR2(params: {
 // const fileNames = { images: ["a", "b"], document: ["my-doc"] };
 
 // const uploaded = await renameToR2({
-//   bucket: process.env.R2_BUCKET_NAME as string,
+//   bucket: process.env.GECL_R2_BUCKET_NAME as string,
 //   filesByField,
 //   fileNames,
 // });

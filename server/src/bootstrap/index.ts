@@ -8,5 +8,7 @@ export async function initServer() {
   // Dependent modules
   // await initRedis();
   await initMongoAuth();
-  startCronJob();
+  if (process.env.NODE_ENV !== "development") {
+    startCronJob();
+  }
 }

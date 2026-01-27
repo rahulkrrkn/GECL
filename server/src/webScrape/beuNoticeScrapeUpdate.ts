@@ -8,7 +8,7 @@ const BEU_URL = "https://beu-bih.ac.in/notification";
 const BASE_DOMAIN = "https://beu-bih.ac.in";
 
 /* -------------------------------------------------------------------------- */
-/*                                    TYPES                                   */
+/* TYPES                                   */
 /* -------------------------------------------------------------------------- */
 
 type ScrapedItem = {
@@ -19,7 +19,7 @@ type ScrapedItem = {
 };
 
 /* -------------------------------------------------------------------------- */
-/*                                   HELPERS                                  */
+/* HELPERS                                  */
 /* -------------------------------------------------------------------------- */
 
 const clean = (text: string | null | undefined) =>
@@ -31,8 +31,36 @@ function generateSlug(title: string, date: string) {
   return `beu-${safeDate}-${safeTitle}`.substring(0, 100);
 }
 
+// 🆕 NEW: Parse "DD-MM-YYYY" or "DD/MM/YYYY" into a JS Date Object
+function parseDate(dateStr: string): Date {
+  try {
+    // Remove any extra whitespace
+    const cleanStr = dateStr.trim();
+
+    // Split by - or /
+    const parts = cleanStr.split(/[-/]/);
+
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JS
+      const year = parseInt(parts[2], 10);
+
+      const parsed = new Date(year, month, day);
+
+      // Validate if date is valid
+      if (!isNaN(parsed.getTime())) {
+        return parsed;
+      }
+    }
+    console.warn(`⚠️ Could not parse date: "${dateStr}", using current time.`);
+    return new Date(); // Fallback to now
+  } catch (e) {
+    return new Date();
+  }
+}
+
 /* -------------------------------------------------------------------------- */
-/*                             SCRAPE MAIN LIST                               */
+/* SCRAPE MAIN LIST                              */
 /* -------------------------------------------------------------------------- */
 
 async function fetchNoticeList(browser: Browser): Promise<ScrapedItem[]> {
@@ -45,15 +73,12 @@ async function fetchNoticeList(browser: Browser): Promise<ScrapedItem[]> {
       timeout: 60000,
     });
 
-    // Wait until table exists
     await page.waitForSelector("table", { timeout: 30000 });
 
-    // 🔥 KEY FIX: wait until rows STOP increasing
+    // Wait for rows to stabilize
     let previousCount = 0;
-
     for (let i = 0; i < 25; i++) {
       const currentCount = await page.locator("table tbody tr").count();
-
       if (currentCount > previousCount) {
         previousCount = currentCount;
         await page.waitForTimeout(500);
@@ -101,7 +126,7 @@ async function fetchNoticeList(browser: Browser): Promise<ScrapedItem[]> {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                           FIND PDF LINK (DETAIL)                           */
+/* FIND PDF LINK (DETAIL)                           */
 /* -------------------------------------------------------------------------- */
 
 async function findPdfLink(browser: Browser, url: string): Promise<string> {
@@ -122,7 +147,6 @@ async function findPdfLink(browser: Browser, url: string): Promise<string> {
     });
 
     const pdfAnchor = page.locator('a[href$=".pdf"], a[href$=".PDF"]');
-
     if ((await pdfAnchor.count()) > 0) {
       const href = await pdfAnchor.first().getAttribute("href");
       if (href) return new URL(href, url).toString();
@@ -132,7 +156,6 @@ async function findPdfLink(browser: Browser, url: string): Promise<string> {
       .locator("iframe")
       .getAttribute("src")
       .catch(() => null);
-
     if (iframeSrc?.toLowerCase().includes(".pdf")) {
       return new URL(iframeSrc, url).toString();
     }
@@ -146,15 +169,15 @@ async function findPdfLink(browser: Browser, url: string): Promise<string> {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                 SYNC JOB                                   */
+/* SYNC JOB                                  */
 /* -------------------------------------------------------------------------- */
 
 export async function syncNotices() {
   console.log("\n🔍 Starting BEU Notice Sync...");
 
-  const SYSTEM_USER_ID = process.env.SYSTEM_USER_ID;
-  if (!SYSTEM_USER_ID) {
-    console.error("❌ SYSTEM_USER_ID missing");
+  const GECL_SYSTEM_USER_ID = process.env.GECL_SYSTEM_USER_ID;
+  if (!GECL_SYSTEM_USER_ID) {
+    console.error("❌ GECL_SYSTEM_USER_ID missing");
     return;
   }
 
@@ -165,16 +188,22 @@ export async function syncNotices() {
     const scrapedNotices = await fetchNoticeList(browser);
     console.log(`📡 Found ${scrapedNotices.length} notices`);
 
+    // 🆕 FIX 1: REVERSE ORDER
+    // The website has Latest at Top (Index 0).
+    // We reverse it so we process [Oldest ... Newest].
+    // This creates IDs in chronological order and ensures the "Newest" is inserted last.
+    const chronologicalNotices = [...scrapedNotices].reverse();
+
     let newCount = 0;
 
-    for (const item of scrapedNotices) {
+    for (const item of chronologicalNotices) {
       const exists = await NoticeModel.exists({
         $or: [{ slug: item.slug }, { title: item.title }],
       });
 
       if (exists) continue;
 
-      console.log(`✨ New Notice: ${item.title}`);
+      console.log(`✨ New Notice: ${item.title} [${item.rawDate}]`);
 
       const pdfUrl = await findPdfLink(browser, item.viewUrl);
 
@@ -195,6 +224,9 @@ export async function syncNotices() {
       if (t.includes("result")) category = "ACADEMIC";
       if (t.includes("holiday")) category = "HOLIDAY";
 
+      // 🆕 FIX 2: USE REAL DATE
+      const realPublishDate = parseDate(item.rawDate);
+
       await NoticeModel.create({
         source: "BEU",
         title: item.title,
@@ -205,8 +237,8 @@ export async function syncNotices() {
         audience: ["PUBLIC", "STUDENTS"],
         status: "PUBLISHED",
         attachments,
-        addedBy: new mongoose.Types.ObjectId(SYSTEM_USER_ID),
-        publishAt: new Date(),
+        addedBy: new mongoose.Types.ObjectId(GECL_SYSTEM_USER_ID),
+        publishAt: realPublishDate, // <--- Using the parsed date from website
       });
 
       newCount++;

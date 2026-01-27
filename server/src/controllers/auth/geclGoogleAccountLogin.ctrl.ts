@@ -6,14 +6,14 @@ import { getGeclUserFUIConn } from "../../models/gecl_user.model.js";
 import { makeGeclUserLogin } from "../../services/auth/makeGeclUserLogin.service.js";
 
 // Ensure Client ID is defined or crash early/handle gracefully
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
-const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+const GECL_GOOGLE_CLIENT_ID = process.env.GECL_GOOGLE_CLIENT_ID || "";
+const client = new OAuth2Client(GECL_GOOGLE_CLIENT_ID);
 
 export const geclGoogleAccountLogin = async (req: Request, res: Response) => {
   try {
     // 1. Check Server Configuration
-    if (!GOOGLE_CLIENT_ID) {
-      console.error("Missing GOOGLE_CLIENT_ID in .env");
+    if (!GECL_GOOGLE_CLIENT_ID) {
+      console.error("Missing GECL_GOOGLE_CLIENT_ID in .env");
       return sendError(res, "Server configuration error", {
         status: 500,
         code: "INTERNAL_SERVER_ERROR",
@@ -32,7 +32,7 @@ export const geclGoogleAccountLogin = async (req: Request, res: Response) => {
     // 2. Verify Google Token
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: GOOGLE_CLIENT_ID, // ✅ Fixed: Now strictly a string
+      audience: GECL_GOOGLE_CLIENT_ID, // ✅ Fixed: Now strictly a string
     });
 
     const payload = ticket.getPayload();

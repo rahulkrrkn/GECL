@@ -51,7 +51,7 @@ export const requirePermission = (permissionKey: string): RequestHandler => {
         return sendError(res, "Access expired", {
           status: 401,
           code: "ACCESS_EXPIRED",
-  GECL_IS_ACCESS_TOKEN_EXPIRED: true;
+          GECL_IS_ACCESS_TOKEN_EXPIRED: true,
         });
 
       return sendError(res, "Invalid token", {

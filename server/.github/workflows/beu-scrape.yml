@@ -2,7 +2,7 @@ name: BEU Scraper
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # Every 6 hours
+    - cron: "0 */6 * * *" # Every 6 hours
   workflow_dispatch:
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          
+
       - run: npm ci
       - run: npx playwright install chromium --with-deps
 
@@ -22,5 +22,5 @@ jobs:
         run: npx tsx ./server/src/webScrape/sync-beu.ts
         env:
           # Match variable names used in your DB connection file
-          MONGO_URI: ${{ secrets.MONGO_URI }} 
-          SYSTEM_USER_ID: ${{ secrets.SYSTEM_USER_ID }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          GECL_SYSTEM_USER_ID: ${{ secrets.GECL_SYSTEM_USER_ID }}
