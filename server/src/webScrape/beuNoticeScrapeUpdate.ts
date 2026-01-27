@@ -1,16 +1,10 @@
 import { chromium, type Browser } from "playwright";
-import slugify from "slugify";
 import mongoose from "mongoose";
-import { getGeclNoticeFUIConn } from "./../models/gecl_notice.model.js"; // Your DB connection
-
-// --- CONFIGURATION ---
+import { getGeclNoticeFUIConn } from "./../models/gecl_notice.model.js";
+import { slugify } from "../utils/slugify.js";
 const BEU_URL = "https://beu-bih.ac.in/notification";
 const BASE_DOMAIN = "https://beu-bih.ac.in";
 
-// We need a valid User ID for the 'addedBy' field.
-// We will load this from the environment variable (GitHub Secret)
-
-// --- TYPES ---
 type ScrapedItem = {
   rawDate: string;
   title: string;
@@ -19,17 +13,13 @@ type ScrapedItem = {
 };
 
 // --- HELPER: Clean Text ---
-const clean = (text: string | null) => text?.replace(/\s+/g, " ").trim() || "";
+const clean = (text: string | null | undefined) =>
+  (text || "").replace(/\s+/g, " ").trim();
 
 // --- HELPER: Generate Unique Slug ---
 function generateSlug(title: string, date: string) {
-  const safeTitle = slugify(title, {
-    lower: true,
-    strict: true,
-    remove: /[*+~.()'"!:@]/g,
-  });
-  const safeDate = slugify(date, { lower: true, strict: true }) || "nodate";
-  // Prefix 'beu' prevents collision with GECL notices
+  const safeTitle = slugify(title);
+  const safeDate = slugify(date) || "nodate";
   return `beu-${safeDate}-${safeTitle}`.substring(0, 100);
 }
 
@@ -39,36 +29,56 @@ async function fetchNoticeList(browser: Browser): Promise<ScrapedItem[]> {
   console.log(`\n🔍 Fetching Main List: ${BEU_URL}`);
 
   try {
-    await page.goto(BEU_URL, { waitUntil: "domcontentloaded", timeout: 60000 });
-    await page.waitForSelector("tbody tr", { timeout: 15000 });
+    await page.goto(BEU_URL, {
+      waitUntil: "domcontentloaded", // ✅ NOT networkidle
+      timeout: 60000,
+    });
+    const browser = await chromium.launch({
+      headless: false,
+      slowMo: 200,
+    });
 
-    const rows = await page.locator("tbody").first().locator("tr").all();
+    // ✅ Wait for the table itself
+    await page.waitForSelector("table", { timeout: 30000 });
+
+    // ✅ Wait until table rows are injected by JS
+    await page.waitForFunction(
+      () => {
+        const table = document.querySelector("table");
+        if (!table) return false;
+
+        const rows = table.querySelectorAll("tbody tr");
+        return rows.length > 0;
+      },
+      { timeout: 30000 },
+    );
+
+    const rows = await page.locator("table tbody tr").all();
+    console.log("✅ Rows detected:", rows.length);
+
     const notices: ScrapedItem[] = [];
 
     for (const row of rows) {
       const tds = await row.locator("td").all();
       if (tds.length < 3) continue;
 
-      // Extract text columns
-      let dateText = await tds[0].textContent();
-      let titleText = await tds[1].textContent();
-      let linkEl = await tds[2].locator("a").first();
+      const date = clean(await tds[0].textContent());
+      const title = clean(await tds[1].textContent());
 
-      const title = clean(titleText);
-      const date = clean(dateText);
-      const href = await linkEl.getAttribute("href");
+      const link = row.locator("a").first();
+      if ((await link.count()) === 0) continue;
 
-      if (!title || !href) continue;
-
-      const fullUrl = new URL(href, BASE_DOMAIN).toString();
+      const href = await link.getAttribute("href");
+      if (!href || !title) continue;
 
       notices.push({
         rawDate: date,
-        title: title,
-        viewUrl: fullUrl,
+        title,
+        viewUrl: new URL(href, BASE_DOMAIN).toString(),
         slug: generateSlug(title, date),
       });
     }
+
     return notices;
   } catch (err) {
     console.error("❌ Error scraping list:", err);
@@ -77,14 +87,11 @@ async function fetchNoticeList(browser: Browser): Promise<ScrapedItem[]> {
     await page.close();
   }
 }
-
-// --- STEP 2: Find PDF URL (Only runs for NEW notices) ---
 async function findPdfLink(browser: Browser, url: string): Promise<string> {
   if (url.toLowerCase().endsWith(".pdf")) return url;
 
   const page = await browser.newPage();
   try {
-    // Optimization: Block images/fonts
     await page.route("**/*", (route) =>
       ["image", "stylesheet", "font"].includes(route.request().resourceType())
         ? route.abort()
@@ -93,7 +100,6 @@ async function findPdfLink(browser: Browser, url: string): Promise<string> {
 
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
 
-    // Look for PDF anchor
     const pdfAnchor = await page
       .locator('a[href$=".pdf"], a[href$=".PDF"]')
       .first();
@@ -102,7 +108,6 @@ async function findPdfLink(browser: Browser, url: string): Promise<string> {
       if (href) return new URL(href, url).toString();
     }
 
-    // Look for Iframes
     const iframeSrc = await page
       .locator("iframe")
       .getAttribute("src")
@@ -119,21 +124,16 @@ async function findPdfLink(browser: Browser, url: string): Promise<string> {
   }
 }
 
-// --- MAIN SYNC FUNCTION ---
 export async function syncNotices() {
   console.log("\n🔍 Starting BEU Notice Sync...");
-  console.log("LOGS", process.env.NODE_ENV);
 
   const SYSTEM_USER_ID = process.env.SYSTEM_USER_ID;
-
   if (!SYSTEM_USER_ID) {
-    console.error("❌ ERROR: SYSTEM_USER_ID environment variable is missing.");
-    process.exit(1);
+    console.error("❌ ERROR: SYSTEM_USER_ID missing.");
+    return;
   }
 
   const browser = await chromium.launch({ headless: true });
-
-  // Get your existing Model connection
   const NoticeModel = await getGeclNoticeFUIConn();
 
   try {
@@ -143,46 +143,40 @@ export async function syncNotices() {
     let newCount = 0;
 
     for (const item of scrapedNotices) {
-      // 1. Check Duplicates (by slug or title)
       const exists = await NoticeModel.exists({
         $or: [{ slug: item.slug }, { title: item.title }],
       });
 
-      if (exists) continue; // Skip if exists
+      if (exists) continue;
 
       console.log(`✨ New Notice: "${item.title}"`);
-
-      // 2. Fetch PDF Link
       const pdfUrl = await findPdfLink(browser, item.viewUrl);
 
-      // 3. Prepare Attachments
       const attachments = pdfUrl
         ? [
             {
               fileUrl: pdfUrl,
               fileName: `${item.slug}.pdf`,
-              fileType: "pdf",
+              fileType: "application/pdf",
               fileSize: 0,
             },
           ]
         : [];
 
-      // 4. Determine Category (Simple logic)
       let category = "GENERAL";
       const t = item.title.toLowerCase();
       if (t.includes("exam") || t.includes("schedule")) category = "EXAM";
       if (t.includes("result")) category = "ACADEMIC";
       if (t.includes("holiday")) category = "HOLIDAY";
 
-      // 5. Save to DB
       await NoticeModel.create({
         source: "BEU",
         title: item.title,
         slug: item.slug,
-        content: `Official Notice from BEU. Date: ${item.rawDate}`,
+        content: `Official Notice from BEU.`,
         category: category,
         department: "ALL",
-        audience: ["PUBLIC", "STUDENTS"], // Default audience
+        audience: ["PUBLIC", "STUDENTS"],
         status: "PUBLISHED",
         attachments: attachments,
         addedBy: new mongoose.Types.ObjectId(SYSTEM_USER_ID),
@@ -192,13 +186,10 @@ export async function syncNotices() {
       console.log(`✅ Saved.`);
       newCount++;
     }
-
     console.log(`\n🏁 Sync Complete. ${newCount} new notices added.`);
   } catch (error) {
     console.error("Critical Error:", error);
-    // process.exit(1);
   } finally {
     await browser.close();
-    // process.exit(0);
   }
 }

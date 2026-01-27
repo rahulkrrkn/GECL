@@ -8,5 +8,5 @@ export async function initServer() {
   // Dependent modules
   // await initRedis();
   await initMongoAuth();
-  // startCronJob();
+  startCronJob();
 }

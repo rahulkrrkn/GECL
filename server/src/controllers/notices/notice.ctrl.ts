@@ -1,9 +1,16 @@
 import type { Request, Response } from "express";
-import slugify from "slugify";
-
+import { slugify } from "../../utils/slugify.js"; // ✅ Custom utility import
 import { sendError, sendSuccess } from "../../helpers/response.helper.js";
 import { getGeclNoticeFUIConn } from "../../models/gecl_notice.model.js";
 import { renameToR2 } from "../../services/fileUploadRenameR2.service.js";
+
+// ✅ 1. Define Auth Request Type locally to fix TS errors
+type AuthRequest = Request & {
+  validatedBody?: NoticeBody;
+  files?:
+    | { [fieldname: string]: Express.Multer.File[] }
+    | Express.Multer.File[];
+};
 
 // Interface for Body
 interface NoticeBody {
@@ -31,6 +38,19 @@ interface AttachmentData {
 // ==============================
 export const createNotice = async (req: Request, res: Response) => {
   try {
+    // ✅ 2. Cast Request to AuthRequest
+    const authReq = req as AuthRequest;
+
+    // ✅ 3. Robust User ID Check
+    const userId = authReq.user?._id || authReq.user?.userId;
+
+    if (!userId) {
+      return sendError(res, "Unauthorized: User not found", {
+        status: 401,
+        code: "UNAUTHORIZED",
+      });
+    }
+
     const {
       title,
       content,
@@ -41,11 +61,9 @@ export const createNotice = async (req: Request, res: Response) => {
       status,
       publishAt,
       expireAt,
-    } = req.validatedBody as NoticeBody;
+    } = authReq.validatedBody || req.body; // Fallback to req.body if validation middleware skipped
 
-    const { userId } = req.user;
-
-    // 1. Validation
+    // 4. Validation
     if (
       !title ||
       !content ||
@@ -63,23 +81,26 @@ export const createNotice = async (req: Request, res: Response) => {
 
     const NoticeModel = await getGeclNoticeFUIConn();
 
-    // 2. Slug Logic
-    let slug = slugify(title, { lower: true, strict: true });
+    // 5. Slug Logic (Fixed for Custom Utility)
+    //
+    // Note: custom slugify() takes 1 arg, not 2 options
+    let slug = slugify(title);
+
     let slugExists = await NoticeModel.findOne({ slug });
     let counter = 1;
+
     while (slugExists) {
-      const newSlug = slugify(`${title}-${counter}`, {
-        lower: true,
-        strict: true,
-      });
+      const newSlug = slugify(`${title}-${counter}`);
       slugExists = await NoticeModel.findOne({ slug: newSlug });
       if (!slugExists) slug = newSlug;
       counter++;
     }
 
-    // 3. File Upload & Object Construction
+    // 6. File Upload & Object Construction
     const finalAttachments: AttachmentData[] = [];
-    const files = req.files as
+
+    // Handle Multer files safely
+    const files = authReq.files as
       | { [fieldname: string]: Express.Multer.File[] }
       | undefined;
     const attachmentFiles = files?.attachments || [];
@@ -93,7 +114,7 @@ export const createNotice = async (req: Request, res: Response) => {
       );
 
       const uploaded = await renameToR2({
-        req,
+        req: authReq, // Pass the casted request
         fileNames: { attachments: newFileNames },
       });
 
@@ -104,34 +125,33 @@ export const createNotice = async (req: Request, res: Response) => {
         });
       }
 
-      // ✅ FIX: Combine R2 URL with Multer Metadata
+      // Combine R2 URL with Multer Metadata
       if (uploaded.attachments && uploaded.attachments.length > 0) {
         uploaded.attachments.forEach((uploadResult: any, index: number) => {
           const originalFile = attachmentFiles[index];
 
           if (originalFile && uploadResult.url) {
-            // Create the exact object structure your Schema expects
             finalAttachments.push({
-              fileUrl: uploadResult.url, // From R2
-              fileName: originalFile.originalname, // From User's PC
-              fileType: originalFile.mimetype, // e.g. 'application/pdf'
-              fileSize: originalFile.size, // e.g. 102400 (bytes)
+              fileUrl: uploadResult.url,
+              fileName: originalFile.originalname,
+              fileType: originalFile.mimetype,
+              fileSize: originalFile.size,
             });
           }
         });
       }
     }
 
-    // 4. Create Document
+    // 7. Create Document
     const newNotice = new NoticeModel({
-      source: "GECL", // Force Source
+      source: "GECL",
       title,
       slug,
       content,
       category,
       department,
       audience,
-      attachments: finalAttachments, // ✅ Passing Array of Objects
+      attachments: finalAttachments,
       isPinned,
       status,
       publishAt: publishAt || new Date(),

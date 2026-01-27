@@ -1,6 +1,15 @@
 import type { Request, Response } from "express";
 import { sendError, sendSuccess } from "../../helpers/response.helper.js";
 import { getGeclNoticeFUIConn } from "../../models/gecl_notice.model.js";
+import type { GetNoticesQuery } from "../../validations/notice.val.js";
+
+// ✅ Define AuthRequest locally to fix TS errors
+type AuthRequest = Request & {
+  query: {
+    page?: string;
+    limit?: string;
+  };
+};
 
 /**
  * @desc    Get All Notices with Role-Based Filtering
@@ -8,14 +17,13 @@ import { getGeclNoticeFUIConn } from "../../models/gecl_notice.model.js";
  * @access  Public / Private (Role Dependent)
  */
 export const getAllNotices = async (req: Request, res: Response) => {
-  // const { page, limit } = req.validatedBody;
   try {
-    // 1. Pagination & Sorting
-    const page = Math.max(1, Number(req.validatedBody.page) || 1);
-    const limit = Math.min(
-      50,
-      Math.max(1, Number(req.validatedBody.limit) || 20),
-    );
+    const validatedQuery = req.validatedQuery as GetNoticesQuery;
+    const user = req.user;
+
+    // 1. Pagination & Sorting (Using req.query for GET requests)
+    const page = Math.max(1, Number(validatedQuery.page) || 1);
+    const limit = Math.min(50, Math.max(1, Number(validatedQuery.limit) || 20));
     const skip = (page - 1) * limit;
 
     // 2. Role Definitions
@@ -29,14 +37,14 @@ export const getAllNotices = async (req: Request, res: Response) => {
     const FACULTY_ROLES = ["teacher", "librarian", "tpo"];
 
     // 3. Determine User Scope
-    const userRole = req.user?.role?.toLowerCase() || "guest";
+    // ✅ FIX: Safely access first role from array
+    const userRole = user?.roles?.[0]?.toLowerCase() || "guest";
 
     let query: any = {};
 
     // --- LOGIC A: STATUS FILTER ---
     if (SUPER_ROLES.includes(userRole)) {
       // Admin sees EVERYTHING (Draft, Published, Archived, Deleted)
-      // No status filter applied
     } else if (MANAGEMENT_ROLES.includes(userRole)) {
       // Management sees everything EXCEPT Deleted
       query.status = { $ne: "DELETED" };
@@ -48,7 +56,6 @@ export const getAllNotices = async (req: Request, res: Response) => {
     // --- LOGIC B: AUDIENCE FILTER ---
     if (SUPER_ROLES.includes(userRole) || MANAGEMENT_ROLES.includes(userRole)) {
       // Admins & Management see notices for ALL audiences
-      // No audience filter applied
     } else {
       // Restricted Access
       let allowedAudience = ["PUBLIC"];
@@ -74,7 +81,7 @@ export const getAllNotices = async (req: Request, res: Response) => {
         .skip(skip)
         .limit(limit)
         .select(
-          " -expireAt -viewsCount -downloadsCount -createdAt -updatedAt -__v -addedBy -updatedBy",
+          "-expireAt -viewsCount -downloadsCount -createdAt -updatedAt -__v -addedBy -updatedBy",
         )
         .lean(), // High-performance read
 

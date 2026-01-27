@@ -26,6 +26,7 @@ import {
 import { PERMISSIONS } from "../config/pagePermissionData.config.js";
 import { getAllNotices } from "../controllers/notices/getNotice.ctrl.js";
 import { getNoticeBySlug } from "../controllers/notices/getSingleNotice.ctrl.js";
+import { validateRequest } from "../middlewares/validateRequest.mid.js";
 
 const notices = Router();
 
@@ -56,10 +57,10 @@ const uploadAttachments = createUploadMiddleware({
  * @route   GET /api/notices
  * @desc    Get all notices (Paginated + Search + Filter)
  */
-notices.post(
+notices.get(
   "/",
   checkUser,
-  validateBody(noticeSchemas.getAllNoticesSchema),
+  validateRequest({ query: noticeSchemas.getAllNoticesSchema }),
   getAllNotices,
 );
 notices.get(

@@ -2,6 +2,15 @@ import type { Request, Response } from "express";
 import { sendError, sendSuccess } from "../../helpers/response.helper.js";
 import { getGeclNoticeFUIConn } from "../../models/gecl_notice.model.js";
 
+// ✅ Define AuthRequest locally to fix TS errors
+type AuthRequest = Request & {
+  user?: {
+    _id?: string;
+    userId?: string;
+    roles?: string[];
+  };
+};
+
 /**
  * @desc    Get Single Notice by Slug
  * @route   GET /api/v1/notices/:slug
@@ -18,8 +27,10 @@ export const getNoticeBySlug = async (req: Request, res: Response) => {
       });
     }
 
-    // 1. Role Definitions & User Scope
-    const userRole = req.user?.role?.toLowerCase() || "guest";
+    // ✅ FIX: Cast request and safely access the first role from the array
+    const authReq = req as AuthRequest;
+    const userRole = authReq.user?.roles?.[0]?.toLowerCase() || "guest";
+
     const SUPER_ROLES = ["admin", "super-admin", "super_admin"];
     const MANAGEMENT_ROLES = ["principal", "vice_principal", "hod"];
     const FACULTY_ROLES = ["teacher", "librarian", "tpo"];

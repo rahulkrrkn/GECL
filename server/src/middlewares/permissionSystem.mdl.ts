@@ -5,19 +5,6 @@ import { sendError } from "../helpers/response.helper.js";
 import getRedis from "../config/redis.config.js";
 import { ROLE_PERMISSIONS } from "../config/pagePermissionData.config.js";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        _id: string;
-        userId: string;
-        email: string;
-        roles?: string[];
-      };
-    }
-  }
-}
-
 // Helper to extract Bearer token securely
 export function getBearerToken(req: Request): string | null {
   const auth = req.headers.authorization;
