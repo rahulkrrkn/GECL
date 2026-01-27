@@ -219,7 +219,7 @@ export default function AddNoticeForm() {
       const res = await request<any>(
         {
           method: "POST",
-          url: "/notice/create", // Ensure this matches your route
+          url: "/notices/create", // Ensure this matches your route
           data: payload,
           headers: { "Content-Type": "multipart/form-data" },
         },
