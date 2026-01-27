@@ -44,7 +44,7 @@ export const NewsTicker = () => {
             url: "/notices",
             params: {
               page: 1,
-              limit: 10,
+              limit: 5,
             },
           },
           { showMsg: false, showErrorMsg: false },
