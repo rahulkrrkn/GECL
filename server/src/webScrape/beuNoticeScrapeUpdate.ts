@@ -1,9 +1,15 @@
 import { chromium, type Browser } from "playwright";
 import mongoose from "mongoose";
-import { getGeclNoticeFUIConn } from "./../models/gecl_notice.model.js";
+
+import { getGeclNoticeFUIConn } from "../models/gecl_notice.model.js";
 import { slugify } from "../utils/slugify.js";
+
 const BEU_URL = "https://beu-bih.ac.in/notification";
 const BASE_DOMAIN = "https://beu-bih.ac.in";
+
+/* -------------------------------------------------------------------------- */
+/*                                    TYPES                                   */
+/* -------------------------------------------------------------------------- */
 
 type ScrapedItem = {
   rawDate: string;
@@ -12,49 +18,52 @@ type ScrapedItem = {
   slug: string;
 };
 
-// --- HELPER: Clean Text ---
+/* -------------------------------------------------------------------------- */
+/*                                   HELPERS                                  */
+/* -------------------------------------------------------------------------- */
+
 const clean = (text: string | null | undefined) =>
   (text || "").replace(/\s+/g, " ").trim();
 
-// --- HELPER: Generate Unique Slug ---
 function generateSlug(title: string, date: string) {
   const safeTitle = slugify(title);
   const safeDate = slugify(date) || "nodate";
   return `beu-${safeDate}-${safeTitle}`.substring(0, 100);
 }
 
-// --- STEP 1: Scrape Main List ---
+/* -------------------------------------------------------------------------- */
+/*                             SCRAPE MAIN LIST                               */
+/* -------------------------------------------------------------------------- */
+
 async function fetchNoticeList(browser: Browser): Promise<ScrapedItem[]> {
   const page = await browser.newPage();
   console.log(`\n🔍 Fetching Main List: ${BEU_URL}`);
 
   try {
     await page.goto(BEU_URL, {
-      waitUntil: "domcontentloaded", // ✅ NOT networkidle
+      waitUntil: "domcontentloaded",
       timeout: 60000,
     });
-    const browser = await chromium.launch({
-      headless: false,
-      slowMo: 200,
-    });
 
-    // ✅ Wait for the table itself
+    // Wait until table exists
     await page.waitForSelector("table", { timeout: 30000 });
 
-    // ✅ Wait until table rows are injected by JS
-    await page.waitForFunction(
-      () => {
-        const table = document.querySelector("table");
-        if (!table) return false;
+    // 🔥 KEY FIX: wait until rows STOP increasing
+    let previousCount = 0;
 
-        const rows = table.querySelectorAll("tbody tr");
-        return rows.length > 0;
-      },
-      { timeout: 30000 },
-    );
+    for (let i = 0; i < 25; i++) {
+      const currentCount = await page.locator("table tbody tr").count();
+
+      if (currentCount > previousCount) {
+        previousCount = currentCount;
+        await page.waitForTimeout(500);
+      } else {
+        break;
+      }
+    }
 
     const rows = await page.locator("table tbody tr").all();
-    console.log("✅ Rows detected:", rows.length);
+    console.log("✅ Final row count:", rows.length);
 
     const notices: ScrapedItem[] = [];
 
@@ -62,10 +71,13 @@ async function fetchNoticeList(browser: Browser): Promise<ScrapedItem[]> {
       const tds = await row.locator("td").all();
       if (tds.length < 3) continue;
 
-      const date = clean(await tds[0].textContent());
-      const title = clean(await tds[1].textContent());
+      const [dateTd, titleTd, linkTd] = tds;
+      if (!dateTd || !titleTd || !linkTd) continue;
 
-      const link = row.locator("a").first();
+      const date = clean(await dateTd.textContent());
+      const title = clean(await titleTd.textContent());
+
+      const link = linkTd.locator("a").first();
       if ((await link.count()) === 0) continue;
 
       const href = await link.getAttribute("href");
@@ -80,17 +92,23 @@ async function fetchNoticeList(browser: Browser): Promise<ScrapedItem[]> {
     }
 
     return notices;
-  } catch (err) {
-    console.error("❌ Error scraping list:", err);
+  } catch (error) {
+    console.error("❌ Error scraping notice list:", error);
     return [];
   } finally {
     await page.close();
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/*                           FIND PDF LINK (DETAIL)                           */
+/* -------------------------------------------------------------------------- */
+
 async function findPdfLink(browser: Browser, url: string): Promise<string> {
   if (url.toLowerCase().endsWith(".pdf")) return url;
 
   const page = await browser.newPage();
+
   try {
     await page.route("**/*", (route) =>
       ["image", "stylesheet", "font"].includes(route.request().resourceType())
@@ -98,13 +116,15 @@ async function findPdfLink(browser: Browser, url: string): Promise<string> {
         : route.continue(),
     );
 
-    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+    await page.goto(url, {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
 
-    const pdfAnchor = await page
-      .locator('a[href$=".pdf"], a[href$=".PDF"]')
-      .first();
+    const pdfAnchor = page.locator('a[href$=".pdf"], a[href$=".PDF"]');
+
     if ((await pdfAnchor.count()) > 0) {
-      const href = await pdfAnchor.getAttribute("href");
+      const href = await pdfAnchor.first().getAttribute("href");
       if (href) return new URL(href, url).toString();
     }
 
@@ -112,24 +132,29 @@ async function findPdfLink(browser: Browser, url: string): Promise<string> {
       .locator("iframe")
       .getAttribute("src")
       .catch(() => null);
+
     if (iframeSrc?.toLowerCase().includes(".pdf")) {
       return new URL(iframeSrc, url).toString();
     }
 
     return url;
-  } catch (e) {
+  } catch {
     return url;
   } finally {
     await page.close();
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                 SYNC JOB                                   */
+/* -------------------------------------------------------------------------- */
+
 export async function syncNotices() {
   console.log("\n🔍 Starting BEU Notice Sync...");
 
   const SYSTEM_USER_ID = process.env.SYSTEM_USER_ID;
   if (!SYSTEM_USER_ID) {
-    console.error("❌ ERROR: SYSTEM_USER_ID missing.");
+    console.error("❌ SYSTEM_USER_ID missing");
     return;
   }
 
@@ -138,7 +163,7 @@ export async function syncNotices() {
 
   try {
     const scrapedNotices = await fetchNoticeList(browser);
-    console.log(`📡 Found ${scrapedNotices.length} notices on BEU website.`);
+    console.log(`📡 Found ${scrapedNotices.length} notices`);
 
     let newCount = 0;
 
@@ -149,7 +174,8 @@ export async function syncNotices() {
 
       if (exists) continue;
 
-      console.log(`✨ New Notice: "${item.title}"`);
+      console.log(`✨ New Notice: ${item.title}`);
+
       const pdfUrl = await findPdfLink(browser, item.viewUrl);
 
       const attachments = pdfUrl
@@ -173,22 +199,22 @@ export async function syncNotices() {
         source: "BEU",
         title: item.title,
         slug: item.slug,
-        content: `Official Notice from BEU.`,
-        category: category,
+        content: "Official Notice from BEU.",
+        category,
         department: "ALL",
         audience: ["PUBLIC", "STUDENTS"],
         status: "PUBLISHED",
-        attachments: attachments,
+        attachments,
         addedBy: new mongoose.Types.ObjectId(SYSTEM_USER_ID),
         publishAt: new Date(),
       });
 
-      console.log(`✅ Saved.`);
       newCount++;
     }
+
     console.log(`\n🏁 Sync Complete. ${newCount} new notices added.`);
   } catch (error) {
-    console.error("Critical Error:", error);
+    console.error("❌ Critical Sync Error:", error);
   } finally {
     await browser.close();
   }
