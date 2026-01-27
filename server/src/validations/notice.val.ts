@@ -47,18 +47,13 @@ export type GetNoticesQuery = z.infer<typeof getAllNoticesSchema>;
 /* ================= CREATE NOTICE ================= */
 export const createNoticeSchema = z
   .object({
-    source: z.enum(SOURCE_ENUM),
-
     title: z
       .string()
       .min(5, "Title must be at least 5 characters")
       .max(200, "Title is too long")
       .trim(),
 
-    content: z
-      .string()
-      .min(10, "Content must be at least 10 characters")
-      .trim(),
+    content: z.string().min(0, "Content must be at least 10 characters").trim(),
 
     category: z
       .enum(CATEGORY_ENUM, {
@@ -97,7 +92,7 @@ export const createNoticeSchema = z
 export const updateNoticeSchema = z
   .object({
     title: z.string().min(3).max(200).trim().optional(),
-    content: z.string().min(10).trim().optional(),
+    content: z.string().min(0).trim().optional(),
     category: z.enum(CATEGORY_ENUM).optional(),
     department: z.enum(DEPARTMENT_ENUM).optional(),
 

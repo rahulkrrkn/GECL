@@ -12,7 +12,8 @@ export const DEPT_DATA: Record<string, any> = {
     intake: 300, // Common for 1st Year
     labs: 4,
     faculty: 12,
-    image: "/gecl/images/departments/applied-applied-science-hod-profile.webp",
+    image:
+      "/gecl/images/departments/applied-science-humanities-hod-profile.webp",
   },
   "cse-ai": {
     name: "Computer Science (AI)",

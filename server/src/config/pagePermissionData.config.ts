@@ -9,7 +9,8 @@ export const PERMISSIONS = {
 
 export const ROLE_PERMISSIONS = {
   student: [PERMISSIONS.NOTICE.READ],
-  teacher: [
+  teacher: [PERMISSIONS.NOTICE.READ],
+  hod: [
     PERMISSIONS.NOTICE.READ,
     PERMISSIONS.NOTICE.CREATE,
     PERMISSIONS.NOTICE.UPDATE,

@@ -13,7 +13,8 @@ export const HOD_DATA: Record<string, any> = {
       "Foundational Mathematics",
       "Communication Skills",
     ],
-    image: "/gecl/images/departments/applied-applied-science-hod-profile.webp",
+    image:
+      "/gecl/images/departments/applied-science-humanities-hod-profile.webp",
   },
   "cse-ai": {
     name: "Prof. Phool Kumari",

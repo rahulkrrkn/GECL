@@ -152,9 +152,17 @@ export default function LoginPage() {
     const hasToken = document.cookie
       .split("; ")
       .find((row) => row.startsWith("GECL_ACCESS_TOKEN="));
-
-    if (hasToken) {
+    const hasLocalToken = localStorage.getItem("GECL_ACCESS_TOKEN");
+    if (hasToken && hasLocalToken) {
       router.replace("/");
+    }
+    // Remove if only one of them is present
+    if (hasToken && !hasLocalToken) {
+      document.cookie =
+        "GECL_ACCESS_TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+    if (!hasToken && hasLocalToken) {
+      localStorage.removeItem("GECL_ACCESS_TOKEN");
     }
   }, [router]);
 

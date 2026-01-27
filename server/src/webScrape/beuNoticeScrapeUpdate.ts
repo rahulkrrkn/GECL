@@ -34,16 +34,14 @@ function generateSlug(title: string, date: string) {
 // 🆕 NEW: Parse "DD-MM-YYYY" or "DD/MM/YYYY" into a JS Date Object
 function parseDate(dateStr: string): Date {
   try {
-    // Remove any extra whitespace
     const cleanStr = dateStr.trim();
-
-    // Split by - or /
     const parts = cleanStr.split(/[-/]/);
 
     if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JS
-      const year = parseInt(parts[2], 10);
+      // Fix: Added '!' to assure TS these indices exist
+      const day = parseInt(parts[0]!, 10);
+      const month = parseInt(parts[1]!, 10) - 1; // Months are 0-indexed in JS
+      const year = parseInt(parts[2]!, 10);
 
       const parsed = new Date(year, month, day);
 
@@ -188,10 +186,9 @@ export async function syncNotices() {
     const scrapedNotices = await fetchNoticeList(browser);
     console.log(`📡 Found ${scrapedNotices.length} notices`);
 
-    // 🆕 FIX 1: REVERSE ORDER
+    // 🆕 FIX: REVERSE ORDER
     // The website has Latest at Top (Index 0).
     // We reverse it so we process [Oldest ... Newest].
-    // This creates IDs in chronological order and ensures the "Newest" is inserted last.
     const chronologicalNotices = [...scrapedNotices].reverse();
 
     let newCount = 0;
@@ -224,7 +221,7 @@ export async function syncNotices() {
       if (t.includes("result")) category = "ACADEMIC";
       if (t.includes("holiday")) category = "HOLIDAY";
 
-      // 🆕 FIX 2: USE REAL DATE
+      // 🆕 FIX: USE REAL DATE
       const realPublishDate = parseDate(item.rawDate);
 
       await NoticeModel.create({
@@ -238,7 +235,7 @@ export async function syncNotices() {
         status: "PUBLISHED",
         attachments,
         addedBy: new mongoose.Types.ObjectId(GECL_SYSTEM_USER_ID),
-        publishAt: realPublishDate, // <--- Using the parsed date from website
+        publishAt: realPublishDate, // <--- Using the parsed date
       });
 
       newCount++;

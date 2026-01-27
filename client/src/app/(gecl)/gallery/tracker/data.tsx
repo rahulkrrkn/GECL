@@ -101,7 +101,7 @@ export const imageLinks = [
   "/gecl/images/departments/civil-engineering-hod-profile.webp",
   "/gecl/images/departments/electrical-and-electronics-engineering-hod-profile.webp",
   "/gecl/images/departments/mechanical-engineering-hod-profile.webp",
-  "/gecl/images/departments/applied-applied-science-hod-profile.webp",
+  "/gecl/images/departments/applied-science-humanities-hod-profile.webp",
   "/gecl/images/classroom-lecture.webp",
 ];
 

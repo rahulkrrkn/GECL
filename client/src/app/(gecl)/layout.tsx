@@ -41,7 +41,7 @@ export default function RootLayout({
 }) {
   return (
     <>
-      <ContentProtection />
+      {/* <ContentProtection /> */}
       <Navbar />
       <main className="select-none"> {children}</main>
       <Footer />

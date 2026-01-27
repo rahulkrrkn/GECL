@@ -44,6 +44,8 @@ import {
   FaUserTie,
   FaTimeline,
   FaFilePdf,
+  FaPlus,
+  FaNewspaper,
 } from "react-icons/fa6";
 
 // ✅ Roles (Updated)
@@ -335,6 +337,19 @@ export const menuConfig: MenuItem[] = [
   //     },
   //   ],
   // },
+  {
+    label: "Notices",
+    href: "/notices",
+    icon: FaNewspaper,
+    children: [
+      {
+        roles: ["hod", "principal", "admin", "super-admin"],
+        label: "Add Notice",
+        href: "/notices/add",
+        icon: FaPlus,
+      },
+    ],
+  },
 
   // ---------------- DEV / ADMIN TOOLS ----------------
   {

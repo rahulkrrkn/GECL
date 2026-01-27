@@ -10,20 +10,21 @@ export const metadata: Metadata = {
 
 export default function AddNoticePage() {
   return (
-    <main className="min-h-screen bg-[#0f172a] text-slate-200 pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
-        <Breadcrumb
-          items={[
-            { label: "Admin", href: "/admin" },
-            { label: "Notices", href: "/admin/notices" },
-            { label: "Create New" },
-          ]}
-        />
-
-        <div className="mt-8">
-          <AddNoticeForm />
+    <>
+      <Breadcrumb
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Notices", href: "/notices" },
+          { label: "Create New" },
+        ]}
+      />
+      <main className="min-h-screen bg-[#0f172a] text-slate-200 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
+          <div className="mt-8">
+            <AddNoticeForm />
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

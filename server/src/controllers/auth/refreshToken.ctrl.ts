@@ -227,9 +227,22 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
 
   // response
   res.locals.publicData = res.locals.publicData || {};
-  res.locals.publicData.GECL_ACCESS_TOKEN = newAccessToken;
 
+  // Create access token data
+  const ACCESS_MIN = Number(process.env.GECL_JWT_ACCESS_EXPIRES_MIN) || 15;
+
+  res.locals.publicData = res.locals.publicData || {};
+  const accessTokenData: any = {
+    token: newAccessToken,
+    expiresAt: new Date(Date.now() + ACCESS_MIN * 60 * 1000),
+    allow: user.pageAccess?.allow ?? [],
+    deny: user.pageAccess?.deny ?? [],
+    allowExtra: user.pageAccess?.allowExtra ?? [],
+    role: user.role,
+    personType: user.personType,
+  };
+  res.locals.publicData.GECL_ACCESS_TOKEN = accessTokenData;
   return sendSuccess(res, "Access token refreshed", {
-    GECL_ACCESS_TOKEN: newAccessToken,
+    // GECL_ACCESS_TOKEN: newAccessToken,
   });
 };

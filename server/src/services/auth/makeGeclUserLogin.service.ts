@@ -13,7 +13,7 @@ import { json } from "zod";
 // ==============================
 // Types
 // ==============================
-type LoginMethod  =
+type LoginMethod =
   | "email-password"
   | "mobile-password"
   | "email-otp"
