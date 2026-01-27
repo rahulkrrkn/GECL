@@ -60,7 +60,7 @@ type RetryAxiosRequestConfig = InternalAxiosRequestConfig & {
 };
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://api.gecl.rahulkrrkn.com";
+  process.env.NEXT_PUBLIC_API_URL || "https://api.geclakhisarai.com";
 
 export const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
