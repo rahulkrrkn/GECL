@@ -1,0 +1,216 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+
+/////////////////////////////////////////////////////////
+// ENUMS
+/////////////////////////////////////////////////////////
+
+enum UserStatus {
+  pending
+  active
+  rejected
+  blocked
+  unverified
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+enum PersonType {
+  student
+  employee
+}
+
+enum Branch {
+  CSE
+  ECE
+  EE
+  ME
+  CE
+  CSE_AI
+  CSE_DS
+  EEE
+  AS
+}
+
+enum Designation {
+  PROFESSOR
+  ASSISTANT_PROFESSOR
+  GUEST
+  LAB_ASSISTANT
+}
+
+enum LoginMethod {
+  PASS_EMAIL
+  PASS_USERNAME
+  PASS_MOBILE
+  OTP_SMS
+  OTP_WHATSAPP
+  OTP_EMAIL
+  GOOGLE_EMAIL
+  GOOGLE_SUB
+}
+
+/////////////////////////////////////////////////////////
+// USER
+/////////////////////////////////////////////////////////
+
+model User {
+  id String @id @default(uuid())
+
+  fullName     String
+  email        String @unique
+  passwordHash String
+
+  googleSub     String?
+  mobile        String?
+  profilePicUrl String?
+  username      String? @unique
+
+  roles      String[]   @default([])
+  status     UserStatus @default(pending)
+  personType PersonType
+
+  gender Gender?
+  dob    DateTime?
+
+  address          Json?
+  emergencyContact Json?
+  socialLinks      Json?
+  pageAccess       Json?
+  notifications    Json?
+
+  approvedBy   String?
+  approvedAt   DateTime?
+  rejectedBy   String?
+  rejectedAt   DateTime?
+  rejectReason String?
+
+  // ✅ RELATIONS
+  student Student?
+  teacher Teacher?
+  refreshSessions RefreshSession[]  // ⭐ ADD THIS
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+/////////////////////////////////////////////////////////
+// STUDENT
+/////////////////////////////////////////////////////////
+
+model Student {
+  userId String @id
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  regNo  String? @unique
+  rollNo String?
+
+  branch   Branch
+  semester Int
+
+  admissionYear Int
+  passingYear   Int?
+
+  isLateralEntry Boolean @default(false)
+
+  guardian Json?
+  hostel   Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([branch, semester])
+}
+
+/////////////////////////////////////////////////////////
+// TEACHER
+/////////////////////////////////////////////////////////
+
+model Teacher {
+  userId String @id
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  employeeId    String? @unique
+  officialEmail String? @unique
+
+  designation Designation?
+  department  Branch?
+
+  roomNo String?
+  office Json?
+
+  joiningDate     DateTime?
+  experienceYears Int? @default(0)
+  specialization  String?
+  skills          String[] @default([])
+  education       Json?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([department])
+}
+
+/////////////////////////////////////////////////////////
+// REFRESH SESSION
+/////////////////////////////////////////////////////////
+
+model RefreshSession {
+  id String @id @default(uuid())
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  refreshTokenHash String
+
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  loginMethod LoginMethod
+  loginAt DateTime @default(now())
+
+  ip        String?
+  userAgent String?
+  device    String?
+
+  country String?
+  state   String?
+  city    String?
+
+  rotatedFromId String?
+  rotatedFrom   RefreshSession?  @relation("Rotation", fields: [rotatedFromId], references: [id])
+  rotatedTo     RefreshSession[] @relation("Rotation")
+
+  isRevoked    Boolean @default(false)
+  revokedAt    DateTime?
+  revokeReason String?
+
+  lastUsedAt DateTime?
+
+  @@index([userId, isRevoked])
+  @@index([expiresAt])
+  @@index([userId, loginMethod])
+}
