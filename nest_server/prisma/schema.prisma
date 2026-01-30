@@ -76,7 +76,7 @@ model User {
 
   fullName     String
   email        String @unique
-  passwordHash String
+  password String
 
   googleSub     String?
   mobile        String?
@@ -93,9 +93,12 @@ model User {
   address          Json?
   emergencyContact Json?
   socialLinks      Json?
-  pageAccess       Json?
   notifications    Json?
 
+  // ✅ Access
+  allow        String[]   @default([])
+  deny         String[]   @default([])
+  allowExtra   String[]   @default([])
   approvedBy   String?
   approvedAt   DateTime?
   rejectedBy   String?
@@ -105,7 +108,7 @@ model User {
   // ✅ RELATIONS
   student Student?
   teacher Teacher?
-  refreshSessions RefreshSession[]  // ⭐ ADD THIS
+  refreshSessions RefreshSession[]  
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -122,11 +125,11 @@ model Student {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  regNo  String? @unique
+  regNo  String @unique
   rollNo String?
 
   branch   Branch
-  semester Int
+  semester Int?
 
   admissionYear Int
   passingYear   Int?
