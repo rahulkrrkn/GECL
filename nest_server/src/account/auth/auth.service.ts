@@ -3,11 +3,33 @@ import { PrismaService } from 'src/common/prisma/prisma.service';
 import { RegisterStudentDto } from './dto/registerStudent.dto';
 import * as bcrypt from 'bcryptjs';
 import { StudentRegNo } from 'src/common/helpers/students/studentRegNoBreak.helper';
+import { EmailService } from 'src/common/email/email.service';
+import { RedisService } from 'src/common/redis/redis.service';
+import { NotificationProducer } from 'src/jobs/producers/notification.producer';
 // import {} from '@prisma/client';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private emailService: EmailService,
+    private redis: RedisService,
+    private readonly notificationProducer: NotificationProducer,
+  ) {}
+
+  async test() {
+    for (let i = 0; i < 5; i++) {
+      await this.notificationProducer.sendRtqJob('email', {
+        to: 'rahulkrrkn@gmail.com',
+        subject: 'Welcome to GECL',
+        template: 'welcome', // template name
+        context: {
+          name: 'Rahul' + i,
+        },
+      });
+      // await this.emailService.sendEmail({});
+    }
+  }
 
   // 🔍 Check existing user
   async checkEmailMobileRegNo(dto: RegisterStudentDto) {
@@ -24,14 +46,6 @@ export class AuthService {
 
   // 📝 Register user
   async registerUserStudent(dto: RegisterStudentDto) {
-    // 1️⃣ Check duplicates
-    const existing = await this.checkEmailMobileRegNo(dto);
-
-    if (existing) {
-      throw new BadRequestException(
-        'Email, mobile, or registration number already exists',
-      );
-    }
     const { regNo } = dto;
 
     // Create instance
@@ -102,3 +116,29 @@ export class AuthService {
     });
   }
 }
+
+// // src/auth/auth.service.ts
+// import { Injectable } from '@nestjs/common';
+// import { EmailService } from '../email/email.service'; // 👈 Import Service
+
+// @Injectable()
+// export class AuthService {
+//   // 1. Inject the EmailService
+//   constructor(private emailService: EmailService) {}
+
+//   async register(userData: any) {
+//     // ... (Your logic to save user to database via Prisma) ...
+//     const savedUser = { email: 'rahul@example.com', name: 'Rahul Sharma' }; // Dummy data
+
+//     // 2. Call the email function
+//     console.log('Sending email...');
+//
+//     // You typically don't await this if you want the API to be fast.
+//     // Let it run in the background.
+//     this.emailService.sendUserWelcome(savedUser.email, savedUser.name)
+//       .then(() => console.log('✅ Email sent successfully'))
+//       .catch((err) => console.error('❌ Email failed:', err));
+
+//     return { message: 'User registered successfully' };
+//   }
+// }

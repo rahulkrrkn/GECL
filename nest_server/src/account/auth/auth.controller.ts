@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterStudentDto } from './dto/registerStudent.dto';
 import { EmailUtil } from 'src/common/utils/email.util';
@@ -7,6 +7,19 @@ import { EmailUtil } from 'src/common/utils/email.util';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Get('test')
+  async test() {
+    const start = performance.now();
+
+    const result = await this.authService.test();
+
+    const end = performance.now();
+
+    return {
+      result,
+      timeTaken: end - start,
+    };
+  }
   /* ==========================================================
   ✅ Register Student 
   ==========================================================*/

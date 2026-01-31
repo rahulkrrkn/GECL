@@ -217,3 +217,66 @@ model RefreshSession {
   @@index([expiresAt])
   @@index([userId, loginMethod])
 }
+///////////////////////////////////////////////////////////
+// NOTIFICATION LOG (Sending Layer)
+///////////////////////////////////////////////////////////
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  WHATSAPP
+  PUSH_WEB
+  PUSH_APP
+  IN_APP
+}
+
+enum NotificationStatus {
+  PENDING
+  SCHEDULED    // 👈 Added: For future tasks
+  SENT
+  DELIVERED
+  READ
+  FAILED
+  CANCELED     // 👈 Added: If user cancels a scheduled job
+}
+
+model NotificationLog {
+  id          String   @id @default(uuid())
+
+  // 1. Identity & Grouping
+  userId      String?  @map("user_id") // Optional: specific user
+  recipient   String   // The Email, Phone, or Token
+  batchId     String?  // 👈 CRITICAL: Links 10k emails to 1 "Campaign"
+
+  // 2. Core Details
+  channel     NotificationChannel
+  status      NotificationStatus @default(PENDING)
+  priority    String?  @default("normal") // low, normal, high
+
+  // 3. Content (Store generic data here)
+  title       String?
+  content     String?  // SMS/Push body
+  metadata    Json?    // 👈 Store Template ID, Context Variables, IP, Device Info here
+
+  // 4. Provider Info
+  provider          String?  // "AWS SES", "Twilio"
+  providerId        String?  // The ID given by AWS/Twilio (for webhooks)
+  error             String?  // Error message if failed
+  retryCount        Int      @default(0)
+
+  // 5. Lifecycle Timestamps
+  createdAt    DateTime @default(now())
+  scheduledAt  DateTime? // 👈 Added: When should this be sent?
+  sentAt       DateTime? // When it actually left
+  deliveredAt  DateTime?
+  readAt       DateTime?
+  clickedAt    DateTime?
+
+  // Indexes for high-speed querying
+  @@index([recipient])  // "Show all emails sent to Rahul"
+  @@index([batchId])    // "Show analytics for Diwali Campaign"
+  @@index([status])     // "Show all FAILED emails"
+  @@index([scheduledAt]) // "Find jobs that need to run now"
+  
+  @@map("notification_logs")
+}
