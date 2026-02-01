@@ -1,144 +1,266 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaService } from 'src/common/prisma/prisma.service';
-import { RegisterStudentDto } from './dto/registerStudent.dto';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
-import { StudentRegNo } from 'src/common/helpers/students/studentRegNoBreak.helper';
-import { EmailService } from 'src/common/email/email.service';
+import * as crypto from 'crypto';
+import { randomInt } from 'crypto';
+
+import { PrismaService } from 'src/common/prisma/prisma.service';
 import { RedisService } from 'src/common/redis/redis.service';
 import { NotificationProducer } from 'src/jobs/producers/notification.producer';
-// import {} from '@prisma/client';
+import { StudentRegNo } from 'src/common/helpers/students/studentRegNoBreak.helper';
+import { safeJsonParse } from 'src/common/helpers/safeJsonParse.helper';
+
+import { RegisterStudentDto } from './dto/registerStudent.dto';
+import { RegisterFacultyDto } from './dto/registerFaculty.dto';
+
+/* =====================
+   🔒 Types
+===================== */
+
+interface OtpPayload {
+  otpHash: string;
+  attempts: number;
+  maxAttempts: number;
+}
+
+interface RegistrationPayload {
+  REG_KEY: string;
+  attempt: number;
+  maxAttempt: number;
+}
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
-    private emailService: EmailService,
-    private redis: RedisService,
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
     private readonly notificationProducer: NotificationProducer,
   ) {}
 
-  async test() {
-    for (let i = 0; i < 5; i++) {
-      await this.notificationProducer.sendRtqJob('email', {
-        to: 'rahulkrrkn@gmail.com',
-        subject: 'Welcome to GECL',
-        template: 'welcome', // template name
-        context: {
-          name: 'Rahul' + i,
+  /* ==========================================================
+     ✅ SEND OTP
+  ========================================================== */
+  async sendOtp(email: string): Promise<boolean> {
+    const redisKey = `GECL:VERIFY_REGISTRATION:${email}`;
+
+    if (await this.redis.get(redisKey)) {
+      throw new BadRequestException(
+        'OTP already sent. Please wait before requesting again.',
+      );
+    }
+
+    const otp = randomInt(100000, 999999).toString();
+    const otpHash = await bcrypt.hash(otp, 10);
+
+    const payload: OtpPayload = {
+      otpHash,
+      attempts: 0,
+      maxAttempts: 3,
+    };
+
+    await this.redis.set(redisKey, JSON.stringify(payload), 15 * 60);
+
+    await this.notificationProducer.sendRtqJob('email', {
+      to: email,
+      subject: 'GEC Lakhisarai Registration OTP',
+      template: 'studentRegisterOtpEmail',
+      context: {
+        otp,
+        expiryTime: 15,
+        currentYear: new Date().getFullYear(),
+      },
+    });
+
+    return true;
+  }
+
+  /* ==========================================================
+     ✅ VERIFY OTP
+  ========================================================== */
+  async verifyOtp(email: string, inputOtp: string): Promise<string> {
+    const redisKey = `GECL:VERIFY_REGISTRATION:${email}`;
+    const storedData = await this.redis.get(redisKey);
+
+    if (!storedData) {
+      throw new BadRequestException('OTP expired or invalid');
+    }
+
+    const payload = safeJsonParse<OtpPayload>(storedData);
+
+    if (payload.attempts >= payload.maxAttempts) {
+      await this.redis.del(redisKey);
+      throw new BadRequestException('Too many incorrect attempts');
+    }
+
+    const isMatch = await bcrypt.compare(inputOtp, payload.otpHash);
+
+    if (!isMatch) {
+      payload.attempts += 1;
+
+      await this.redis.set(
+        redisKey,
+        JSON.stringify(payload),
+        await this.redis.ttl(redisKey),
+      );
+
+      throw new BadRequestException('Invalid OTP');
+    }
+
+    await this.redis.del(redisKey);
+
+    const registrationKey = crypto.randomBytes(32).toString('hex');
+
+    const registrationPayload: RegistrationPayload = {
+      REG_KEY: registrationKey,
+      attempt: 0,
+      maxAttempt: 5,
+    };
+
+    await this.redis.set(
+      `GECL:REGISTRATION:${email}`,
+      JSON.stringify(registrationPayload),
+      15 * 60,
+    );
+
+    return registrationKey;
+  }
+
+  /* ==========================================================
+     ✅ VERIFY REGISTRATION KEY
+  ========================================================== */
+  async verifyRegistrationKey(email: string, regKey: string): Promise<void> {
+    const redisKey = `GECL:REGISTRATION:${email}`;
+    const storedData = await this.redis.get(redisKey);
+
+    if (!storedData) {
+      throw new BadRequestException('Registration key expired');
+    }
+
+    const payload = safeJsonParse<RegistrationPayload>(storedData);
+
+    if (payload.REG_KEY !== regKey) {
+      payload.attempt += 1;
+
+      if (payload.attempt >= payload.maxAttempt) {
+        await this.redis.del(redisKey);
+        throw new BadRequestException('Too many incorrect attempts');
+      }
+
+      await this.redis.set(
+        redisKey,
+        JSON.stringify(payload),
+        await this.redis.ttl(redisKey),
+      );
+
+      throw new BadRequestException('Invalid registration key');
+    }
+  }
+
+  async deleteRegistrationKey(email: string) {
+    await this.redis.del(`GECL:REGISTRATION:${email}`);
+  }
+
+  /* ==========================================================
+     ✅ STUDENT REGISTRATION (FULLY SAFE)
+  ========================================================== */
+  async registerStudentFull(dto: RegisterStudentDto, profilePicUrl: string) {
+    return this.prisma.$transaction(async (tx) => {
+      // 🔒 Duplicate check (race-condition safe)
+      const existing = await tx.user.findFirst({
+        where: {
+          OR: [
+            { email: dto.email },
+            { mobile: dto.mobile },
+            { username: dto.regNo },
+          ],
         },
       });
-      // await this.emailService.sendEmail({});
-    }
-  }
 
-  // 🔍 Check existing user
-  async checkEmailMobileRegNo(dto: RegisterStudentDto) {
-    return this.prisma.user.findFirst({
-      where: {
-        OR: [
-          { email: dto.email },
-          { mobile: dto.mobile },
-          { username: dto.regNo },
-        ],
-      },
+      if (existing) {
+        throw new ConflictException(
+          'Email, mobile number, or registration number already exists',
+        );
+      }
+
+      const reg = new StudentRegNo(dto.regNo);
+      if (!reg.isValidCollege(158)) {
+        throw new BadRequestException('Invalid college code');
+      }
+
+      const passwordHash = await bcrypt.hash(dto.password, 10);
+
+      const user = await tx.user.create({
+        data: {
+          fullName: dto.fullName,
+          username: dto.regNo,
+          email: dto.email,
+          mobile: dto.mobile,
+          password: passwordHash,
+          personType: 'student',
+          roles: ['student'],
+          profilePicUrl,
+        },
+      });
+
+      await tx.student.create({
+        data: {
+          regNo: dto.regNo,
+          branch: reg.getBranch(),
+          admissionYear: reg.getAdmissionYear(),
+          passingYear: reg.getPassingYear(),
+          isLateralEntry: reg.isLateralEntry(),
+          userId: user.id,
+        },
+      });
+
+      return user;
     });
   }
 
-  // 📝 Register user
-  async registerUserStudent(dto: RegisterStudentDto) {
-    const { regNo } = dto;
+  /* ==========================================================
+     ✅ FACULTY REGISTRATION (FULLY SAFE)
+  ========================================================== */
+  async registerFacultyFull(dto: RegisterFacultyDto, profilePicUrl: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const existing = await tx.user.findFirst({
+        where: {
+          OR: [{ email: dto.email }, { mobile: dto.mobile }],
+        },
+      });
 
-    // Create instance
-    const reg = new StudentRegNo(regNo);
-    if (!reg.isValidRegNo()) {
-      throw new Error('Invalid registration number');
-    }
+      if (existing) {
+        throw new ConflictException('Email or mobile number already exists');
+      }
 
-    // 2️⃣ Hash password
-    const passwordHash = await bcrypt.hash(dto.password, 10);
-    // 3️⃣ Create user
-    return this.prisma.user.create({
-      data: {
-        fullName: dto.FullName,
-        username: dto.regNo,
-        email: dto.email,
-        mobile: dto.mobile,
-        password: passwordHash,
-        personType: 'student',
-        roles: ['student'],
-      },
+      const passwordHash = await bcrypt.hash(dto.password, 10);
 
-      // 4️⃣ Return safe data only
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        mobile: true,
-        createdAt: true,
-      },
-    });
-  }
-  async registerStudent(dto: RegisterStudentDto, userId: string) {
-    const { regNo } = dto;
+      const user = await tx.user.create({
+        data: {
+          fullName: dto.fullName,
+          email: dto.email,
+          mobile: dto.mobile,
+          password: passwordHash,
+          personType: 'employee',
+          roles: ['teacher'],
+          profilePicUrl,
+        },
+      });
 
-    // Create instance
-    const reg = new StudentRegNo(regNo);
+      await tx.teacher.create({
+        data: {
+          userId: user.id,
+          designation: dto.designation,
+          branches: dto.branches,
+          specialization: dto.specialization,
+          experienceYears: dto.experienceYears,
+          officialEmail: dto.officialEmail,
+        },
+      });
 
-    // Optional strict college validation
-    if (!reg.isValidCollege(158)) {
-      throw new Error('Invalid college code');
-    }
-
-    // Extract values via methods
-    const branch = reg.getBranch();
-    const admissionYear = reg.getAdmissionYear();
-    const passingYear = reg.getPassingYear();
-    const isLateralEntry = reg.isLateralEntry();
-
-    // Save in DB
-    return this.prisma.student.create({
-      data: {
-        regNo,
-        branch,
-        admissionYear,
-        passingYear,
-        isLateralEntry,
-        userId: userId,
-      },
-      select: {
-        userId: true,
-        regNo: true,
-        branch: true,
-        admissionYear: true,
-        passingYear: true,
-        createdAt: true,
-      },
+      return user;
     });
   }
 }
-
-// // src/auth/auth.service.ts
-// import { Injectable } from '@nestjs/common';
-// import { EmailService } from '../email/email.service'; // 👈 Import Service
-
-// @Injectable()
-// export class AuthService {
-//   // 1. Inject the EmailService
-//   constructor(private emailService: EmailService) {}
-
-//   async register(userData: any) {
-//     // ... (Your logic to save user to database via Prisma) ...
-//     const savedUser = { email: 'rahul@example.com', name: 'Rahul Sharma' }; // Dummy data
-
-//     // 2. Call the email function
-//     console.log('Sending email...');
-//
-//     // You typically don't await this if you want the API to be fast.
-//     // Let it run in the background.
-//     this.emailService.sendUserWelcome(savedUser.email, savedUser.name)
-//       .then(() => console.log('✅ Email sent successfully'))
-//       .catch((err) => console.error('❌ Email failed:', err));
-
-//     return { message: 'User registered successfully' };
-//   }
-// }

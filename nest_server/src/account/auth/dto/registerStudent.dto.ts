@@ -2,7 +2,7 @@ import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
 const RegistrationSchema = z.object({
-  FullName: z.string().min(2, 'Name must be at least 2 characters').trim(),
+  fullName: z.string().min(2, 'Name must be at least 2 characters').trim(),
 
   email: z.string().email('Invalid email address').toLowerCase().trim(),
 

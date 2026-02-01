@@ -1,9 +1,21 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  InternalServerErrorException,
+  Post,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterStudentDto } from './dto/registerStudent.dto';
-import { EmailUtil } from 'src/common/utils/email.util';
+import { RegisterFacultyDto } from './dto/registerFaculty.dto';
+import { RegisterSendOtpDto } from './dto/registerSendOtp.dto';
+import { RegisterVerifyOtpDto } from './dto/registerVerifyOtp.dto';
 
-// Uplode image
+import { EmailUtil } from 'src/common/utils/email.util';
+import { ApiResponse } from 'src/common/response/api-response';
+import { ApiErrorCode } from 'src/common/response/api-error-codes';
+
+// Upload
 import { UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FileValidationPipe } from 'src/common/pipes/file-validation.pipe';
@@ -13,108 +25,53 @@ import { SeoUploadService } from 'src/common/uploads/documentUpload.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('test')
-  async test() {
-    const start = performance.now();
+  /* ==========================================================
+     ✅ SEND OTP
+  ========================================================== */
+  @Post('registration/send-otp')
+  async sendOtp(@Body() dto: RegisterSendOtpDto) {
+    const cleanEmail = EmailUtil.normalize(dto.email);
+    if (!cleanEmail) {
+      throw new BadRequestException('Invalid email address');
+    }
 
-    const result = await this.authService.test();
+    await this.authService.sendOtp(cleanEmail);
 
-    const end = performance.now();
-
-    return {
-      result,
-      timeTaken: end - start,
-    };
+    return ApiResponse.success('OTP sent successfully');
   }
 
-  // @Post('upload')
-  // @UseInterceptors(
-  //   FileFieldsInterceptor([
-  //     { name: 'profile_photo', maxCount: 1 },
-  //     { name: 'document', maxCount: 10 },
-  //   ]),
-  // )
-  // async uploadData(
-  //   // 1. CAPTURE FILES (Validated by Pipe)
-  //   @UploadedFiles(
-  //     new FileValidationPipe([
-  //       {
-  //         name: 'profile_photo',
-  //         minCount: 1,
-  //         maxCount: 1,
-  //         size: 2 * 1024 * 1024,
-  //         type: ['IMAGE'],
-  //       },
-  //       {
-  //         name: 'document',
-  //         minCount: 0,
-  //         maxCount: 10,
-  //         size: 5 * 1024 * 1024,
-  //         type: ['IMAGE', 'DOCUMENT'],
-  //       },
-  //     ]),
-  //   )
-  //   files: {
-  //     profile_photo?: Express.Multer.File[];
-  //     document?: Express.Multer.File[];
-  //   },
+  /* ==========================================================
+     ✅ VERIFY OTP
+  ========================================================== */
+  @Post('registration/verify-otp')
+  async verifyOtp(@Body() dto: RegisterVerifyOtpDto) {
+    const cleanEmail = EmailUtil.normalize(dto.email);
+    if (!cleanEmail) {
+      throw new BadRequestException('Invalid email address');
+    }
 
-  //   // 2. CAPTURE EXTRA DATA (Text fields from the form)
-  //   @Body() extraData: any,
-  // ) {
-  //   const fileNames = extraData.fileNames
-  //     ? JSON.parse(extraData.fileNames)
-  //     : {};
+    const registrationKey = await this.authService.verifyOtp(
+      cleanEmail,
+      dto.otp,
+    );
 
-  //   const uploaded = await SeoUploadService.upload(files, fileNames);
-
-  //   return { uploaded };
-  //   // --- LOGGING LOGIC ---
-
-  //   console.log('--- UPLOAD SUCCESSFUL ---');
-
-  //   // A. Log File Details (Clean output)
-  //   const fileSummary = {};
-  //   Object.keys(files).forEach((key) => {
-  //     fileSummary[key] = files[key].map((f) => ({
-  //       originalName: f.originalname,
-  //       size: `${(f.size / 1024).toFixed(2)} KB`,
-  //       mimeType: f.mimetype,
-  //     }));
-  //   });
-  //   console.table(fileSummary); // Uses a nice table format in console
-
-  //   // B. Log Extra Data (Text fields)
-  //   if (Object.keys(extraData).length > 0) {
-  //     console.log('--- EXTRA DATA RECEIVED (BODY) ---');
-  //     console.log(extraData);
-  //   } else {
-  //     console.log('--- NO EXTRA TEXT DATA ---');
-  //   }
-
-  //   return {
-  //     message: 'Success',
-  //     dataReceived: {
-  //       files: Object.keys(files), // Just return field names
-  //       extra: extraData,
-  //     },
-  //   };
-  // }
+    return ApiResponse.success('OTP verified successfully', {
+      REGISTRATION_KEY: registrationKey,
+    });
+  }
 
   /* ==========================================================
-  ✅ Register Student 
-  ==========================================================*/
-
-  @Post('register-student')
+     ✅ REGISTER STUDENT (FINAL)
+  ========================================================== */
+  @Post('registration/student')
   @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'profile_photo', maxCount: 1 }]),
+    FileFieldsInterceptor([{ name: 'profilePhoto', maxCount: 1 }]),
   )
   async registerStudent(
-    // Check Profile Photo
     @UploadedFiles(
       new FileValidationPipe([
         {
-          name: 'profile_photo',
+          name: 'profilePhoto',
           minCount: 1,
           maxCount: 1,
           size: 5 * 1024 * 1024,
@@ -122,54 +79,108 @@ export class AuthController {
         },
       ]),
     )
-    files: {
-      profile_photo?: Express.Multer.File[];
-      document?: Express.Multer.File[];
-    },
-    // Body
+    files: { profilePhoto?: Express.Multer.File[] },
+
     @Body()
-    registerStudentDto: RegisterStudentDto,
+    dto: RegisterStudentDto,
   ) {
-    // Normalize email
-    registerStudentDto.email = registerStudentDto.email.toLowerCase();
-    const cleanEmail = EmailUtil.normalize(registerStudentDto.email);
-    if (!cleanEmail) throw new Error('Invalid email');
-    registerStudentDto.email = cleanEmail;
-    // Check if email, mobile or reg no already exists
-    const checkedUserData =
-      await this.authService.checkEmailMobileRegNo(registerStudentDto);
-    if (checkedUserData) {
-      throw new Error('Email, Mobile or Reg No already exists');
+    /* 1️⃣ Normalize Email */
+    const cleanEmail = EmailUtil.normalize(dto.email);
+    if (!cleanEmail) {
+      throw new BadRequestException({
+        message: 'Invalid email address',
+        code: ApiErrorCode.INVALID_EMAIL,
+      });
     }
-    // Upload Images
-    const uploaded = await SeoUploadService.upload(files, {
-      profile_photo: ['Name', 400, 80],
-    });
-    console.log('uploaded', uploaded);
+    dto.email = cleanEmail;
 
-    // Register Students
-    const registeredStudent =
-      await this.authService.registerUserStudent(registerStudentDto);
-    if (!registeredStudent.id) {
-      throw new Error('Error registering student');
-    }
-    const finalRegisteredStudent = await this.authService.registerStudent(
-      registerStudentDto,
-      registeredStudent.id,
+    /* 2️⃣ Verify Registration Key (throws on failure) */
+    await this.authService.verifyRegistrationKey(
+      cleanEmail,
+      dto.REGISTRATION_KEY,
     );
-    // user
 
-    return finalRegisteredStudent;
+    /* 3️⃣ Upload Profile Photo */
+    const uploaded = await SeoUploadService.upload(files, {
+      profilePhoto: [dto.fullName, 400, 80],
+    });
+
+    const profilePicUrl = uploaded.profilePhoto?.[0]?.url ?? null;
+    if (!profilePicUrl) {
+      throw new InternalServerErrorException({
+        message: 'Profile photo upload failed',
+        code: ApiErrorCode.INTERNAL_ERROR,
+      });
+    }
+
+    /* 4️⃣ Full Registration (transaction-safe) */
+    await this.authService.registerStudentFull(dto, profilePicUrl);
+
+    /* 5️⃣ Cleanup */
+    await this.authService.deleteRegistrationKey(cleanEmail);
+
+    return ApiResponse.success('Student registered successfully');
   }
-  /*
-  
-  // 1. get data 
-  // 2. validate data 
-  3. check image
-  // 4. normalize email
-  4. check email, reg no, phone no
-  5. hash password
-  6. create user
-  7. create student/
-  */
+
+  /* ==========================================================
+     ✅ REGISTER FACULTY (FINAL)
+  ========================================================== */
+  @Post('registration/employee')
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'profilePhoto', maxCount: 1 }]),
+  )
+  async registerFaculty(
+    @UploadedFiles(
+      new FileValidationPipe([
+        {
+          name: 'profilePhoto',
+          minCount: 1,
+          maxCount: 1,
+          size: 5 * 1024 * 1024,
+          type: ['IMAGE'],
+        },
+      ]),
+    )
+    files: { profilePhoto?: Express.Multer.File[] },
+
+    @Body()
+    dto: RegisterFacultyDto,
+  ) {
+    /* 1️⃣ Normalize Email */
+    const cleanEmail = EmailUtil.normalize(dto.email);
+    if (!cleanEmail) {
+      throw new BadRequestException({
+        message: 'Invalid email address',
+        code: ApiErrorCode.INVALID_EMAIL,
+      });
+    }
+    dto.email = cleanEmail;
+
+    /* 2️⃣ Verify Registration Key */
+    await this.authService.verifyRegistrationKey(
+      cleanEmail,
+      dto.REGISTRATION_KEY,
+    );
+
+    /* 3️⃣ Upload Profile Photo */
+    const uploaded = await SeoUploadService.upload(files, {
+      profilePhoto: [dto.fullName, 400, 80],
+    });
+
+    const profilePicUrl = uploaded.profilePhoto?.[0]?.url ?? null;
+    if (!profilePicUrl) {
+      throw new InternalServerErrorException({
+        message: 'Profile photo upload failed',
+        code: ApiErrorCode.INTERNAL_ERROR,
+      });
+    }
+
+    /* 4️⃣ Full Registration (transaction-safe) */
+    await this.authService.registerFacultyFull(dto, profilePicUrl);
+
+    /* 5️⃣ Cleanup */
+    await this.authService.deleteRegistrationKey(cleanEmail);
+
+    return ApiResponse.success('Faculty registered successfully');
+  }
 }

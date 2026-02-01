@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+// import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class EmailService {
@@ -35,7 +35,7 @@ export class EmailService {
         channel: 'EMAIL',
         status: 'PENDING',
         title: subject,
-        metadata: context as Prisma.InputJsonValue,
+        // metadata: context as Prisma.InputJsonValue,
         provider: 'SMTP',
       },
     });
@@ -84,7 +84,7 @@ export class EmailService {
         where: { id: log.id },
         data: {
           status: 'FAILED',
-          error: String(error),
+          error: error instanceof Error ? error.message : JSON.stringify(error),
           retryCount: { increment: 1 },
         },
       });
