@@ -36,9 +36,10 @@ import {
 // Constants for GEC Lakhisarai
 // ----------------------------
 const DESIGNATIONS = [
-  "Assistant Professor",
-  "Professor",
-  "Guest Faculty",
+  "ASSISTANT_PROFESSOR",
+  "PROFESSOR",
+  "GUEST",
+  "LAB_ASSISTANT",
   // "Lab Assistant",
 ];
 
@@ -457,7 +458,7 @@ export default function TeacherRegisterForm() {
       const res = await request<unknown>(
         {
           method: "POST",
-          url: "/auth/registration/otp/send",
+          url: "/auth/registration/send-otp",
           data: { email: formData.email },
         },
         { showSuccessMsg: true, showMsg: false, showErrorMsg: false },
@@ -487,7 +488,7 @@ export default function TeacherRegisterForm() {
       const res = await request<OtpVerifyData>(
         {
           method: "POST",
-          url: "/auth/registration/otp/verify",
+          url: "/auth/registration/verify-otp",
           data: { email: formData.email, otp },
         },
         { showSuccessMsg: true, showMsg: false, showErrorMsg: false },

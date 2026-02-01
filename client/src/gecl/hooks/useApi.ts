@@ -40,6 +40,15 @@ export const useApi = () => {
       }
       setIsLoading(true);
 
+      console.log(
+        "Request Method ,url, data,params,header :",
+        args.method,
+        args.url,
+        args.data,
+        args.params,
+        args.headers,
+      );
+
       const res = await apiRequest<TResponse, TData>({
         method: args.method ?? "GET",
         url: args.url,

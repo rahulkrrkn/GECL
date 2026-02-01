@@ -3,6 +3,8 @@
     /* Environment */
     "target": "ES2022",
     "lib": ["ES2022"],
+
+    /* ESM for Node.js */
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
 
@@ -26,7 +28,10 @@
     "isolatedModules": true,
     "moduleDetection": "force",
 
+    /* Interop & safety */
     "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
 
     /* Performance */
     "skipLibCheck": true
