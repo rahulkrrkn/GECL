@@ -26,10 +26,10 @@ import {
 export const metadata: Metadata = {
   title: "B.Tech Syllabus & Curriculum | BEU Patna | GEC Lakhisarai",
   description:
-    "Access the official BEU Patna syllabus for Applied Science (1st Year) and specialized Engineering branches at GEC Lakhisarai. Download semester-wise course structures.",
+    "Access the official BEU Patna syllabus for Applied Science and Humanities (1st Year) and specialized Engineering branches at GEC Lakhisarai. Download semester-wise course structures.",
   keywords: [
     "GEC Lakhisarai Syllabus",
-    "Applied Science and Humanities Syllabus",
+    "Applied Science and Humanities and Humanities Syllabus",
     "BEU Patna Engineering Curriculum",
     "B.Tech 1st Year Syllabus Bihar",
     "CSE AI Data Science Syllabus",
@@ -78,7 +78,7 @@ export default function SyllabusHubPage() {
         title="Curriculum & Syllabus"
         badge="BEU Patna Standards"
         icon={<LuBookOpen />}
-        description="Explore the academic roadmap for the Department of Applied Applied Science and all core Engineering branches."
+        description="Explore the academic roadmap for the Department of Applied Science and Humanities and all core Engineering branches."
         image="/gecl/images/campus/college-building.webp"
         className="bg-[#0f172a]"
         themeColor="text-blue-400"
@@ -93,10 +93,10 @@ export default function SyllabusHubPage() {
         <div className="flex flex-col lg:flex-row gap-12">
           {/* --- MAIN CONTENT --- */}
           <div className="lg:w-3/4 space-y-16">
-            {/* 1. FOUNDATION: Applied Science */}
+            {/* 1. FOUNDATION: Applied Science and Humanities */}
             <section id="applied-science" className="scroll-mt-28">
               <SectionHeader
-                title="Applied Applied Science"
+                title="Applied Science and Humanities"
                 icon={LuAtom}
                 subtitle="The foundation semesters for all engineering disciplines."
               />
@@ -110,9 +110,9 @@ export default function SyllabusHubPage() {
                   </h3>
                   <p className="text-slate-600 mb-8 leading-relaxed max-w-2xl">
                     All undergraduate students at GEC Lakhisarai begin their
-                    journey with the Department of Applied Applied Science,
-                    mastering the fundamental concepts of physics, chemistry,
-                    and mathematics.
+                    journey with the Department of Applied Science and
+                    Humanities, mastering the fundamental concepts of physics,
+                    chemistry, and mathematics.
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -219,7 +219,7 @@ export default function SyllabusHubPage() {
                 title="Curriculum Hub"
                 links={[
                   {
-                    label: "Applied Science",
+                    label: "Applied Science and Humanities",
                     href: "#applied-science",
                   },
                   {

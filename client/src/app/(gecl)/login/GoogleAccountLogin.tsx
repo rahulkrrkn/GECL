@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { useApi } from "@/gecl/hooks/useApi";
-import type { ApiFailure } from "@/gecl/utils/apiRequest";
+import type { ApiFailure } from "@/types/api";
 import { FiLoader, FiAlertCircle } from "react-icons/fi";
 import { motion } from "framer-motion";
 

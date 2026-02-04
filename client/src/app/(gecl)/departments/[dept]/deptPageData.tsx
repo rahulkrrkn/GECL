@@ -1,6 +1,6 @@
 export const DEPT_DATA: Record<string, any> = {
   "applied-science": {
-    name: "Applied Applied Science",
+    name: "Applied Science and Humanities",
     hod: "Dr. Girija Nandan Prasad",
     role: "Assistant Professor & HOD",
     vision:
@@ -8,7 +8,7 @@ export const DEPT_DATA: Record<string, any> = {
     mission:
       "To foster analytical thinking and communication skills in first-year engineering students through rigorous academic training in Physics, Chemistry, and Mathematics.",
     description:
-      "The Department of Applied Science at GEC Lakhisarai is responsible for the foundational training of 1st-year B.Tech students. It plays a pivotal role in bridging the transition from school to technical education.",
+      "The Department of Applied Science and Humanities at GEC Lakhisarai is responsible for the foundational training of 1st-year B.Tech students. It plays a pivotal role in bridging the transition from school to technical education.",
     intake: 300, // Common for 1st Year
     labs: 4,
     faculty: 12,

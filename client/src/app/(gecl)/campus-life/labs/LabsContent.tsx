@@ -12,7 +12,7 @@ import {
   FaScrewdriverWrench,
   FaCircleCheck,
 } from "react-icons/fa6";
-import { PageHero, ImageCard } from "@/gecl/components/ui/";
+import { PageHero, ImageCard } from "@/gecl/components/ui";
 
 // Types
 interface LabItem {

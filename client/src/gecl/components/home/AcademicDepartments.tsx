@@ -62,7 +62,7 @@ const DEPARTMENTS = [
   },
   {
     id: "applied-science",
-    name: "Applied Science & Humanities",
+    name: "Applied Science and Humanities & Humanities",
     icon: LuFlaskConical,
     color: "text-emerald-600",
     bg: "bg-emerald-50",

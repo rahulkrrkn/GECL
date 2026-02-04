@@ -40,17 +40,17 @@ const normalizeRole = (role: unknown): UserRole => {
   return isValidRole(role) ? role : "guest";
 };
 
-const normalizeRoles = (roles: unknown): UserRole[] => {
-  if (!roles) return ["guest"];
+const normalizeRoles = (role: unknown): UserRole[] => {
+  if (!role) return ["guest"];
 
-  if (typeof roles === "string") {
-    const r = normalizeRole(roles);
+  if (typeof role === "string") {
+    const r = normalizeRole(role);
     return r === "guest" ? ["guest"] : [r];
   }
 
   // If backend sends role: ["teacher","principal"]
-  if (Array.isArray(roles)) {
-    const cleaned = roles.map(normalizeRole).filter((r) => r !== "guest");
+  if (Array.isArray(role)) {
+    const cleaned = role.map(normalizeRole).filter((r) => r !== "guest");
 
     return cleaned.length ? cleaned : ["guest"];
   }
@@ -75,7 +75,7 @@ const getInitialRoles = (): UserRole[] => {
 export const useRole = () => {
   const { request } = useApi();
   // ✅ now role is array internally
-  const [roles, setRoles] = useState<UserRole[]>(() => getInitialRoles());
+  const [role, setRoles] = useState<UserRole[]>(() => getInitialRoles());
   const [isLoading] = useState(false);
 
   // ✅ menu shows items for ANY role (teacher + principal both)
@@ -84,10 +84,10 @@ export const useRole = () => {
       return items
         .filter((item) => {
           // public item
-          if (!item.roles || item.roles.length === 0) return true;
+          if (!item.role || item.role.length === 0) return true;
 
           // show if user has at least one role that matches
-          return item.roles.some((r) => roles.includes(r));
+          return item.role.some((r) => role.includes(r));
         })
         .map((item) => ({
           ...item,
@@ -96,7 +96,7 @@ export const useRole = () => {
     };
 
     return filterByRoles(menuConfig);
-  }, [roles]);
+  }, [role]);
 
   // ✅ keep same API for Navbar
 
@@ -140,7 +140,7 @@ export const useRole = () => {
     setRoles([safeRole]);
   };
 
-  const isAuthenticated = !roles.includes("guest");
+  const isAuthenticated = !role.includes("guest");
 
   return {
     filteredMenu,

@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaArrowRight, FaShapes } from "react-icons/fa6";
-import { PageHero, ImageCard } from "@/gecl/components/ui/";
+import { PageHero, ImageCard } from "@/gecl/components/ui";
 
 interface SectionItem {
   id: string;

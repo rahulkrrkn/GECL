@@ -1,6 +1,118 @@
-import { Schema, model, models, Types } from "mongoose";
+import mongoose, { Schema, model, Types, Document } from "mongoose";
 
-// --- Sub-Schemas ---
+// ===========================
+// 1. Define TypeScript Interfaces
+// ===========================
+
+// Sub-Interface for WebPush
+interface IWebPush {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
+
+// Main User Interface
+export interface IGeclUser extends Document {
+  fullName: string;
+  email: string;
+  googleSub?: string | null; // ✅ Fixes the TS error
+  mobile?: string | null;
+
+  // Access Control (Top level in your schema)
+  allow: string[];
+  deny: string[];
+  allowExtra: string[];
+
+  passwordHash: string;
+  profilePicUrl?: string | null;
+
+  role: (
+    | "student"
+    | "hod"
+    | "teacher"
+    | "vice_principal"
+    | "principal"
+    | "librarian"
+    | "tpo"
+    | "alumni"
+    | "staff"
+    | "admin"
+  )[];
+
+  status: "pending" | "active" | "rejected" | "blocked" | "deleted";
+  userName?: string | null;
+  personType: "student" | "employee";
+
+  notification: {
+    settings: {
+      email: boolean;
+      whatsapp: boolean;
+      webPush: boolean;
+      appPush: boolean;
+      voiceCall: boolean;
+    };
+    tokens: {
+      fcm: string[];
+      webPush: IWebPush[];
+    };
+  };
+
+  branch: (
+    | "CSE"
+    | "ECE"
+    | "EE"
+    | "ME"
+    | "CE"
+    | "CSE-AI"
+    | "CSE-DS"
+    | "EEE"
+    | "ASH"
+  )[];
+
+  // Nested Objects
+  student?: {
+    regNo?: string | null;
+    rollNo?: string | null;
+    semester?: number | null;
+    admissionYear?: number | null;
+    passingYear?: number | null;
+  } | null;
+
+  teacher?: {
+    isHod: boolean;
+    joiningDate?: Date | null;
+    officialEmail?: string | null;
+    designation?:
+      | "Professor"
+      | "Assistant Professor"
+      | "Guest"
+      | "Lab Assistant"
+      | "Staff"
+      | null;
+    experienceYears: number;
+    specialization?: string | null;
+  } | null;
+
+  gender?: "male" | "female" | "other" | null;
+
+  // Approval / Rejection
+  approvedBy?: Types.ObjectId | null;
+  approvedAt?: Date | null;
+  rejectedBy?: Types.ObjectId | null;
+  rejectedAt?: Date | null;
+  rejectReason?: string | null;
+
+  // Timestamps (Auto-added by mongoose)
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ===========================
+// 2. Schema Definitions
+// ===========================
+
 const WebPushSchema = new Schema(
   {
     endpoint: { type: String, required: true },
@@ -12,8 +124,7 @@ const WebPushSchema = new Schema(
   { _id: false },
 );
 
-// --- Main Schema ---
-const GeclUserSchema = new Schema(
+const GeclUserSchema = new Schema<IGeclUser>(
   {
     // ===========================
     // COMMON PROFILE
@@ -23,27 +134,22 @@ const GeclUserSchema = new Schema(
     email: {
       type: String,
       required: true,
-      unique: true, // Added unique constraint for email
+      unique: true,
       lowercase: true,
       trim: true,
     },
 
-    // For Google OAuth
     googleSub: { type: String, default: null, trim: true },
 
     mobile: { type: String, default: null, trim: true },
 
-    // Dynamic Page Access Control (ACL)
     allow: { type: [String], default: [] },
     deny: { type: [String], default: [] },
     allowExtra: { type: [String], default: [] },
 
-    passwordHash: { type: String, required: true, select: false }, // Added select: false for security
+    passwordHash: { type: String, required: true, select: false },
 
-    profilePicUrl: {
-      type: String,
-      default: null,
-    },
+    profilePicUrl: { type: String, default: null },
 
     role: [
       {
@@ -99,63 +205,37 @@ const GeclUserSchema = new Schema(
         webPush: { type: [WebPushSchema], default: [] },
       },
     },
+
     branch: {
       type: [String],
-      enum: ["CSE", "ECE", "EE", "ME", "CE", "CSE-AI", "CSE-DS", "EEE", "AS"],
+      enum: ["CSE", "ECE", "EE", "ME", "CE", "CSE-AI", "CSE-DS", "EEE", "ASH"],
       default: [],
       index: true,
     },
 
     // ===========================
-    // STUDENT SPECIFIC DATA
+    // STUDENT
     // ===========================
     student: {
-      regNo: {
-        type: String,
-        default: null,
-        trim: true,
-        sparse: true,
-        index: true,
-      }, // Added sparse indexing if unique is needed later
+      regNo: { type: String, default: null, trim: true, index: true },
       rollNo: { type: String, default: null, trim: true },
-
       semester: { type: Number, min: 1, max: 8, default: null },
       admissionYear: { type: Number, default: null },
       passingYear: { type: Number, default: null },
-
-      guardian: {
-        fatherName: { type: String, default: null, trim: true },
-        motherName: { type: String, default: null, trim: true },
-        guardianMobile: { type: String, default: null, trim: true },
-      },
-
-      category: {
-        type: String,
-        enum: ["GEN", "OBC", "SC", "ST", "EWS"],
-        default: null,
-      },
-
-      hostel: {
-        isHosteller: { type: Boolean, default: false },
-        hostelName: { type: String, default: null, trim: true },
-        roomNo: { type: String, default: null, trim: true },
-      },
     },
 
     // ===========================
-    // TEACHER / EMPLOYEE SPECIFIC DATA
+    // TEACHER
     // ===========================
     teacher: {
       isHod: { type: Boolean, default: false, index: true },
       joiningDate: { type: Date, default: null },
-
       officialEmail: {
         type: String,
         default: null,
         lowercase: true,
         trim: true,
       },
-
       designation: {
         type: String,
         enum: [
@@ -168,35 +248,10 @@ const GeclUserSchema = new Schema(
         default: null,
         index: true,
       },
-
       experienceYears: { type: Number, default: 0, min: 0 },
       specialization: { type: String, default: null, trim: true },
-      skills: { type: [String], default: [] },
-
-      officeAddress: {
-        line1: { type: String, default: null, trim: true },
-        line2: { type: String, default: null, trim: true },
-        city: { type: String, default: null, trim: true },
-        state: { type: String, default: null, trim: true },
-        pincode: { type: String, default: null, trim: true },
-        country: { type: String, default: "India", trim: true },
-      },
-
-      notes: { type: String, default: null, trim: true },
-
-      education: [
-        {
-          degree: { type: String, default: null, trim: true },
-          field: { type: String, default: null, trim: true },
-          institute: { type: String, default: null, trim: true },
-          yearOfPassing: { type: Number, default: null, min: 1900 },
-        },
-      ],
     },
 
-    // =====================
-    // GENERIC OPTIONAL
-    // =====================
     gender: {
       type: String,
       enum: ["male", "female", "other"],
@@ -204,31 +259,7 @@ const GeclUserSchema = new Schema(
       index: true,
     },
 
-    dob: { type: Date, default: null },
-
-    address: {
-      line1: { type: String, default: null, trim: true },
-      line2: { type: String, default: null, trim: true },
-      city: { type: String, default: null, trim: true },
-      state: { type: String, default: null, trim: true },
-      pincode: { type: String, default: null, trim: true },
-      country: { type: String, default: "India", trim: true },
-    },
-
-    emergencyContact: {
-      name: { type: String, default: null, trim: true },
-      relation: { type: String, default: null, trim: true },
-      mobile: { type: String, default: null, trim: true },
-    },
-
-    socialLinks: {
-      linkedin: { type: String, default: null, trim: true },
-      github: { type: String, default: null, trim: true },
-      portfolio: { type: String, default: null, trim: true },
-    },
-
-    // Administrative Approval Tracking
-    approvedBy: { type: Types.ObjectId, ref: "gecl_user", default: null }, // Match the model name string exactly
+    approvedBy: { type: Types.ObjectId, ref: "gecl_user", default: null },
     approvedAt: { type: Date, default: null },
 
     rejectedBy: { type: Types.ObjectId, ref: "gecl_user", default: null },
@@ -242,7 +273,12 @@ const GeclUserSchema = new Schema(
   },
 );
 
-// Prevent model recompilation (Hot Reload / Serverless Fix)
-const GeclUser = models.gecl_user || model("gecl_user", GeclUserSchema);
+// ===========================
+// 3. Model Export with Interface
+// ===========================
+
+// ✅ Pass IGeclUser to the model generic
+const GeclUser =
+  mongoose.models.gecl_user || model<IGeclUser>("gecl_user", GeclUserSchema);
 
 export default GeclUser;

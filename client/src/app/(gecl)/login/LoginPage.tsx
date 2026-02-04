@@ -7,7 +7,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
 import { useApi } from "@/gecl/hooks/useApi";
-import type { ApiFailure } from "@/gecl/utils/apiRequest";
+import type { ApiFailure } from "@/types/api";
 import { FcGoogle } from "react-icons/fc";
 import {
   FiMail,
@@ -22,6 +22,10 @@ import {
   FiCheckCircle,
 } from "react-icons/fi";
 import GoogleAccountLogin from "./GoogleAccountLogin";
+import {
+  StoredTokenData,
+  tokenService,
+} from "@/gecl/services/api/tokenService";
 
 // ✅ Updated Interface to be flexible (String OR Object)
 interface LoginData {
@@ -224,8 +228,10 @@ export default function LoginPage() {
   const handleLoginSuccess = (data: string | { token: string }) => {
     // Check if data is string or object and extract token accordingly
     const tokenVal = typeof data === "string" ? data : data.token;
+    console.log("tokenVal", tokenVal);
 
     document.cookie = `GECL_ACCESS_TOKEN=${tokenVal}; path=/; max-age=86400; SameSite=Strict; Secure`;
+    tokenService.setTokenData(data as StoredTokenData);
     window.location.href = "/";
   };
 
@@ -255,11 +261,14 @@ export default function LoginPage() {
         },
         { showMsg: false, showErrorMsg: false, showSuccessMsg: true },
       );
+      console.log("res", res);
 
       if (res.success) {
         // Pass whatever data format comes back
         const token = res.GECL_ACCESS_TOKEN;
         if (token) {
+          console.log("res.GECL_ACCESS_TOKEN", res.GECL_ACCESS_TOKEN);
+
           handleLoginSuccess(token);
         }
       } else {
@@ -286,7 +295,7 @@ export default function LoginPage() {
       const res = await request<OtpSentData>(
         {
           method: "POST",
-          url: "/auth/login/email",
+          url: "/auth/login/email/otp/send",
           data: { email: otpEmail },
         },
         { showMsg: false, showErrorMsg: false, showSuccessMsg: true },
@@ -323,7 +332,7 @@ export default function LoginPage() {
       const res = await request<LoginData>(
         {
           method: "POST",
-          url: "/auth/login/email/verify",
+          url: "/auth/login/email/otp/verify",
           data: { email: otpEmail, otp },
         },
         { showMsg: false, showErrorMsg: false, showSuccessMsg: true },
@@ -331,6 +340,8 @@ export default function LoginPage() {
 
       if (res.success) {
         if (res.GECL_ACCESS_TOKEN) {
+          console.log("res.GECL_ACCESS_TOKEN", res.GECL_ACCESS_TOKEN);
+
           handleLoginSuccess(res.GECL_ACCESS_TOKEN);
         }
       } else {

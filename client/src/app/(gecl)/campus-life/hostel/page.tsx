@@ -27,7 +27,7 @@ import {
   StatCard,
   FileCard,
   ImageCard,
-} from "@/gecl/components/ui/";
+} from "@/gecl/components/ui";
 
 const HostelContent = () => {
   return (

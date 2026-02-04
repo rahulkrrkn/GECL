@@ -291,7 +291,7 @@ const EligibilityPage = () => {
                     href="#"
                     className="flex items-center gap-2 text-sm text-gecl-primary hover:text-gecl-accent transition"
                   >
-                    <FaFileAlt className="text-red-500" /> UGEAC Prospectus 
+                    <FaFileAlt className="text-red-500" /> UGEAC Prospectus
                   </a>
                 </li>
                 <li>

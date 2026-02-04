@@ -6,6 +6,7 @@
 /extra
 /test
 /dist
+.env
 
 # Temporal files
 # /src/gecl

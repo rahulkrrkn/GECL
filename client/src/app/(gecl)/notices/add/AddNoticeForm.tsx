@@ -11,11 +11,9 @@ import {
   FiX,
   FiAlertCircle,
   FiLayers,
-  FiUsers,
   FiTag,
   FiSend,
   FiPaperclip,
-  FiTrash2,
   FiCpu,
 } from "react-icons/fi";
 import { LuMegaphone } from "react-icons/lu";
@@ -219,7 +217,7 @@ export default function AddNoticeForm() {
       const res = await request<any>(
         {
           method: "POST",
-          url: "/notices/create", // Ensure this matches your route
+          url: "/notices", // Ensure this matches your route
           data: payload,
           headers: { "Content-Type": "multipart/form-data" },
         },

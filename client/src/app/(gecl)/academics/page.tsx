@@ -11,10 +11,10 @@ import {
   LuFileText,
   LuLibrary,
 } from "react-icons/lu";
-import { FaCheckCircle,  } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
 
 // Import Reusable Components
-import { PageHero,  StatCard } from "@/gecl/components/ui";
+import { PageHero, StatCard } from "@/gecl/components/ui";
 
 // --- SEO METADATA ---
 export const metadata: Metadata = {

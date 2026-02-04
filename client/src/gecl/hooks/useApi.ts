@@ -1,20 +1,12 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation"; // Use 'next/router' if using Pages router
-import type { RawAxiosRequestHeaders } from "axios";
-import { apiRequest, type ApiResult } from "../utils/apiRequest";
-
-type ApiArgs<TData = unknown> = {
-  method?: "GET" | "POST" | "PUT" | "DELETE";
-  url: string;
-  data?: TData | FormData | null;
-  params?: Record<string, unknown>;
-  headers?: RawAxiosRequestHeaders;
-};
+import { useRouter } from "next/navigation";
+import { apiRequest } from "@/gecl/utils/apiRequest";
+import type { ApiRequestOptions, ApiResponse } from "@/types/api";
 
 type ApiOptions = {
-  showFullLoading?: boolean;
+  showFullLoading?: boolean; // Useful for triggering global spinners
   loadingMsg?: string;
   showSuccessMsg?: boolean;
   successMsg?: string | null;
@@ -23,60 +15,21 @@ type ApiOptions = {
   showMsg?: boolean;
   redirectOnSuccess?: string | null;
 };
-
 export const useApi = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const request = useCallback(
-    async <TResponse, TData = unknown>(
-      args: ApiArgs<TData>,
+    async <TResponse, TBody = unknown>(
+      args: ApiRequestOptions<TBody>,
       options: ApiOptions = {},
-    ): Promise<ApiResult<TResponse>> => {
-      // 1. Handle Loading
-      if (options.showFullLoading) {
-        console.log("Loading started...", options.loadingMsg);
-        // You can trigger a global loading state here if you have a Context
-      }
+    ): Promise<ApiResponse<TResponse>> => {
       setIsLoading(true);
-
-      console.log(
-        "Request Method ,url, data,params,header :",
-        args.method,
-        args.url,
-        args.data,
-        args.params,
-        args.headers,
-      );
-
-      const res = await apiRequest<TResponse, TData>({
-        method: args.method ?? "GET",
-        url: args.url,
-        data: args.data ?? null,
-        params: args.params ?? {},
-        headers: args.headers ?? {},
-      });
-      console.log("Response :", res);
-
+      const res = await apiRequest<TResponse, TBody>(args);
       setIsLoading(false);
 
-      // 2. Handle Success
-      if (res.success) {
-        if (options.showSuccessMsg || options.showMsg) {
-          console.log("Success:", options.successMsg || "Operation Successful");
-          // Replace console.log with toast.success(...)
-        }
-
-        if (options.redirectOnSuccess) {
-          router.push(options.redirectOnSuccess);
-        }
-      }
-      // 3. Handle Error
-      else {
-        if (options.showErrorMsg || options.showMsg) {
-          console.error("Error:", options.errorMsg || res.message);
-          // Replace console.error with toast.error(...)
-        }
+      if (!res.success && res.statusCode === 401) {
+        router.push("/login");
       }
 
       return res;

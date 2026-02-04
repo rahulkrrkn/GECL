@@ -53,7 +53,7 @@ export const departments = {
     stats: { students: 240, faculty: 12, labs: 8 },
   },
   "applied-science": {
-    name: "Applied Science",
+    name: "Applied Science and Humanities",
     code: "BSH",
     icon: FaFlask,
     hod: "Prof. [Name Needed]",

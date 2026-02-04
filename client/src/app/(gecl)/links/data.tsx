@@ -1,5 +1,5 @@
 export const working = [
-  // Applied Science
+  // Applied Science and Humanities
   "/departments/applied-science/about",
   "/departments/applied-science/faculty",
   "/departments/applied-science/syllabus",
@@ -128,7 +128,7 @@ export const done = [
   // Departments
   "/departments",
 
-  // Applied Science
+  // Applied Science and Humanities
   "/departments/applied-science",
   "/departments/applied-science/hod",
   // Civil

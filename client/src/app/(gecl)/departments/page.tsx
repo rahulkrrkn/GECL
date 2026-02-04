@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 const DEPTS = [
   {
-    name: "Applied Science",
+    name: "Applied Science and Humanities",
     slug: "applied-science",
     icon: LuAtom,
     color: "bg-blue-600",

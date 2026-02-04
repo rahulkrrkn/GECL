@@ -221,8 +221,7 @@ const RequiredDocumentsPage = () => {
                 </div>
                 <div className="bg-white p-4 rounded-lg border border-gecl-border shadow-sm">
                   <h5 className="font-bold text-gecl-primary flex items-center gap-2 mb-2">
-                    <FaFile className="text-gray-400" /> Residential
-                    (Domicile)
+                    <FaFile className="text-gray-400" /> Residential (Domicile)
                   </h5>
                   <p className="text-sm text-gecl-text-muted">
                     Issued by CO/SDO/DM (Mandatory for Bihar Quota).

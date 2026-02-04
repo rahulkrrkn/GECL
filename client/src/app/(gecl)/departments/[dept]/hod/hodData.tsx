@@ -6,7 +6,7 @@ export const HOD_DATA: Record<string, any> = {
     specialization: "Condensed Matter Physics",
     email: "hod.ash@geclakhisarai.ac.in", // Placeholder pattern
     message:
-      "Welcome to the Department of Applied Applied Science. As the foundation of engineering education, we strive to inculcate strong analytical skills and scientific temperament in our students. Our focus is not just on the curriculum but on bridging the gap between school-level science and technical engineering applications.",
+      "Welcome to the Department of Applied Science and Humanities. As the foundation of engineering education, we strive to inculcate strong analytical skills and scientific temperament in our students. Our focus is not just on the curriculum but on bridging the gap between school-level science and technical engineering applications.",
     vision: "To create a strong scientific base for future engineers.",
     priorities: [
       "Student Discipline",
@@ -40,7 +40,7 @@ export const HOD_DATA: Record<string, any> = {
     specialization: "Big Data, Machine Learning",
     email: "hod.cse@geclakhisarai.ac.in",
     message:
-      "Data is the new oil. The Data Science stream is designed to equip students with the analytical tools needed to interpret complex information. Our curriculum focuses on Python, R, and Statistical Modeling, preparing students for high-demand roles in analytics and data engineering.",
+      "Data is the new oil. The Data Science stream is designed to equip students with the analytical tools needed to interpret complex information. Our curriculum focuses on Python, R, and Statistical Modeling, preparing students for high-demand role in analytics and data engineering.",
     vision: "Empowering students to turn data into actionable insights.",
     priorities: [
       "Data Analytics",

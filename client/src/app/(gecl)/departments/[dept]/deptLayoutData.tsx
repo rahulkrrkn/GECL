@@ -29,7 +29,7 @@ export const DEPT_MAP: Record<
   }
 > = {
   "applied-science": {
-    name: "Applied Applied Science",
+    name: "Applied Science and Humanities",
     short: "AS&H",
     // Animated Deep Gradient
     gradient: "from-slate-900 via-slate-800 to-slate-900",

@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
 import { useApi } from "@/gecl/hooks/useApi";
 // IMPORT TYPES FROM YOUR UTILS
-import type { ApiFailure } from "@/gecl/utils/apiRequest";
+import type { ApiFailure } from "@/types/api";
 
 import {
   FiMail,
@@ -350,7 +350,7 @@ export default function StudentRegisterForm() {
       const res = await request<unknown>(
         {
           method: "POST",
-          url: "/auth/registration/send-otp",
+          url: "/auth/register/otp/send",
           data: { email: formData.email },
         },
         { showSuccessMsg: true, showMsg: false, showErrorMsg: false },
@@ -383,15 +383,13 @@ export default function StudentRegisterForm() {
       const res = await request<OtpVerifyData>(
         {
           method: "POST",
-          url: "/auth/registration/verify-otp",
+          url: "/auth/register/otp/verify",
           data: { email: formData.email, otp },
         },
         { showSuccessMsg: true, showMsg: false, showErrorMsg: false },
       );
 
       if (res.success) {
-        console.log("res", res);
-
         setRegistrationKey(res.data.REGISTRATION_KEY);
         setStep("academic");
       } else {
@@ -448,12 +446,11 @@ export default function StudentRegisterForm() {
       const res = await request<unknown>(
         {
           method: "POST",
-          url: "/auth/registration/student",
+          url: "/auth/register/student",
           data: data,
         },
         { showSuccessMsg: false, showMsg: false, showErrorMsg: false },
       );
-      console.log("res", res);
 
       if (res.success) {
         setStep("success");

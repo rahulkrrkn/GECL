@@ -36,5 +36,5 @@
     /* Performance */
     "skipLibCheck": true
   },
-  "include": ["src", "src/types"]
+  "include": ["src", "src/types", "src/modules/app.route.ts"]
 }

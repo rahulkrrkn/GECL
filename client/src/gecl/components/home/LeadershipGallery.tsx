@@ -41,7 +41,7 @@ const LEADERS = [
   {
     name: "Dr. Vijay Kumar",
     role: "HOD",
-    dept: "Applied Science & Humanities",
+    dept: "Applied Science and Humanities & Humanities",
     link: "/departments/applied-science/hod",
     image:
       "/gecl/images/departments/applied-science-humanities-hod-profile.webp",

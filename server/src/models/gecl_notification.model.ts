@@ -1,11 +1,14 @@
-import { Schema, model, models, Types } from "mongoose";
+import mongoose, { Schema, model, Types } from "mongoose";
 
-// --- Sub-Schema for Failed Logs ---
+/* -------------------------------------------------------------------------- */
+/*                         SUB-SCHEMA: FAILED ITEMS                            */
+/* -------------------------------------------------------------------------- */
+
 const FailedItemSchema = new Schema(
   {
     userId: {
-      type: Types.ObjectId, // Updated to Types.ObjectId
-      ref: "gecl_user", // ✅ Changed "User" to "gecl_user" to match your User model
+      type: Types.ObjectId,
+      ref: "gecl_user",
       required: true,
       index: true,
     },
@@ -21,10 +24,15 @@ const FailedItemSchema = new Schema(
   { _id: false },
 );
 
-// --- Main Schema ---
+/* -------------------------------------------------------------------------- */
+/*                             MAIN SCHEMA                                     */
+/* -------------------------------------------------------------------------- */
+
 const NotificationSchema = new Schema(
   {
-    // GECL / BEU
+    /* ===========================
+       SOURCE
+    =========================== */
     source: {
       type: String,
       required: true,
@@ -32,38 +40,48 @@ const NotificationSchema = new Schema(
       index: true,
     },
 
-    // optional link with notice
+    /* ===========================
+       OPTIONAL NOTICE LINK
+    =========================== */
     noticeId: {
       type: Types.ObjectId,
-      ref: "gecl_notice", // ✅ Assumed you will have a "gecl_notice" model
+      ref: "gecl_notice",
       default: null,
       index: true,
     },
 
     title: { type: String, required: true, trim: true },
     message: { type: String, required: true },
-    link: { type: String, default: null }, // "/notices/slug"
+    link: { type: String, default: null },
 
+    /* ===========================
+       CHANNELS
+    =========================== */
     channels: {
       type: [String],
       required: true,
       enum: ["EMAIL", "WHATSAPP", "WEB_PUSH", "APP_PUSH", "VOICE_CALL"],
     },
 
+    /* ===========================
+       TARGETING
+    =========================== */
     target: {
       department: {
         type: String,
-        required: true,
-        // ⚠️ NOTE: Ensure these match your User model branch enums exactly
-        // (e.g., if User has "CSE-AI", this should probably be "CSE-AI" not "CSE_AI")
         enum: [
           "ALL",
-          "CSE_AI",
-          "CSE_DS",
-          "CIVIL",
+
+          // match GeclUser.branch exactly
+          "CSE",
+          "ECE",
           "EE",
           "ME",
-          "SCIENCE_HUMANITIES",
+          "CE",
+          "CSE-AI",
+          "CSE-DS",
+          "EEE",
+          "ASH",
         ],
         default: "ALL",
         index: true,
@@ -71,13 +89,15 @@ const NotificationSchema = new Schema(
 
       role: {
         type: String,
-        required: true,
-        enum: ["ALL", "STUDENT", "FACULTY", "STAFF"],
+        enum: ["ALL", "student", "teacher", "staff"],
         default: "ALL",
         index: true,
       },
     },
 
+    /* ===========================
+       PRIORITY & STATUS
+    =========================== */
     priority: {
       type: String,
       enum: ["LOW", "NORMAL", "HIGH", "URGENT"],
@@ -87,7 +107,6 @@ const NotificationSchema = new Schema(
 
     status: {
       type: String,
-      required: true,
       enum: ["QUEUED", "PROCESSING", "DONE", "FAILED"],
       default: "QUEUED",
       index: true,
@@ -95,6 +114,9 @@ const NotificationSchema = new Schema(
 
     scheduledAt: { type: Date, default: null, index: true },
 
+    /* ===========================
+       STATS
+    =========================== */
     stats: {
       total: { type: Number, default: 0 },
       sent: { type: Number, default: 0 },
@@ -102,18 +124,27 @@ const NotificationSchema = new Schema(
       skipped: { type: Number, default: 0 },
     },
 
-    // keep only failed logs for performance
-    failed: { type: [FailedItemSchema], default: [] },
+    /* ===========================
+       FAILED LOGS (LIMIT SIZE!)
+    =========================== */
+    failed: {
+      type: [FailedItemSchema],
+      default: [],
+    },
 
+    /* ===========================
+       AUDIT
+    =========================== */
     addedBy: {
       type: Types.ObjectId,
-      ref: "gecl_user", // ✅ Changed from "User" to "gecl_user"
+      ref: "gecl_user",
       required: true,
       index: true,
     },
+
     updatedBy: {
       type: Types.ObjectId,
-      ref: "gecl_user", // ✅ Changed from "User" to "gecl_user"
+      ref: "gecl_user",
       default: null,
       index: true,
     },
@@ -125,10 +156,12 @@ const NotificationSchema = new Schema(
   },
 );
 
-// --- Create and Export Model ---
+/* -------------------------------------------------------------------------- */
+/*                           MODEL EXPORT (ESM SAFE)                           */
+/* -------------------------------------------------------------------------- */
 
-// Prevent model recompilation (Hot Reload / Serverless Fix)
 const Notification =
-  models.gecl_notification || model("gecl_notification", NotificationSchema);
+  mongoose.models.gecl_notification ||
+  model("gecl_notification", NotificationSchema);
 
 export default Notification;

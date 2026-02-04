@@ -27,7 +27,7 @@ import {
 export const metadata: Metadata = {
   title: "Class Timetable | Semester Jan-June 2026 | GEC Lakhisarai",
   description:
-    "Access official class schedules for all departments including Applied Science, CSE (AI & DS), Civil, Mechanical, and Electrical Engineering at GEC Lakhisarai.",
+    "Access official class schedules for all departments including Applied Science and Humanities, CSE (AI & DS), Civil, Mechanical, and Electrical Engineering at GEC Lakhisarai.",
   keywords: [
     "GEC Lakhisarai Class Routine",
     "Engineering Timetable Bihar",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 // --- TIMETABLE LINKS DATA ---
 const TIMETABLE_SECTIONS = [
   {
-    title: "Applied Science",
+    title: "Applied Science and Humanities",
     subtitle: "1st Year (Sem 1 & 2)",
     href: "/departments/applied-science/timetable",
     icon: LuAtom,

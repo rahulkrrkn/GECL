@@ -510,7 +510,6 @@ export default function AcademicCalendarPage() {
             <div className="grow overflow-auto p-4 bg-slate-100 text-center flex items-center justify-center min-h-75">
               {selectedYear === "2026" ? (
                 <div className="relative w-full h-full min-h-125">
-              
                   <Image
                     src="/gecl/images/calendar-2026-notice.webp"
                     alt={`Official Academic Calendar Notice ${selectedYear}`}

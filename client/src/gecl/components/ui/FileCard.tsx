@@ -11,7 +11,7 @@ interface FileCardProps {
   className?: string;
 }
 
-export default  function FileCard({
+export default function FileCard({
   title,
   subtitle,
   date,

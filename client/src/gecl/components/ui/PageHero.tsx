@@ -3,7 +3,7 @@
 import React from "react";
 import { motion, Variants } from "framer-motion";
 import { cn } from "@/gecl/lib/cn";
-import { Breadcrumb } from "@/gecl/components/ui/";
+import { Breadcrumb } from "@/gecl/components/ui";
 
 interface PageHeroProps {
   title: string;

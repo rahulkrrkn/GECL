@@ -70,7 +70,7 @@ export interface MenuItem {
   description?: string;
   children?: MenuItem[];
   megaMenu?: boolean;
-  roles?: UserRole[];
+  role?: UserRole[];
 }
 
 // ✅ Single Menu Config Only (Public + Role Protected)
@@ -145,6 +145,11 @@ export const menuConfig: MenuItem[] = [
         icon: FaTimeline,
       },
       {
+        label: "Faculty",
+        href: "/academics/faculty",
+        icon: FaChalkboardUser, // or FaUserTie
+      },
+      {
         label: "Rules & Regulations",
         href: "/academics/rules-regulations",
         icon: FaScaleBalanced,
@@ -194,7 +199,7 @@ export const menuConfig: MenuItem[] = [
         icon: FaGear,
       },
       {
-        label: "Applied Science & Humanities",
+        label: "Applied Science and Humanities & Humanities",
         href: "/departments/applied-science",
         icon: FaFlask,
       },
@@ -343,7 +348,7 @@ export const menuConfig: MenuItem[] = [
     icon: FaNewspaper,
     children: [
       {
-        roles: ["hod", "principal", "admin", "super-admin"],
+        role: ["hod", "principal", "admin", "super-admin"],
         label: "Add Notice",
         href: "/notices/add",
         icon: FaPlus,
@@ -353,13 +358,13 @@ export const menuConfig: MenuItem[] = [
 
   // ---------------- DEV / ADMIN TOOLS ----------------
   {
-    roles: ["teacher", "principal", "admin", "super-admin"],
+    role: ["teacher", "principal", "admin", "super-admin"],
     label: "Quick Links",
     href: "/links",
     icon: FaSitemap,
   },
   {
-    roles: ["teacher", "admin", "super-admin"],
+    role: ["teacher", "admin", "super-admin"],
     label: "Asset Gallery",
     href: "/gallery/tracker",
     icon: FaImage,

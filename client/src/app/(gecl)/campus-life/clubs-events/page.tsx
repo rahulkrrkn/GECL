@@ -57,7 +57,7 @@ const clubsEventsData = {
       id: "training",
       name: "Training & Placement Cell",
       description:
-        "Organizes expert talks, 'Hands-on Training' sessions, and soft skill workshops to prepare students for industry roles.",
+        "Organizes expert talks, 'Hands-on Training' sessions, and soft skill workshops to prepare students for industry role.",
       icon: "briefcase",
     },
     {

@@ -266,7 +266,7 @@ export default function AdministrationFullTree() {
                 <HODCard
                   icon={<LuUsers />}
                   name="Dr. Vijay Kumar"
-                  dept="Applied Science"
+                  dept="Applied Science and Humanities"
                   email="vijaykr.02023@gmail.com"
                 />
               </div>

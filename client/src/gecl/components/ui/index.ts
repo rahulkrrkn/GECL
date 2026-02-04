@@ -12,3 +12,5 @@ export { default as FeatureItem } from "./FeatureItem";
 export { default as StatCard } from "./StatCard";
 export { default as ImageCard } from "./ImageCard";
 export { default as ContentProtection } from "./ContentProtection";
+// export { PdfViewer } from "./PdfViewer";
+//

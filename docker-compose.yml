@@ -1,0 +1,30 @@
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: next-client
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  redis:
+    image: redis:7
+    container_name: redis-db
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: express-api
+    ports:
+      - "3001:3001"
+    environment:
+      GECL_REDIS_HOST: redis
+      GECL_REDIS_PORT: 6379
+    depends_on:
+      - redis
+    restart: unless-stopped

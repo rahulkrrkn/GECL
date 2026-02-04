@@ -75,7 +75,7 @@ const HOD_DATA = [
   },
   {
     name: "Dr. Vijay Kumar",
-    dept: "Applied Science",
+    dept: "Applied Science and Humanities",
     email: "vijaykr.02023@gmail.com",
   },
 ];

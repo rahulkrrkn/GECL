@@ -1,94 +1,77 @@
-import { AxiosError, type Method, type RawAxiosRequestHeaders } from "axios";
-import { api } from "../services/api/axiosInstance";
+// utils/apiRequest.ts
+import { AxiosError } from "axios";
+import { api } from "@/gecl/services/api/api";
+import { tokenService } from "@/gecl/services/api/tokenService";
+import { refreshToken } from "@/gecl/services/api/refreshToken";
+import type { ApiRequestOptions, ApiResponse } from "@/types/api";
 
-// --------------------
-// Backend response type
-// --------------------
-export type BackendResponse<T> = {
-  GECL_ACCESS_TOKEN?: string;
-  success: boolean;
-  statusCode: number;
-  status: string;
-  code: string;
-  message: string;
-  data: T;
-  error: unknown | null;
-};
+export async function apiRequest<TResponse, TBody = unknown>(
+  options: ApiRequestOptions<TBody>,
+): Promise<ApiResponse<TResponse>> {
+  const makeRequest = async () => {
+    const token = tokenService.getAccessToken();
 
-// --------------------
-// Success / Failure union
-// --------------------
-export type ApiSuccess<T> = BackendResponse<T> & { success: true };
-
-export type ApiFailure = BackendResponse<null> & { success: false };
-
-export type ApiResult<T> = ApiSuccess<T> | ApiFailure;
-
-// --------------------
-// Error payload type (axios error response)
-// --------------------
-interface BackendErrorResponse {
-  message?: string;
-  errors?: Record<string, unknown> | Array<unknown>;
-  [key: string]: unknown;
-}
-
-// --------------------
-// Request options
-// --------------------
-export type ApiRequestOptions<TBody = unknown> = {
-  method?: Method;
-  url: string;
-  data?: TBody | FormData | null;
-  params?: Record<string, unknown>;
-  headers?: RawAxiosRequestHeaders;
-};
-
-// --------------------
-// API Request function
-// --------------------
-export async function apiRequest<TResponse, TBody = unknown>({
-  method = "GET",
-  url,
-  data = null,
-  params = {},
-  headers = {},
-}: ApiRequestOptions<TBody>): Promise<ApiResult<TResponse>> {
-  try {
-    const isFormData =
-      typeof FormData !== "undefined" && data instanceof FormData;
-
-    const response = await api.request<BackendResponse<TResponse>>({
-      method,
-      url,
-      data,
-      params,
+    return api.request<ApiResponse<TResponse>>({
+      ...options,
       headers: {
-        ...(isFormData ? {} : { "Content-Type": "application/json" }),
-        ...headers,
+        ...(options.data instanceof FormData
+          ? {}
+          : { "Content-Type": "application/json" }),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...options.headers,
       },
     });
+  };
 
-    // ✅ backend already sends { success, statusCode, data, ... }
-    // We just ensure success is boolean
-    return {
-      ...response.data,
-      success: response.data.status === "success" ? true : false,
-    } as ApiResult<TResponse>;
-  } catch (err: unknown) {
-    const error = err as AxiosError<BackendErrorResponse>;
+  try {
+    const res = await makeRequest();
+    return res.data;
+  } catch (err) {
+    const error = err as AxiosError<ApiResponse<TResponse>>;
 
-    return {
-      success: false,
-      statusCode: error.response?.status ?? 0,
-      status: "error",
-      code: "",
-      message:
-        error.response?.data?.message ||
-        error.message ||
-        "Something went wrong",
-      data: null,
-      error: error.response?.data?.errors || null,
-    };
+    const status = error.response?.status;
+    const code = error.response?.data?.code ?? error.response?.data?.resultCode;
+
+    const isExpired = status === 401 || code === "ACCESS_EXPIRED";
+
+    // ⛔ Not an auth issue → return error
+    if (!isExpired) {
+      return (
+        error.response?.data ?? {
+          success: false,
+          statusCode: 0,
+          message: error.message || "Network error",
+          data: null,
+        }
+      );
+    }
+
+    // 🔁 Try refresh ONCE
+    try {
+      const newToken = await refreshToken();
+      console.log("newToken", newToken);
+
+      const retryRes = await api.request<ApiResponse<TResponse>>({
+        ...options,
+        headers: {
+          ...(options.data instanceof FormData
+            ? {}
+            : { "Content-Type": "application/json" }),
+          Authorization: `Bearer ${newToken}`,
+          ...options.headers,
+        },
+      });
+
+      return retryRes.data;
+    } catch (refreshErr) {
+      tokenService.removeTokenData();
+
+      return {
+        success: false,
+        statusCode: 401,
+        message: "Session expired. Please login again.",
+        data: null,
+      };
+    }
   }
 }

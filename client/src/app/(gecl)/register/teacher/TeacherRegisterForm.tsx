@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
 import { useApi } from "@/gecl/hooks/useApi";
 // Import strict type from your utils
-import type { ApiFailure } from "@/gecl/utils/apiRequest";
+import type { ApiFailure } from "@/types/api";
 
 import {
   FiMail,
@@ -36,10 +36,9 @@ import {
 // Constants for GEC Lakhisarai
 // ----------------------------
 const DESIGNATIONS = [
-  "ASSISTANT_PROFESSOR",
-  "PROFESSOR",
-  "GUEST",
-  "LAB_ASSISTANT",
+  "Assistant Professor",
+  "Professor",
+  "Guest",
   // "Lab Assistant",
 ];
 
@@ -51,7 +50,7 @@ const BRANCH_OPTIONS = [
   // { label: "Electronics & Comm. (ECE)", value: "ECE" },
   { label: "CSE - Data Science", value: "CSE-DS" },
   { label: "CSE - AI", value: "CSE-AI" },
-  { label: "Applied Science (AS)", value: "AS" },
+  { label: "Applied Science and Humanities (ASH)", value: "ASH" },
   // { label: "Electrical & Electronics (EEE)", value: "EEE" },
 ];
 
@@ -458,7 +457,7 @@ export default function TeacherRegisterForm() {
       const res = await request<unknown>(
         {
           method: "POST",
-          url: "/auth/registration/send-otp",
+          url: "/auth/register/otp/send",
           data: { email: formData.email },
         },
         { showSuccessMsg: true, showMsg: false, showErrorMsg: false },
@@ -488,7 +487,7 @@ export default function TeacherRegisterForm() {
       const res = await request<OtpVerifyData>(
         {
           method: "POST",
-          url: "/auth/registration/verify-otp",
+          url: "/auth/register/otp/verify",
           data: { email: formData.email, otp },
         },
         { showSuccessMsg: true, showMsg: false, showErrorMsg: false },
@@ -559,7 +558,7 @@ export default function TeacherRegisterForm() {
       const res = await request<unknown>(
         {
           method: "POST",
-          url: "/auth/registration/employee",
+          url: "/auth/register/teacher",
           data: data,
         },
         { showSuccessMsg: false, showMsg: false, showErrorMsg: false },
