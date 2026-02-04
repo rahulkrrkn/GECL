@@ -1,0 +1,31 @@
+import { Redis } from "ioredis";
+
+let redis: Redis | null = null;
+
+export function getRedis(): Redis {
+  if (!redis) {
+    redis = new Redis({
+      // 🔥 IMPORTANT: default must be docker service name
+      host: process.env.GECL_REDIS_HOST ?? "redis",
+      port: Number(process.env.GECL_REDIS_PORT ?? 6379),
+
+      ...(process.env.GECL_REDIS_USERNAME && {
+        username: process.env.GECL_REDIS_USERNAME,
+      }),
+      ...(process.env.GECL_REDIS_PASSWORD && {
+        password: process.env.GECL_REDIS_PASSWORD,
+      }),
+
+      // REQUIRED FOR BULLMQ
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+    });
+
+    redis.on("connect", () => console.log("✅ Redis connected"));
+    redis.on("ready", () => console.log("🚀 Redis ready"));
+    redis.on("error", (err: Error) => console.error("❌ Redis error:", err));
+    redis.on("end", () => console.log("⚠️ Redis connection closed"));
+  }
+
+  return redis;
+}
