@@ -1,9 +1,12 @@
 import nodemailer from "nodemailer";
 
 export async function sendTestEmail() {
-  const SMTP_USER = "contact@geclakhisarai.com"; // MUST match from
+  const SMTP_USER = "contact@geclakhisarai.com";
   const SMTP_PASS = process.env.GECL_MAIL_PASS;
-  console.log("SMTP_PASS", SMTP_PASS);
+
+  if (!SMTP_PASS) {
+    throw new Error("GECL_MAIL_PASS is missing");
+  }
 
   const transporter = nodemailer.createTransport({
     host: "smtp.zoho.in",
@@ -13,6 +16,8 @@ export async function sendTestEmail() {
       user: SMTP_USER,
       pass: SMTP_PASS,
     },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
   });
 
   try {
@@ -22,7 +27,7 @@ export async function sendTestEmail() {
 
     console.log("📧 Sending email...");
     await transporter.sendMail({
-      from: `"GECL" <${SMTP_USER}>`, // 🔥 MUST MATCH
+      from: `"GECL" <${SMTP_USER}>`,
       to: "rahulkrrkn@gmail.com",
       subject: "SMTP Relay Test",
       html: "<h3>Email relay successful 🚀</h3>",
