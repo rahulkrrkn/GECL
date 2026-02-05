@@ -1,17 +1,18 @@
 import nodemailer from "nodemailer";
 
 export async function sendTestEmail() {
-  const SMTP_USER = "contact@geclakhisarai.com";
+  const SMTP_USER = "a030bb001@smtp-brevo.com";
   const SMTP_PASS = process.env.GECL_MAIL_PASS;
+  console.log("SMTP_PASS", SMTP_PASS);
 
   if (!SMTP_PASS) {
     throw new Error("GECL_MAIL_PASS is missing");
   }
 
   const transporter = nodemailer.createTransport({
-    host: "smtp.zoho.in",
-    port: 465,
-    secure: true,
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
     auth: {
       user: SMTP_USER,
       pass: SMTP_PASS,
