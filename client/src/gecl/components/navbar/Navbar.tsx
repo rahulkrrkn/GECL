@@ -146,7 +146,7 @@ export const Navbar = () => {
         onLogout={logout}
       />
 
-      <div className="h-16.5 lg:h-15.25" />
+      <div className="h-14.75 lg:h-15.25" />
     </>
   );
 };

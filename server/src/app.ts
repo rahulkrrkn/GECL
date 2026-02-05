@@ -35,11 +35,11 @@ app.use(
     },
   }),
 );
-import { sendTestEmail } from "./utils/testMail.js";
-app.get("/test", async (req: Request, res: Response) => {
-  await sendTestEmail();
-  res.send("Email sent");
-});
+// import { sendTestEmail } from "./utils/testMail.js";
+// app.get("/test", async (req: Request, res: Response) => {
+//   await sendTestEmail();
+//   res.send("Email sent");
+// });
 
 // =======================
 // Routes

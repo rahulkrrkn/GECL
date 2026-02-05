@@ -20,15 +20,20 @@ const worker = new Worker(
   async (job) => {
     switch (job.name) {
       case EMAIL_JOBS.LOGIN_OTP:
+        console.log("job.Data", job.data);
+
         return handleLoginOtpEmail(job.data);
 
       case EMAIL_JOBS.REGISTER_OTP:
+        console.log("job.Data", job.data);
         return handleRegisterOtpEmail(job.data);
 
       case EMAIL_JOBS.RESEND_OTP:
+        console.log("job.Data", job.data);
         return handleResendOtpEmail(job.data);
 
       case EMAIL_JOBS.WELCOME:
+        console.log("job.Data", job.data);
         return handleWelcomeEmail(job.data);
 
       default:
