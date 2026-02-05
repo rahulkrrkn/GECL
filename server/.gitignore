@@ -7,6 +7,7 @@
 /test
 /dist
 .env
+.env-prod
 
 # Temporal files
 # /src/gecl
