@@ -1,8 +1,8 @@
 export const EmailConfig = {
   provider: process.env.GECL_MAIL_PROVIDER || "smtp",
 
-  fromName: process.env.GECL_MAIL_FROM_NAME || "RahulKrRKN",
-  fromEmail: process.env.GECL_MAIL_FROM_EMAIL || "rahulkrrkn@gmail.com",
+  fromName: process.env.GECL_MAIL_FROM_NAME || "GECL",
+  fromEmail: process.env.GECL_MAIL_FROM_EMAIL || "",
 
   smtp: {
     host: process.env.GECL_MAIL_HOST || "",
@@ -14,10 +14,22 @@ export const EmailConfig = {
 };
 
 export function assertEmailConfig() {
+  if (!EmailConfig.fromEmail) {
+    throw new Error("GECL_MAIL_FROM_EMAIL is missing");
+  }
+
   if (EmailConfig.provider === "smtp") {
     const { host, user, pass } = EmailConfig.smtp;
+
     if (!host) throw new Error("GECL_MAIL_HOST is missing");
     if (!user) throw new Error("GECL_MAIL_USER is missing");
     if (!pass) throw new Error("GECL_MAIL_PASS is missing");
+
+    // Safety: avoid Gmail-from with custom SMTP
+    if (EmailConfig.fromEmail.endsWith("@gmail.com")) {
+      console.warn(
+        "⚠️ Using gmail.com as fromEmail with custom SMTP may break delivery",
+      );
+    }
   }
 }

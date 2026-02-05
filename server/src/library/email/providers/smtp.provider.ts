@@ -1,9 +1,10 @@
 import nodemailer from "nodemailer";
-import type { EmailProvider, EmailSendInput } from "../email.types.js";
+import type { Transporter } from "nodemailer";
+import type { EmailProvider, SendEmailInput } from "../email.types.js";
 import { EmailConfig } from "../email.config.js";
 
 export class SmtpEmailProvider implements EmailProvider {
-  private transporter;
+  private transporter: Transporter;
   private from: string;
 
   constructor(from: string) {
@@ -17,26 +18,44 @@ export class SmtpEmailProvider implements EmailProvider {
         user: EmailConfig.smtp.user,
         pass: EmailConfig.smtp.pass,
       },
-      tls: {
-        rejectUnauthorized: false, // ✅ REQUIRED on Render
-      },
+      connectionTimeout: 8000,
+      greetingTimeout: 8000,
     });
   }
 
-  async send(input: EmailSendInput): Promise<void> {
+  async verify() {
     try {
-      const info = await this.transporter.sendMail({
-        from: this.from,
-        to: input.to,
-        subject: input.subject,
-        html: input.html,
-        text: input.text,
+      await this.transporter.verify();
+      console.log("✅ SMTP verified and ready");
+    } catch (error: any) {
+      console.error("❌ SMTP verification failed", {
+        code: error.code,
+        command: error.command,
+        message: error.message,
       });
 
-      console.log("📧 SMTP response:", info.response);
-    } catch (err) {
-      console.error("❌ SMTP send failed:", err);
-      throw err;
+      throw new Error(
+        `SMTP unreachable (${error.code || "UNKNOWN"}): ${error.message}`,
+      );
+    }
+  }
+
+  async send({ to, subject, html }: SendEmailInput) {
+    try {
+      await this.transporter.sendMail({
+        from: this.from,
+        to,
+        subject,
+        html,
+      });
+    } catch (error: any) {
+      console.error("❌ SMTP send failed", {
+        code: error.code,
+        command: error.command,
+        message: error.message,
+      });
+
+      throw error;
     }
   }
 }
