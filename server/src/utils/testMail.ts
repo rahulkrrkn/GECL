@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 export async function sendTestEmail() {
   const SMTP_USER = "contact@geclakhisarai.com"; // MUST match from
   const SMTP_PASS = process.env.GECL_MAIL_PASS;
+  console.log("SMTP_PASS", SMTP_PASS);
 
   const transporter = nodemailer.createTransport({
     host: "smtp.zoho.in",
