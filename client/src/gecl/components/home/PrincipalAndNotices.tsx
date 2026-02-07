@@ -27,7 +27,7 @@ export const PrincipalAndNotices = () => {
         const res = await request<NoticeResponse["data"]>(
           {
             method: "GET",
-            url: "/notices",
+            url: "/announcements/notices/",
             params: {
               page: 1,
               limit: 5,
@@ -113,7 +113,7 @@ export const PrincipalAndNotices = () => {
                 <LuBell className="text-red-500" /> Notice Board
               </h2>
               <Link
-                href="/notices"
+                href="/announcements/notices/"
                 className="text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-lg hover:bg-slate-200 transition"
               >
                 View Archive
@@ -163,7 +163,7 @@ export const PrincipalAndNotices = () => {
                           className="group hover:bg-slate-50 transition-colors"
                         >
                           <Link
-                            href={`/notices/${notice.slug}`}
+                            href={`/announcements/notices//${notice.slug}`}
                             className="flex items-start gap-4 p-4"
                           >
                             {/* Date Box */}

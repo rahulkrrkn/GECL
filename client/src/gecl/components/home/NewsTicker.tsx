@@ -85,7 +85,11 @@ export const NewsTicker = () => {
             {notices.map((notice, i) => (
               <Link
                 key={i}
-                href={notice.slug !== "#" ? `/notices/${notice.slug}` : "#"}
+                href={
+                  notice.slug !== "#"
+                    ? `/announcements/notices/${notice.slug}`
+                    : "#"
+                }
                 className={`text-sm font-medium flex items-center gap-3 transition-colors ${
                   notice.slug !== "#"
                     ? "hover:text-blue-300 hover:underline"

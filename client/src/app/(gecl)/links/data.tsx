@@ -75,7 +75,7 @@ export const working = [
 ];
 export const pending = [
   "/contact",
-  "/notices",
+  "/announcements/notices/",
   "/gallery",
   "/placement",
   "/academics/exams",
@@ -166,7 +166,7 @@ export const notChecked = [
   "/about/principal-message",
   "/about/college",
   "/about/principal-message",
-  "/notices",
+  "/announcements/notices/",
   "/gallery",
   "/gecl/heroPage/img.jpg",
   "/gecl/images/admin-block.webp",

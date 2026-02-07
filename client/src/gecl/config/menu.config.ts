@@ -344,13 +344,39 @@ export const menuConfig: MenuItem[] = [
   // },
   {
     label: "Notices",
-    href: "/notices",
+    href: "/announcements/notices/",
     icon: FaNewspaper,
     children: [
       {
         role: ["hod", "principal", "admin", "super-admin"],
         label: "Add Notice",
-        href: "/notices/add",
+        href: "/announcements/notices/add",
+        icon: FaPlus,
+      },
+    ],
+  },
+  {
+    label: "Events",
+    href: "/announcements/events/",
+    icon: FaCalendarDays,
+    children: [
+      {
+        role: ["hod", "principal", "admin", "super-admin"],
+        label: "Add Event",
+        href: "/announcements/events/add",
+        icon: FaPlus,
+      },
+    ],
+  },
+  {
+    label: "News",
+    href: "/announcements/news/",
+    icon: FaNewspaper,
+    children: [
+      {
+        role: ["hod", "principal", "admin", "super-admin"],
+        label: "Add News",
+        href: "/announcements/news/add",
         icon: FaPlus,
       },
     ],

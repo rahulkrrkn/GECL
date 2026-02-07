@@ -117,7 +117,7 @@ export const AboutSection = () => {
                 Notice Board
               </h2>
               <Link
-                href="/notices"
+                href="/announcements/notices/"
                 className="text-sm font-semibold text-blue-600 hover:underline"
               >
                 View All

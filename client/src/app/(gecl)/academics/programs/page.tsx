@@ -315,7 +315,7 @@ export default function ProgramsPage() {
                 </div>
 
                 <Link
-                  href="/notices"
+                  href="/announcements/notices/"
                   className="mt-6 flex items-center justify-center gap-2 w-full py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-lg hover:border-gecl-primary hover:text-gecl-primary transition-all shadow-sm"
                 >
                   <LuBell className="w-3.5 h-3.5" />

@@ -18,6 +18,33 @@ export interface Notice {
   isPinned: boolean;
   status: string;
   publishAt: string; // ISO Date String
+  seo: {
+    metaTitle: string;
+    metaDescription: string;
+    keywords: string[];
+  };
+}
+
+export interface Attachment {
+  fileUrl: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+}
+
+export interface Notice {
+  _id: string;
+  source: "GECL" | "BEU";
+  title: string;
+  slug: string;
+  content: string;
+  category: string; // e.g., "EXAM", "GENERAL"
+  department: string;
+  audience: string[];
+  attachments: Attachment[];
+  isPinned: boolean;
+  status: string;
+  publishAt: string; // ISO Date String
 }
 
 export interface NoticeResponse {

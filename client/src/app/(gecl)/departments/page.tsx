@@ -305,7 +305,7 @@ export default function DepartmentsHub() {
               Admission Inquiry
             </Link>
             <Link
-              href="/notices"
+              href="/announcements/notices/"
               className="bg-transparent border-2 border-indigo-400 text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-white/10 transition-all"
             >
               Latest Notices

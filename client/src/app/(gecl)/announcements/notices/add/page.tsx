@@ -14,11 +14,12 @@ export default function AddNoticePage() {
       <Breadcrumb
         items={[
           { label: "Home", href: "/" },
-          { label: "Notices", href: "/notices" },
+          { label: "Announcements", href: "/announcements" },
+          { label: "Notices", href: "/announcements/notices/" },
           { label: "Create New" },
         ]}
       />
-      <main className="min-h-screen bg-[#0f172a] text-slate-200 pb-20">
+      <main className="min-h-screen bg-primary text-slate-200 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6">
           <div className="mt-8">
             <AddNoticeForm />
