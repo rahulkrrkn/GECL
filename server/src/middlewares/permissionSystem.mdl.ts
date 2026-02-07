@@ -3,11 +3,7 @@ import jwt from "jsonwebtoken";
 import { verifyAccessToken } from "../helpers/jwt.helper.js";
 import { getRedis } from "../config/redis.config.js";
 
-import {
-  UnauthorizedError,
-  ForbiddenError,
-  InternalServerError,
-} from "../errors/httpErrors.err.js";
+import { UnauthorizedError, ForbiddenError } from "../errors/httpErrors.err.js";
 
 import {
   ROLE_PERMISSIONS,
@@ -18,7 +14,7 @@ import {
 /*                               HELPERS                                      */
 /* -------------------------------------------------------------------------- */
 
-export function getBearerToken(req: Request): string | null {
+function getBearerToken(req: Request): string | null {
   const auth = req.headers.authorization;
   if (!auth) return null;
 
@@ -28,11 +24,11 @@ export function getBearerToken(req: Request): string | null {
   return token;
 }
 
-const keyGeclUserPageAccess = (userId: string) =>
+const redisUserPermissionKey = (userId: string) =>
   `GECL:userPageAccess:${userId}`;
 
 /* -------------------------------------------------------------------------- */
-/*                         REQUIRE PERMISSION                                  */
+/*                         REQUIRE PERMISSION (HARD AUTH)                      */
 /* -------------------------------------------------------------------------- */
 
 export const requirePermission = (
@@ -50,12 +46,12 @@ export const requirePermission = (
       /* ---------------- Step 2: Verify Token ---------- */
 
       let userId: string;
-      let emailId: string;
+      let email: string;
 
       try {
         const payload = verifyAccessToken(token);
         userId = payload.userId;
-        emailId = payload.email;
+        email = payload.email;
       } catch (err) {
         if (err instanceof jwt.TokenExpiredError) {
           throw new UnauthorizedError("Access expired", "ACCESS_EXPIRED", {
@@ -68,9 +64,9 @@ export const requirePermission = (
       /* ---------------- Step 3: Redis Session ---------- */
 
       const redis = getRedis();
-      const redisRawData = await redis.get(keyGeclUserPageAccess(userId));
+      const redisRaw = await redis.get(redisUserPermissionKey(userId));
 
-      if (!redisRawData) {
+      if (!redisRaw) {
         throw new UnauthorizedError(
           "Session expired or invalid",
           "ACCESS_EXPIRED",
@@ -78,18 +74,21 @@ export const requirePermission = (
         );
       }
 
-      const redisData = JSON.parse(redisRawData);
+      const redisData = JSON.parse(redisRaw);
 
       /* ---------------- Step 4: Permission Check ------- */
 
       // Explicit deny
-      if (redisData.deny?.includes(permissionKey)) {
+      if (
+        Array.isArray(redisData.deny) &&
+        redisData.deny.includes(permissionKey)
+      ) {
         throw new ForbiddenError("Access denied", "ACCESS_DENIED");
       }
 
       let isAllowed = false;
 
-      // Role based permissions
+      // Role-based permissions
       if (Array.isArray(redisData.role)) {
         for (const role of redisData.role) {
           const permissions =
@@ -103,12 +102,20 @@ export const requirePermission = (
       }
 
       // Extra allow
-      if (!isAllowed && redisData.allowExtra?.includes(permissionKey)) {
+      if (
+        !isAllowed &&
+        Array.isArray(redisData.allowExtra) &&
+        redisData.allowExtra.includes(permissionKey)
+      ) {
         isAllowed = true;
       }
 
       // Legacy allow
-      if (!isAllowed && redisData.allow?.includes(permissionKey)) {
+      if (
+        !isAllowed &&
+        Array.isArray(redisData.allow) &&
+        redisData.allow.includes(permissionKey)
+      ) {
         isAllowed = true;
       }
 
@@ -121,8 +128,13 @@ export const requirePermission = (
       req.user = {
         _id: userId,
         userId,
-        email: emailId,
+        email,
         role: redisData.role,
+        branch: redisData.branch,
+        personType: redisData.personType,
+        allow: redisData.allow,
+        deny: redisData.deny,
+        allowExtra: redisData.allowExtra,
       };
 
       next();
@@ -142,26 +154,39 @@ export const checkUser = async (
   next: NextFunction,
 ) => {
   try {
+    /* ---------------- Step 1: Token ---------------- */
+
     const token = getBearerToken(req);
     if (!token) return next();
 
+    /* ---------------- Step 2: Verify Token ---------- */
+
     const payload = verifyAccessToken(token);
+
+    /* ---------------- Step 3: Base User -------------- */
+
+    /* ---------------- Step 4: Redis Lookup ---------- */
+
+    const redis = getRedis();
+    const redisRaw = await redis.get(redisUserPermissionKey(payload.userId));
+
+    if (!redisRaw) return next();
+
+    const redisData = JSON.parse(redisRaw);
+
+    /* ---------------- Step 5: Merge Redis Data ------- */
 
     req.user = {
       _id: payload.userId,
       userId: payload.userId,
-      email: payload.email,
+      email: redisData.email,
+      role: redisData.role,
+      branch: redisData.branch,
+      personType: redisData.personType,
+      allow: redisData.allow,
+      deny: redisData.deny,
+      allowExtra: redisData.allowExtra,
     };
-
-    const redis = getRedis();
-    const redisRawData = await redis.get(keyGeclUserPageAccess(payload.userId));
-
-    if (redisRawData) {
-      const redisData = JSON.parse(redisRawData);
-      if (redisData.role) {
-        req.user.role = redisData.role;
-      }
-    }
 
     next();
   } catch {

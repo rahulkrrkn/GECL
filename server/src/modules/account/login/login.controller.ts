@@ -30,8 +30,27 @@ export class LoginController {
   ) {
     try {
       const { email } = req.validatedBody;
-      const result = await LoginService.sendEmailOtp(email);
+      const result = await LoginService.sendEmailOtp(email, req, false);
       return sendSuccess(res, "OTP sent successfully", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* ==========================================
+     RESEND OTP (Strict Security)
+  ========================================== */
+  static async loginResendEmailOtp(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { email } = req.validatedBody;
+
+      const result = await LoginService.sendEmailOtp(email, req, true);
+
+      return sendSuccess(res, "OTP resent successfully", result);
     } catch (error) {
       next(error);
     }

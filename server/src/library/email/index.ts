@@ -54,4 +54,20 @@ export const Email = {
       emailJobOptions,
     );
   },
+
+  sendLoginSuccess(payload: {
+    to: string;
+    name: string;
+    ip: string;
+    loginAt: Date;
+    device?: string;
+    location?: string;
+    platform?: string;
+  }) {
+    return emailQueue.add(
+      EMAIL_JOBS.LOGIN_SUCCESS,
+      payload, // Pass the full object directly to the job
+      emailJobOptions,
+    );
+  },
 };

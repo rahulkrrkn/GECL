@@ -99,17 +99,17 @@ faculty.patch(
   FacultyController.updateFaculty,
 );
 
-// Update faculty status (Active / Inactive)
-faculty.patch(
-  "/:id/status",
-  checkUser,
-  requirePermission(PERMISSIONS.NOTICE.UPDATE_STATUS),
-  validateRequest({
-    params: FacultyValidation.getById,
-    body: FacultyValidation.updateStatus,
-  }),
-  FacultyController.updateFacultyStatus,
-);
+// // Update faculty status (Active / Inactive)
+// faculty.patch(
+//   "/:id/status",
+//   checkUser,
+//   requirePermission(PERMISSIONS.NOTICE.UPDATE_STATUS),
+//   validateRequest({
+//     params: FacultyValidation.getById,
+//     body: FacultyValidation.updateStatus,
+//   }),
+//   FacultyController.updateFacultyStatus,
+// );
 
 // Soft delete faculty
 faculty.delete(

@@ -8,7 +8,11 @@ import { BadRequestError, ValidationError } from "../errors/httpErrors.err.js";
 ================================ */
 export const MIME_GROUPS = {
   images: ["image/jpeg", "image/png", "image/webp"],
-  documents: ["application/pdf"],
+  documents: [
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ],
   videos: ["video/mp4", "video/webm"],
 } as const;
 
@@ -22,16 +26,16 @@ type MimeType =
 ================================ */
 export type UploadFieldConfig = {
   name: string;
-  min?: number;
-  max: number;
+  min?: number; // ✅ New: Minimum files required for this specific field
+  max: number; // ✅ Existing: Max files allowed (handled by Multer)
   mimeTypes: readonly MimeType[];
   sizeInKb: number;
   folder: string;
 };
 
 export type UploadMiddlewareConfig = {
-  minTotalFiles?: number;
-  maxTotalFiles?: number;
+  minTotalFiles?: number; // Global Min
+  maxTotalFiles?: number; // Global Max
   fields: UploadFieldConfig[];
   baseFolder?: string;
 };
@@ -54,22 +58,29 @@ function safeFolder(folder: string) {
 export function createUploadMiddleware(config: UploadMiddlewareConfig) {
   const baseFolder = safeFolder(config.baseFolder ?? "GECL");
 
+  // Pre-calculate maps for faster lookups during the request
   const allowedTypesByField = new Map<string, Set<string>>();
   const maxSizeBytesByField = new Map<string, number>();
   const folderByField = new Map<string, string>();
+  const minCountByField = new Map<string, number>(); // Map for Min checks
 
   for (const field of config.fields) {
     allowedTypesByField.set(field.name, new Set(field.mimeTypes));
     maxSizeBytesByField.set(field.name, field.sizeInKb * 1024);
     folderByField.set(field.name, `${baseFolder}/${safeFolder(field.folder)}`);
+    if (field.min) minCountByField.set(field.name, field.min);
   }
 
+  // Configure Multer
   const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 50 * 1024 * 1024 },
+    limits: {
+      fileSize: 50 * 1024 * 1024, // Global Hard Cap (Safety net)
+    },
     fileFilter(req, file, cb) {
       const allowed = allowedTypesByField.get(file.fieldname);
 
+      // 1. Check if field is allowed at all
       if (!allowed) {
         return cb(
           new ValidationError(
@@ -80,12 +91,13 @@ export function createUploadMiddleware(config: UploadMiddlewareConfig) {
         );
       }
 
+      // 2. Check Mime Type
       if (!allowed.has(file.mimetype)) {
         return cb(
           new ValidationError(
             `Invalid file type for "${file.fieldname}"`,
             "INVALID_FILE_TYPE",
-            { received: file.mimetype },
+            { received: file.mimetype, allowed: [...allowed] },
           ),
         );
       }
@@ -94,6 +106,7 @@ export function createUploadMiddleware(config: UploadMiddlewareConfig) {
     },
   });
 
+  // Create the Multer handler with Max counts per field
   const multerHandler = upload.fields(
     config.fields.map((f) => ({ name: f.name, maxCount: f.max })),
   );
@@ -104,20 +117,26 @@ export function createUploadMiddleware(config: UploadMiddlewareConfig) {
     next: NextFunction,
   ) {
     multerHandler(req, res, (err: unknown) => {
-      /* ========= MULTER CORE ERRORS ========= */
+      /* =========================================
+         1. HANDLE MULTER ERRORS (Max Checks)
+      ========================================= */
       if (err) {
         if (err instanceof multer.MulterError) {
           switch (err.code) {
             case "LIMIT_FILE_SIZE":
               return next(
-                new ValidationError("File too large", "FILE_TOO_LARGE"),
+                new ValidationError(
+                  "File too large (Max 50MB)",
+                  "FILE_TOO_LARGE",
+                ),
               );
 
+            // Multer throws LIMIT_UNEXPECTED_FILE when maxCount is exceeded for a field
             case "LIMIT_UNEXPECTED_FILE":
               return next(
                 new ValidationError(
-                  `Unexpected field "${err.field}"`,
-                  "UNEXPECTED_FIELD",
+                  `Too many files or invalid field: "${err.field}"`,
+                  "MAX_FILES_EXCEEDED_OR_INVALID_FIELD",
                   { field: err.field },
                 ),
               );
@@ -139,19 +158,40 @@ export function createUploadMiddleware(config: UploadMiddlewareConfig) {
               );
           }
         }
-
-        // already app error
-        if (err instanceof Error) {
-          return next(err);
-        }
-
-        return next(new BadRequestError("Upload error", "UPLOAD_ERROR"));
+        if (err instanceof Error) return next(err);
+        return next(
+          new BadRequestError("Unknown upload error", "UPLOAD_ERROR"),
+        );
       }
 
-      /* ========= POST-UPLOAD VALIDATION ========= */
+      /* =========================================
+         2. PREPARE FILE DATA
+      ========================================= */
       const filesByField =
         (req.files as Record<string, Express.Multer.File[]>) ?? {};
 
+      /* =========================================
+         3. CHECK PER-FIELD MINIMUMS (Crucial Fix)
+      ========================================= */
+      for (const field of config.fields) {
+        const uploadedFiles = filesByField[field.name] || [];
+        const count = uploadedFiles.length;
+        const minRequired = field.min ?? 0;
+
+        if (count < minRequired) {
+          return next(
+            new ValidationError(
+              `Field "${field.name}" requires at least ${minRequired} file(s). You uploaded ${count}.`,
+              "MIN_FILES_PER_FIELD_NOT_MET",
+              { field: field.name, required: minRequired, received: count },
+            ),
+          );
+        }
+      }
+
+      /* =========================================
+         4. CHECK GLOBAL MIN/MAX
+      ========================================= */
       const totalFiles = Object.values(filesByField).reduce(
         (sum, arr) => sum + arr.length,
         0,
@@ -181,20 +221,23 @@ export function createUploadMiddleware(config: UploadMiddlewareConfig) {
         );
       }
 
+      /* =========================================
+         5. CHECK SIZES & ATTACH METADATA
+      ========================================= */
       const enhanced: Record<string, UploadedFileWithMeta[]> = {};
 
       for (const [fieldName, files] of Object.entries(filesByField)) {
         const maxSizeBytes =
           maxSizeBytesByField.get(fieldName) ?? 5 * 1024 * 1024;
-
         const folder = folderByField.get(fieldName)!;
 
         for (const file of files) {
           if (file.size > maxSizeBytes) {
             return next(
               new ValidationError(
-                `File too large in "${fieldName}"`,
+                `File in "${fieldName}" exceeds size limit of ${maxSizeBytes / 1024}KB`,
                 "FIELD_FILE_TOO_LARGE",
+                { field: fieldName, size: file.size, limit: maxSizeBytes },
               ),
             );
           }
@@ -207,6 +250,7 @@ export function createUploadMiddleware(config: UploadMiddlewareConfig) {
         }));
       }
 
+      // Replace req.files with our enhanced version containing folder meta
       req.files = enhanced as any;
       next();
     });

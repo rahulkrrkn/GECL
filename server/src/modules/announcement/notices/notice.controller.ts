@@ -1,12 +1,15 @@
 import type { Request, Response } from "express";
-import { NoticeService } from "./notice.service.js";
-import { UnauthorizedError } from "../../errors/httpErrors.err.js";
-import { sendSuccess } from "../../helpers/response.helper.js";
-import { BadRequestError } from "../../errors/httpErrors.err.js";
+import { AnnouncementService } from "./notice.service.js";
+import {
+  BadRequestError,
+  UnauthorizedError,
+} from "../../../errors/httpErrors.err.js";
+import { sendSuccess } from "../../../helpers/response.helper.js";
 
 /* ==============================
-   Upload Types (INLINE)
+   TYPES
 ============================== */
+
 type UploadedFileWithMeta = Express.Multer.File & {
   folder: string;
   field: string;
@@ -14,43 +17,48 @@ type UploadedFileWithMeta = Express.Multer.File & {
 
 type UploadedFilesMap = Record<string, UploadedFileWithMeta[]>;
 
-/* ==============================
-   Auth Request Type
-============================== */
-type AuthRequest = Request & {
-  validatedBody?: unknown;
-  files?: UploadedFilesMap;
-  user?: {
-    _id?: string;
-    userId?: string;
-  };
+type AuthUser = {
+  _id: string;
+  userId: string;
+  email: string;
+  role?: string[];
 };
 
+type AuthRequest = Request & {
+  validatedBody?: any;
+  files?: UploadedFilesMap;
+  user?: AuthUser;
+};
+
+/* ==============================
+   CONTROLLER
+============================== */
+
 export class NoticesController {
-  /* ================= CREATE NOTICE ================= */
+  /* =====================================================
+     CREATE NOTICE
+  ===================================================== */
   static async create(req: Request, res: Response) {
     const authReq = req as AuthRequest;
 
-    const userId = authReq.user?._id || authReq.user?.userId;
-    if (!userId) {
+    /* ---------- HARD AUTH CHECK ---------- */
+    if (!authReq.user || !authReq.user._id) {
       throw new UnauthorizedError("User not authenticated");
     }
 
-    const payload = {
-      body: authReq.validatedBody || req.body,
-      userId,
+    /* ---------- FILE SAFETY ---------- */
+    const files: UploadedFilesMap = authReq.files ?? {};
+
+    /* ---------- SERVICE CALL ---------- */
+    const notice = await AnnouncementService.createNotice({
+      body: authReq.validatedBody ?? req.body,
+      user: authReq.user, // ✅ now guaranteed
       req: authReq,
-      ...(authReq.files ? { files: authReq.files } : {}), // ✅ exactOptionalPropertyTypes-safe
-    };
+      files, // ✅ never undefined
+    });
 
-    const notice = await NoticeService.createNotice(payload);
-
-    return sendSuccess(res, "Notice created successfully", notice);
-
-    res.status(201).json({
-      success: true,
-      message: "Notice created successfully",
-      data: notice,
+    return sendSuccess(res, "Notice created successfully", notice, {
+      statusCode: 201,
     });
   }
 
@@ -81,10 +89,10 @@ export class NoticesController {
       );
     }
 
-    const result = await NoticeService.getAll({
+    const result = await AnnouncementService.getAll({
       page: query.page,
       limit: query.limit,
-      user: authReq.user, // may be undefined (guest)
+      user: authReq.user,
     });
 
     return sendSuccess(res, "Notices fetched successfully", result);
@@ -95,7 +103,7 @@ export class NoticesController {
     const authReq = req as AuthRequest;
     const { slug } = req.validatedParams as { slug: string };
 
-    const notice = await NoticeService.getBySlug(slug, authReq.user);
+    const notice = await AnnouncementService.getBySlug(slug, authReq.user);
 
     return sendSuccess(res, "Notice fetched successfully", notice);
   }
@@ -104,20 +112,6 @@ export class NoticesController {
   static async update(req: Request, res: Response) {
     return res.status(501).json({
       error: "Update notice controller not implemented yet",
-    });
-  }
-
-  /* ================= CHANGE STATUS ================= */
-  static async changeStatus(req: Request, res: Response) {
-    return res.status(501).json({
-      error: "Change notice status controller not implemented yet",
-    });
-  }
-
-  /* ================= SOFT DELETE ================= */
-  static async softDelete(req: Request, res: Response) {
-    return res.status(501).json({
-      error: "Soft delete notice controller not implemented yet",
     });
   }
 }

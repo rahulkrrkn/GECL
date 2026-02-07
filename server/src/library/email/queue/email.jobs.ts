@@ -5,6 +5,7 @@ export const EMAIL_JOBS = {
   REGISTER_OTP: "EMAIL:REGISTER_OTP",
   RESEND_OTP: "EMAIL:RESEND_OTP",
   WELCOME: "EMAIL:WELCOME",
+  LOGIN_SUCCESS: "EMAIL:LOGIN_SUCCESS",
 } as const;
 
 export type EmailJobName = (typeof EMAIL_JOBS)[keyof typeof EMAIL_JOBS];

@@ -79,6 +79,22 @@ export class InternalServerError extends AppError {
     });
   }
 }
+export class TooManyRequestsError extends AppError {
+  constructor(
+    message = "too many requests",
+    resultCode?: string,
+    data?: unknown,
+  ) {
+    super({
+      message,
+      code: "TOO_MANY_REQUESTS",
+      resultCode,
+      statusCode: 429,
+      data,
+    });
+  }
+}
+
 const httpErrors = {
   ValidationError,
   BadRequestError,
@@ -86,6 +102,7 @@ const httpErrors = {
   ForbiddenError,
   NotFoundError,
   InternalServerError,
+  TooManyRequestsError,
 };
 
 export default httpErrors;

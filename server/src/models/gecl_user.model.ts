@@ -17,7 +17,7 @@ interface IWebPush {
 export interface IGeclUser extends Document {
   fullName: string;
   email: string;
-  googleSub?: string | null; // ✅ Fixes the TS error
+  googleSub?: string | null;
   mobile?: string | null;
 
   // Access Control (Top level in your schema)

@@ -1,141 +1,129 @@
-import mongoose, { Schema, model, Types } from "mongoose";
+import mongoose, { Schema, Types, Document } from "mongoose";
 
-/* -------------------------------------------------------------------------- */
-/*                         SUB-SCHEMA: FAILED ITEMS                            */
-/* -------------------------------------------------------------------------- */
+/* =====================================================
+   ENUMS
+===================================================== */
 
-const FailedItemSchema = new Schema(
+export enum NotificationChannel {
+  EMAIL = "EMAIL",
+  WHATSAPP = "WHATSAPP",
+  WEB_PUSH = "WEB_PUSH",
+  APP_PUSH = "APP_PUSH",
+  VOICE_CALL = "VOICE_CALL",
+  SMS = "SMS",
+}
+
+export enum ChannelStatus {
+  PENDING = "PENDING",
+  SENT = "SENT",
+  FAILED = "FAILED",
+}
+
+export enum NotificationStatus {
+  QUEUED = "QUEUED",
+  PROCESSING = "PROCESSING",
+  DONE = "DONE",
+}
+
+/* =====================================================
+   INTERFACE
+===================================================== */
+
+export interface INotification extends Document {
+  /* LINK TO CONTENT */
+  announcementId: Types.ObjectId;
+
+  /* TARGETING */
+  branches: string[];
+  audience: ("PUBLIC" | "STUDENTS" | "FACULTY" | "STAFF")[];
+
+  /* CHANNEL DELIVERY */
+  channels: {
+    name: NotificationChannel;
+    status: ChannelStatus;
+    sentAt: Date | null;
+    attempts: number;
+    error: string | null;
+  }[];
+
+  /* WORKFLOW */
+  status: NotificationStatus;
+  scheduledAt?: Date | null;
+
+  /* AUDIT */
+  createdBy: Types.ObjectId;
+  updatedBy?: Types.ObjectId | null;
+
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/* =====================================================
+   SCHEMA
+===================================================== */
+
+const NotificationSchema = new Schema<INotification>(
   {
-    userId: {
+    announcementId: {
       type: Types.ObjectId,
-      ref: "gecl_user",
+      ref: "gecl_announcement",
       required: true,
       index: true,
     },
 
-    channel: {
-      type: String,
-      required: true,
-      enum: ["EMAIL", "WHATSAPP", "WEB_PUSH", "APP_PUSH", "VOICE_CALL"],
-    },
-
-    error: { type: String, required: true },
-  },
-  { _id: false },
-);
-
-/* -------------------------------------------------------------------------- */
-/*                             MAIN SCHEMA                                     */
-/* -------------------------------------------------------------------------- */
-
-const NotificationSchema = new Schema(
-  {
-    /* ===========================
-       SOURCE
-    =========================== */
-    source: {
-      type: String,
-      required: true,
-      enum: ["GECL", "BEU"],
+    /* TARGETING */
+    branches: {
+      type: [String],
+      default: ["ALL"],
       index: true,
     },
 
-    /* ===========================
-       OPTIONAL NOTICE LINK
-    =========================== */
-    noticeId: {
-      type: Types.ObjectId,
-      ref: "gecl_notice",
+    audience: {
+      type: [String],
+      enum: ["PUBLIC", "STUDENTS", "FACULTY", "STAFF"],
+      required: true,
+      index: true,
+    },
+
+    /* CHANNEL STATUS */
+    channels: {
+      type: [
+        {
+          name: {
+            type: String,
+            enum: Object.values(NotificationChannel),
+            required: true,
+          },
+          status: {
+            type: String,
+            enum: Object.values(ChannelStatus),
+            default: ChannelStatus.PENDING,
+            index: true,
+          },
+          sentAt: { type: Date, default: null },
+          attempts: { type: Number, default: 0 },
+          error: { type: String, default: null },
+        },
+      ],
+      default: [],
+    },
+
+    /* WORKFLOW */
+    status: {
+      type: String,
+      enum: Object.values(NotificationStatus),
+      default: NotificationStatus.QUEUED,
+      index: true,
+    },
+
+    scheduledAt: {
+      type: Date,
       default: null,
       index: true,
     },
 
-    title: { type: String, required: true, trim: true },
-    message: { type: String, required: true },
-    link: { type: String, default: null },
-
-    /* ===========================
-       CHANNELS
-    =========================== */
-    channels: {
-      type: [String],
-      required: true,
-      enum: ["EMAIL", "WHATSAPP", "WEB_PUSH", "APP_PUSH", "VOICE_CALL"],
-    },
-
-    /* ===========================
-       TARGETING
-    =========================== */
-    target: {
-      department: {
-        type: String,
-        enum: [
-          "ALL",
-
-          // match GeclUser.branch exactly
-          "CSE",
-          "ECE",
-          "EE",
-          "ME",
-          "CE",
-          "CSE-AI",
-          "CSE-DS",
-          "EEE",
-          "ASH",
-        ],
-        default: "ALL",
-        index: true,
-      },
-
-      role: {
-        type: String,
-        enum: ["ALL", "student", "teacher", "staff"],
-        default: "ALL",
-        index: true,
-      },
-    },
-
-    /* ===========================
-       PRIORITY & STATUS
-    =========================== */
-    priority: {
-      type: String,
-      enum: ["LOW", "NORMAL", "HIGH", "URGENT"],
-      default: "NORMAL",
-      index: true,
-    },
-
-    status: {
-      type: String,
-      enum: ["QUEUED", "PROCESSING", "DONE", "FAILED"],
-      default: "QUEUED",
-      index: true,
-    },
-
-    scheduledAt: { type: Date, default: null, index: true },
-
-    /* ===========================
-       STATS
-    =========================== */
-    stats: {
-      total: { type: Number, default: 0 },
-      sent: { type: Number, default: 0 },
-      failed: { type: Number, default: 0 },
-      skipped: { type: Number, default: 0 },
-    },
-
-    /* ===========================
-       FAILED LOGS (LIMIT SIZE!)
-    =========================== */
-    failed: {
-      type: [FailedItemSchema],
-      default: [],
-    },
-
-    /* ===========================
-       AUDIT
-    =========================== */
-    addedBy: {
+    /* AUDIT */
+    createdBy: {
       type: Types.ObjectId,
       ref: "gecl_user",
       required: true,
@@ -146,22 +134,47 @@ const NotificationSchema = new Schema(
       type: Types.ObjectId,
       ref: "gecl_user",
       default: null,
-      index: true,
     },
   },
   {
-    collection: "gecl_notifications",
+    collection: "gecl_notification",
     timestamps: true,
     versionKey: false,
   },
 );
 
-/* -------------------------------------------------------------------------- */
-/*                           MODEL EXPORT (ESM SAFE)                           */
-/* -------------------------------------------------------------------------- */
+/* =====================================================
+   HARD VALIDATION
+===================================================== */
+
+NotificationSchema.pre("validate", function () {
+  if (this.branches.includes("ALL") && this.branches.length > 1) {
+    throw new Error("ALL cannot be combined with other branches");
+  }
+
+  if (!this.audience || this.audience.length === 0) {
+    throw new Error("Audience must be specified");
+  }
+
+  if (!this.channels || this.channels.length === 0) {
+    throw new Error("At least one channel is required");
+  }
+});
+
+/* =====================================================
+   INDEXES
+===================================================== */
+
+NotificationSchema.index({ announcementId: 1, status: 1 });
+NotificationSchema.index({ "channels.name": 1, "channels.status": 1 });
+NotificationSchema.index({ scheduledAt: 1 });
+
+/* =====================================================
+   MODEL EXPORT
+===================================================== */
 
 const Notification =
   mongoose.models.gecl_notification ||
-  model("gecl_notification", NotificationSchema);
+  mongoose.model<INotification>("gecl_notification", NotificationSchema);
 
 export default Notification;

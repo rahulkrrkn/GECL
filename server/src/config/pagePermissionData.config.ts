@@ -12,6 +12,24 @@ export const PERMISSIONS = {
     UPDATE_STATUS: "notice:update_status",
   },
 
+  /* ---------------------------- NEW ---------------------------- */
+  NEWS: {
+    READ: "new:read",
+    CREATE: "new:create",
+    UPDATE: "new:update",
+    DELETE: "new:delete",
+    UPDATE_STATUS: "new:update_status",
+  },
+
+  /* ---------------------------- EVENT ---------------------------- */
+  EVENT: {
+    READ: "event:read",
+    CREATE: "event:create",
+    UPDATE: "event:update",
+    DELETE: "event:delete",
+    UPDATE_STATUS: "event:update_status",
+  },
+
   /* ---------------------------- FACULTY --------------------------- */
   FACULTY: {
     READ: "faculty:read",
@@ -54,6 +72,18 @@ export const ROLE_PERMISSIONS: Record<string, readonly PermissionKey[]> = {
     PERMISSIONS.NOTICE.UPDATE,
     PERMISSIONS.NOTICE.DELETE,
 
+    /* New */
+    PERMISSIONS.NEWS.READ,
+    PERMISSIONS.NEWS.CREATE,
+    PERMISSIONS.NEWS.UPDATE,
+    PERMISSIONS.NEWS.DELETE,
+
+    /* Event */
+    PERMISSIONS.EVENT.READ,
+    PERMISSIONS.EVENT.CREATE,
+    PERMISSIONS.EVENT.UPDATE,
+    PERMISSIONS.EVENT.DELETE,
+
     /* Faculty */
     PERMISSIONS.FACULTY.READ,
     PERMISSIONS.FACULTY.UPDATE,
@@ -68,6 +98,12 @@ export const ROLE_PERMISSIONS: Record<string, readonly PermissionKey[]> = {
     PERMISSIONS.NOTICE.UPDATE,
     PERMISSIONS.NOTICE.DELETE,
     PERMISSIONS.NOTICE.UPDATE_STATUS,
+
+    /* New */
+    PERMISSIONS.NEWS.READ,
+    PERMISSIONS.NEWS.CREATE,
+    PERMISSIONS.NEWS.UPDATE,
+    PERMISSIONS.NEWS.DELETE,
 
     /* Faculty */
     PERMISSIONS.FACULTY.READ,

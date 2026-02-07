@@ -7,6 +7,7 @@ import { registrationOtpEmailTemplate } from "../templates/auth/registrationOtp.
 import { loginOtpEmailTemplate } from "../templates/auth/loginOtp.template.js";
 import { resendOtpEmailTemplate } from "../templates/auth/resendOtp.template.js";
 import { welcomeEmailTemplate } from "../templates/auth/welcome.template.js";
+import { loginSuccessEmailTemplate } from "../templates/auth/loginSuccessEmail.template.js";
 
 /* -------------------------------------------------------------------------- */
 /*                               COMMON CONFIG                                 */
@@ -120,6 +121,59 @@ export async function handleWelcomeEmail(
   await EmailService.sendRaw(
     to,
     "Welcome to Government Engineering College, Lakhisarai",
+    html,
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              5. LOGIN SUCCESS EMAIL                          */
+/* -------------------------------------------------------------------------- */
+
+// Define the payload structure for the job
+type LoginSuccessJobPayload = {
+  to: string;
+  name: string;
+  ip: string;
+  loginAt: Date | string; // Can accept Date object or ISO string
+  device?: string; // Optional (e.g., "Chrome on Linux")
+  platform?: string; // Optional (e.g., "Web", "Mobile")
+  location?: string; // Optional (e.g., "Patna, India")
+};
+
+export async function handleLoginSuccessEmail(
+  data: LoginSuccessJobPayload,
+): Promise<void> {
+  const { to, name, ip, loginAt, device, platform, location } = data;
+
+  // 1. Format the Date (e.g., "7 Feb 2026, 14:35 IST")
+  // We use 'en-IN' locale and 'Asia/Kolkata' timezone for accuracy
+  const dateObj = new Date(loginAt);
+  const formattedDate = new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Kolkata",
+    timeZoneName: "short",
+  }).format(dateObj);
+
+  // 2. Generate HTML using the template
+  const html = loginSuccessEmailTemplate({
+    name,
+    date: formattedDate,
+    ip,
+    device,
+    platform,
+    location,
+    logoUrl: EMAIL_BRAND.logo,
+    supportEmail: EMAIL_BRAND.support,
+  });
+
+  // 3. Send Email
+  await EmailService.sendRaw(
+    to,
+    "Security Alert: New Login to Your Account",
     html,
   );
 }

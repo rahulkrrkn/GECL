@@ -15,6 +15,11 @@ auth.post(
   validateRequest({ body: LoginValidation.loginSendEmailOtp }),
   LoginController.loginSendEmailOtp,
 );
+auth.post(
+  "/email/otp/resend",
+  validateRequest({ body: LoginValidation.loginSendEmailOtp }),
+  LoginController.loginResendEmailOtp,
+);
 
 auth.post(
   "/email/otp/verify",

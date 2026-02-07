@@ -7,6 +7,7 @@ import type { Request, Response } from "express";
 // Models
 import GeclUser from "../../../models/gecl_user.model.js";
 import GeclRefreshSession from "../../../models/gecl_refreshSession.model.js";
+import GeclAuthLog from "../../../models/gecl_auth_logs.model.js";
 
 // Helpers & Utils
 import { emailNormalization } from "../../../utils/emailNormalization.utils.js";
@@ -25,6 +26,7 @@ import {
   InternalServerError,
 } from "../../../errors/httpErrors.err.js";
 import { Email } from "../../../library/email/index.js";
+import { AuthSecurity } from "../core/AuthSecurity.service.js";
 
 const GECL_GOOGLE_CLIENT_ID = process.env.GECL_GOOGLE_CLIENT_ID || "";
 const googleClient = new OAuth2Client(GECL_GOOGLE_CLIENT_ID);
@@ -44,14 +46,14 @@ export class LoginService {
     req: Request;
     res: Response;
   }) {
-    const rawId = id.toString().trim();
-    const pass = password.toString().trim();
+    const rawId = id?.toString().trim();
 
-    if (!rawId || !pass)
-      throw new BadRequestError(
-        "ID and password are required",
-        "INVALID_INPUT",
-      );
+    // 1. SECURITY: GATEKEEPER
+    // Stops the request here if IP is banned or User is locked.
+    await AuthSecurity.gatekeeper(req, rawId);
+
+    if (!rawId || !password)
+      throw new BadRequestError("ID and password are required");
 
     // Detect Email vs Mobile
     const isEmail = rawId.includes("@");
@@ -59,45 +61,49 @@ export class LoginService {
 
     if (isEmail) {
       const normalizedEmail = emailNormalization(rawId.toLowerCase());
-      if (!normalizedEmail)
-        throw new BadRequestError("Invalid email format", "INVALID_EMAIL");
+      if (!normalizedEmail) throw new BadRequestError("Invalid email format");
       query.email = normalizedEmail;
     } else {
+      // Mobile validation
       const mobile = rawId.replace(/\s+/g, "");
       if (!/^\d{10,15}$/.test(mobile))
-        throw new BadRequestError("Invalid mobile number", "INVALID_MOBILE");
+        throw new BadRequestError("Invalid mobile number");
       query.mobile = mobile;
     }
 
-    // Find User
-    const user = await GeclUser.findOne(query).select("+passwordHash").lean();
+    // 2. FIND USER
+    const user = await GeclUser.findOne(query)
+      .select("+passwordHash +status")
+      .lean();
 
-    if (!user?._id)
-      throw new UnauthorizedError("Invalid credentials", "INVALID_CREDENTIALS");
-
-    // Status Check
-    if (user.status === "unverified")
-      throw new ForbiddenError(
-        "Account is not verified",
-        "ACCOUNT_NOT_VERIFIED",
-      );
-    if (user.status !== "active")
-      throw new ForbiddenError("Account is blocked", "ACCOUNT_BLOCKED");
-
-    // Password Check
-    if (!user.passwordHash) {
-      throw new ForbiddenError(
-        "Password login is not enabled for this account",
-        "PASSWORD_NOT_SET",
-      );
+    // 3. SECURITY: HANDLE "USER NOT FOUND"
+    // We delay the response slightly or throw a generic error to prevent enumeration,
+    // but we LOG the specific failure internally.
+    if (!user) {
+      await AuthSecurity.handleFailure(req, rawId, "USER_NOT_FOUND");
+      throw new UnauthorizedError("Invalid credentials");
     }
 
-    const isMatch = await bcrypt.compare(pass, user.passwordHash);
-    if (!isMatch)
-      throw new UnauthorizedError("Invalid credentials", "INVALID_CREDENTIALS");
+    if (user.status !== "active") {
+      throw new ForbiddenError("Account is disabled or unverified");
+    }
 
-    // Login
-    const loginResult = await makeGeclUserLogin({
+    // 4. VERIFY PASSWORD
+    const isMatch = await bcrypt.compare(password, user.passwordHash || "");
+
+    if (!isMatch) {
+      // 5. SECURITY: HANDLE WRONG PASSWORD
+      // This increments the failure counter and might LOCK the account.
+      await AuthSecurity.handleFailure(req, rawId, "WRONG_PASSWORD");
+      throw new UnauthorizedError("Invalid credentials");
+    }
+
+    // 6. SECURITY: HANDLE SUCCESS
+    // Resets counters and checks for "New Device" risk
+    await AuthSecurity.handleSuccess(req, user, "PASSWORD");
+
+    // 7. GENERATE JWT
+    await makeGeclUserLogin({
       loginMethod: isEmail ? "email-password" : "mobile-password",
       userId: user._id.toString(),
       req,
@@ -113,45 +119,68 @@ export class LoginService {
     };
   }
 
-  /* ==========================================
-     2. Send Email OTP
-  ========================================== */
-  static async sendEmailOtp(rawEmail: string) {
-    if (!rawEmail)
-      throw new BadRequestError("Email is required", "INVALID_INPUT");
+  /* ========================================================================
+     2. Send / Resend Email OTP (SECURED)
+     ------------------------------------------------------------------------
+     - Checks Eligibility (Spam protection)
+     - Sets strict cooldowns
+  ======================================================================== */
+  static async sendEmailOtp(
+    rawEmail: string,
+    req: Request,
+    isResend: boolean = false,
+  ) {
+    if (!rawEmail) throw new BadRequestError("Email is required");
 
     const email = emailNormalization(rawEmail);
-    if (!email) throw new BadRequestError("Invalid email", "INVALID_EMAIL");
+    if (!email) throw new BadRequestError("Invalid email");
+
+    // 1. SECURITY: CHECK OTP ELIGIBILITY
+    // Stops request if they are spamming or in cooldown
+    await AuthSecurity.checkOtpEligibility(email, req);
 
     const user = await GeclUser.findOne({ email }).select("_id status").lean();
-
-    if (!user)
-      throw new NotFoundError("Account not found", "ACCOUNT_NOT_FOUND");
+    if (!user) throw new NotFoundError("Account not found");
     if (user.status !== "active")
-      throw new ForbiddenError(
-        "Account is blocked or unverified",
-        "ACCOUNT_BLOCKED",
-      );
+      throw new ForbiddenError("Account is blocked");
 
+    // 2. GENERATE OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Redis OTP Save
+    // 3. SAVE TO REDIS (TTL 5 Mins)
     await saveOtp({
       channel: "email",
       identifier: email,
       otp,
       purpose: "AUTH",
       ttlSeconds: 300,
-      maxAttempts: 5,
+      maxAttempts: 3, // Strict verify limit
     });
+
+    // 4. SEND EMAIL
     await Email.sendLoginOtp(email, otp);
 
-    return { email };
-  }
+    // 5. SECURITY: SET COOLDOWN & LOG
+    await AuthSecurity.setOtpCooldown(email);
 
-  /* ==========================================
-     3. Verify Email OTP
-  ========================================== */
+    await AuthSecurity.log({
+      req,
+      identifier: email,
+      userId: user._id,
+      event: isResend ? "RESEND_OTP" : "OTP_REQUEST",
+      status: "SUCCESS",
+      method: "OTP",
+    });
+
+    return {
+      message: "OTP sent successfully",
+      nextRetry: 60, // Inform client to disable button for 60s
+    };
+  }
+  /* ========================================================================
+     3. Verify Email OTP (SECURED)
+     ------------------------------------------------------------------------
+  ======================================================================== */
   static async verifyEmailOtp({
     email: rawEmail,
     otp,
@@ -164,12 +193,15 @@ export class LoginService {
     res: Response;
   }) {
     if (!rawEmail || !otp)
-      throw new BadRequestError("Email and OTP are required", "INVALID_INPUT");
+      throw new BadRequestError("Email and OTP are required");
 
     const email = emailNormalization(rawEmail);
-    if (!email) throw new BadRequestError("Invalid email", "INVALID_EMAIL");
+    if (!email) throw new BadRequestError("Invalid email");
 
-    // Verify OTP Redis
+    // 1. SECURITY: GATEKEEPER
+    await AuthSecurity.gatekeeper(req, email);
+
+    // 2. VERIFY OTP
     const otpResult = await verifyOtp({
       channel: "email",
       identifier: email,
@@ -177,17 +209,24 @@ export class LoginService {
       purpose: "AUTH",
     });
 
-    if (!otpResult.ok)
-      throw new BadRequestError("OTP verification failed", otpResult.reason);
+    if (!otpResult.ok) {
+      // Log Failure
+      await AuthSecurity.handleFailure(req, email, "INVALID_OTP");
+      throw new BadRequestError("Invalid or Expired OTP");
+    }
 
+    // 3. FIND USER
     const user = await GeclUser.findOne({ email })
       .select("_id email role status")
       .lean();
-    if (!user)
-      throw new NotFoundError("Account not found", "ACCOUNT_NOT_FOUND");
+    if (!user) throw new NotFoundError("Account not found");
     if (user.status !== "active")
-      throw new ForbiddenError("Account is blocked", "ACCOUNT_BLOCKED");
+      throw new ForbiddenError("Account is blocked");
 
+    // 4. SECURITY: SUCCESS
+    await AuthSecurity.handleSuccess(req, user, "OTP");
+
+    // 5. LOGIN
     await makeGeclUserLogin({
       loginMethod: "email-otp",
       userId: user._id.toString(),
@@ -200,9 +239,10 @@ export class LoginService {
     };
   }
 
-  /* ==========================================
-     4. Google Login
-  ========================================== */
+  /* ========================================================================
+     4. Google Login (SECURED)
+     ------------------------------------------------------------------------
+  ======================================================================== */
   static async loginUsingGoogle({
     token,
     req,
@@ -212,6 +252,9 @@ export class LoginService {
     req: Request;
     res: Response;
   }) {
+    // 1. GATEKEEPER (IP Check only, as we don't have user ID yet)
+    await AuthSecurity.gatekeeper(req, "google-login");
+
     if (!GECL_GOOGLE_CLIENT_ID)
       throw new InternalServerError("Server config error", "MISSING_GOOGLE_ID");
     if (!token) throw new BadRequestError("Token required", "INVALID_INPUT");
@@ -235,29 +278,40 @@ export class LoginService {
       throw new BadRequestError("Invalid email from Google", "INVALID_EMAIL");
     const googleSub = payload.sub;
 
-    // Strategy: Sub -> Email -> Error
+    // Find User Logic
     let user = await GeclUser.findOne({ googleSub })
       .select("_id email role status")
       .lean();
-    let method: any = "google-sub";
 
+    // Fallback: Link by Email
     if (!user) {
       user = await GeclUser.findOne({ email })
         .select("_id email role status")
         .lean();
       if (user) {
+        // Auto-link Google ID if emails match
         await GeclUser.updateOne({ _id: user._id }, { $set: { googleSub } });
-        method = "google-email";
       }
     }
 
-    if (!user)
-      throw new NotFoundError("Account not found", "ACCOUNT_NOT_FOUND");
-    if (user.status !== "active")
-      throw new ForbiddenError("Account blocked", "ACCOUNT_BLOCKED");
+    if (!user) {
+      await AuthSecurity.log({
+        req,
+        event: "LOGIN_ATTEMPT",
+        status: "FAILED",
+        reason: "NO_LINKED_ACCOUNT",
+        method: "GOOGLE",
+      });
+      throw new NotFoundError("Account not found");
+    }
 
-    const loginResult = await makeGeclUserLogin({
-      loginMethod: method,
+    if (user.status !== "active") throw new ForbiddenError("Account blocked");
+
+    // 2. SECURITY: SUCCESS
+    await AuthSecurity.handleSuccess(req, user, "GOOGLE");
+
+    await makeGeclUserLogin({
+      loginMethod: "google",
       userId: user._id.toString(),
       req,
       res,

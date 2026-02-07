@@ -6,6 +6,7 @@ import { EMAIL_JOBS } from "./email.jobs.js";
 
 import {
   handleLoginOtpEmail,
+  handleLoginSuccessEmail,
   handleRegisterOtpEmail,
   handleResendOtpEmail,
   handleWelcomeEmail,
@@ -35,6 +36,10 @@ const worker = new Worker(
       case EMAIL_JOBS.WELCOME:
         console.log("job.Data", job.data);
         return handleWelcomeEmail(job.data);
+
+      case EMAIL_JOBS.LOGIN_SUCCESS:
+        console.log("job.Data", job.data);
+        return handleLoginSuccessEmail(job.data);
 
       default:
         throw new Error(`Unhandled email job: ${job.name}`);

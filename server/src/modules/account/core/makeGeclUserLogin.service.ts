@@ -5,13 +5,13 @@ import { sendCookie } from "../../../helpers/response.helper.js";
 import GeclUser from "../../../models/gecl_user.model.js";
 import GeclRefreshSession from "../../../models/gecl_refreshSession.model.js";
 import { buildUserAccessCache } from "./buildUserAccessCache.service.js";
-
-// Import your error classes
 import {
   NotFoundError,
   ForbiddenError,
   InternalServerError,
-} from "../../../errors/httpErrors.err.js"; // Adjust path as needed
+} from "../../../errors/httpErrors.err.js";
+
+import { Email } from "../../../library/email/index.js";
 
 interface MakeLoginInput {
   userId: string;
@@ -26,14 +26,6 @@ interface MakeLoginInput {
   res: Response;
 }
 
-function getClientIp(req: Request): string | null {
-  const xff = req.headers?.["x-forwarded-for"];
-  if (typeof xff === "string" && xff.length > 0)
-    return xff.split(",")[0]?.trim() || null;
-  if (Array.isArray(xff) && xff.length > 0) return xff[0]?.trim() || null;
-  return req.ip ?? req.connection?.remoteAddress ?? null;
-}
-
 export const makeGeclUserLogin = async ({
   userId,
   loginMethod,
@@ -41,7 +33,6 @@ export const makeGeclUserLogin = async ({
   res,
 }: MakeLoginInput) => {
   // 1. Fetch User Data
-  // Note: 'allow', 'deny', 'allowExtra' are now at root level based on your updated schema
   const user = await GeclUser.findOne({ _id: userId })
     .select("_id email role status allow deny allowExtra personType branch")
     .lean();
@@ -76,23 +67,49 @@ export const makeGeclUserLogin = async ({
     process.env.GECL_REFRESH_SESSION_EXPIRES_DAYS || 7,
   );
 
-  // 5. Create Session in DB
-  const ip = getClientIp(req);
-  const userAgent = req.headers["user-agent"] || null;
+  // 5. Create Session in DB using Request Context
+  // We use the exact data provided by your 'attachClientInfo' middleware
+  const { ip, userAgent, deviceHash, country } = req.context;
 
   try {
     const newSession = await GeclRefreshSession.create({
       userId: userId,
       refreshTokenHash: refreshTokenHash, // Store Hash Only
+
+      // Validity
       createdAt: new Date(),
       expiresAt: new Date(Date.now() + REFRESH_DAYS * 24 * 60 * 60 * 1000),
+      isRevoked: false,
+
+      // Metadata
       loginMethod: loginMethod,
       loginAt: new Date(),
-      ip,
-      userAgent,
-      isRevoked: false,
       lastUsedAt: new Date(),
+
+      // Tracking Info (Direct from Context)
+      ip: ip,
+      userAgent: userAgent,
+      deviceHash: deviceHash,
+      location: country, // Map 'country' to 'location' in your schema
     });
+
+    try {
+      const userName = user.firstName
+        ? `${user.firstName} ${user.lastName || ""}`.trim()
+        : "User";
+
+      await Email.sendLoginSuccess({
+        to: user.email,
+        name: userName,
+        ip: req.context.ip,
+        loginAt: new Date(),
+        device: req.context.userAgent, // e.g., "Chrome on Windows"
+        platform: req.context.deviceHash,
+        location: req.context.country, // Don't send "unknown"
+      });
+    } catch (emailErr) {
+      console.error("Failed to send login email:", emailErr);
+    }
 
     // 6. Set Cookie (SID + Raw Token)
     sendCookie(
@@ -110,15 +127,22 @@ export const makeGeclUserLogin = async ({
   const ACCESS_MIN = Number(process.env.GECL_JWT_ACCESS_EXPIRES_MIN) || 15;
 
   res.locals.publicData = res.locals.publicData || {};
+
+  // Attach Access Token Details
   res.locals.publicData.GECL_ACCESS_TOKEN = {
     token: accessToken,
     expiresAt: new Date(Date.now() + ACCESS_MIN * 60 * 1000),
-    // Correctly mapped from root level
-    allow: user.allow ?? [],
-    deny: user.deny ?? [],
-    allowExtra: user.allowExtra ?? [],
+
+    // User Context
+    userId: user._id,
+    email: user.email,
     role: user.role,
     personType: user.personType,
     branch: user.branch ?? [],
+
+    // Permissions (mapped from root level)
+    allow: user.allow ?? [],
+    deny: user.deny ?? [],
+    allowExtra: user.allowExtra ?? [],
   };
 };
