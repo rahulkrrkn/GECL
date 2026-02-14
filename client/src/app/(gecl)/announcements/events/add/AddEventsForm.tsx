@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { motion, AnimatePresence, Variants } from "framer-motion"; // ✅ Added Variants type
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { useApi } from "@/gecl/hooks/useApi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,26 +9,18 @@ import Image from "next/image";
 import {
   FiUploadCloud,
   FiCheckCircle,
-  FiX,
   FiAlertCircle,
   FiSend,
-  FiPaperclip,
-  FiCalendar,
-  FiUsers,
-  FiTag,
-  FiImage,
   FiMapPin,
-  FiVideo,
-  FiClock,
   FiLayers,
-  FiLayout,
-  FiInfo,
-  FiCpu,
-  FiHome,
-  FiEye,
-  FiPlus,
-  FiDollarSign,
-  FiAlignLeft,
+  FiCamera,
+  FiLoader,
+  FiCheck,
+  FiImage,
+  FiClock,
+  FiStar,
+  FiX,
+  FiPaperclip,
 } from "react-icons/fi";
 
 // --- CONFIG ---
@@ -52,6 +44,7 @@ enum EventMode {
 }
 
 const CATEGORIES = [
+  "GENERAL",
   "ACADEMIC",
   "CULTURAL",
   "SPORTS",
@@ -60,38 +53,41 @@ const CATEGORIES = [
   "CONFERENCE",
   "ALUMNI",
 ];
-const BRANCHES = [
-  "ALL",
-  "CSE_AI",
-  "CSE_DS",
-  "CIVIL",
-  "EE",
-  "ME",
-  "SCIENCE_HUMANITIES",
-];
 
-const getNowString = () => {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  return now.toISOString().slice(0, 16);
+const BRANCHES = ["ALL", "CSE_AI", "CSE_DS", "CIVIL", "ME", "EE"];
+
+// --- DATE HELPERS ---
+
+const toISOStringLocal = (date: Date) => {
+  const d = new Date(date);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
 };
 
-// --- ANIMATION VARIANTS (FIXED TYPES) ---
+const getCurrentTimeISO = () => toISOStringLocal(new Date());
+
+const getMinAllowedDateISO = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return toISOStringLocal(d);
+};
+
+const getFutureMidnightISO = (daysToAdd: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + daysToAdd);
+  date.setHours(0, 0, 0, 0);
+  return toISOStringLocal(date);
+};
+
+// --- ANIMATION ---
 const containerVar: Variants = {
   hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
+  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const itemVar: Variants = {
   hidden: { opacity: 0, y: 20 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 50 },
-  },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } },
 };
 
 export default function AddEventsForm() {
@@ -100,24 +96,26 @@ export default function AddEventsForm() {
   const attachmentInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
-  // --- INITIAL STATE ---
+  // --- STATE ---
   const getInitialState = () => ({
     type: "EVENT",
     title: "",
     summary: "",
     content: "",
+    galleryEnabled: true, // Default ON
+    galleryCategory: "",
     event: {
       mode: EventMode.OFFLINE,
-      startDate: getNowString(),
-      endDate: "",
-      venue: "",
+      startDate: getFutureMidnightISO(7),
+      endDate: getFutureMidnightISO(14),
+      venue: "Auditorium",
       meetingLink: "",
     },
-    categories: [] as string[],
+    categories: ["GENERAL"] as string[],
     branches: ["ALL"] as string[],
-    audience: [AudienceGroup.PUBLIC] as AudienceGroup[],
-    isPinned: false,
-    publishAt: getNowString(),
+    audience: [AudienceGroup.PUBLIC] as string[],
+    isPinned: false, // Default OFF
+    publishAt: getCurrentTimeISO(),
     notification: { channels: [] as NotificationChannel[] },
   });
 
@@ -126,150 +124,218 @@ export default function AddEventsForm() {
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [attachments, setAttachments] = useState<File[]>([]);
 
+  // UI States
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [createdSlug, setCreatedSlug] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const isCostly =
-    formData.notification.channels.includes(NotificationChannel.WHATSAPP) ||
-    formData.notification.channels.includes(NotificationChannel.SMS);
+  // Gallery Verification States
+  const [verifyingGallery, setVerifyingGallery] = useState(false);
+  const [galleryVerified, setGalleryVerified] = useState(false);
+  const [galleryError, setGalleryError] = useState<string | null>(null);
 
   // --- HANDLERS ---
 
-  const handleReset = () => {
-    setFormData(getInitialState());
-    setCoverImage(null);
-    setCoverPreview(null);
-    setAttachments([]);
-    setErrors({});
-    setCreatedSlug(null);
-    setSuccess(false);
-    setLoading(false);
-  };
+  const handleChange = (field: string, value: any) => {
+    // 1. Clear Generic Error
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
 
-  const handleChange = (field: string, value: string) => {
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
-    if (field === "title") setFormData({ ...formData, title: value });
-    else if (field === "summary") setFormData({ ...formData, summary: value });
-    else if (field === "content") setFormData({ ...formData, content: value });
+    // 2. Specific Logic for Gallery Category
+    if (field === "galleryCategory") {
+      setGalleryVerified(false);
+      setGalleryError(null);
+      // Explicitly clear gallery error if user starts typing
+      if (errors.galleryCategory) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.galleryCategory;
+          return newErrors;
+        });
+      }
+    }
+
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleEventChange = (field: string, value: string) => {
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
+    if (errors[field])
+      setErrors((prev) => {
+        const n = { ...prev };
+        delete n[field];
+        return n;
+      });
     setFormData((prev) => ({
       ...prev,
       event: { ...prev.event, [field]: value },
     }));
   };
 
+  const handleVenueFocus = () => {
+    if (formData.event.venue === "Auditorium") {
+      handleEventChange("venue", "");
+    }
+  };
+
   const handleToggle = (
     key: "audience" | "categories" | "branches",
     value: string,
   ) => {
-    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
     setFormData((prev) => {
       let list = [...prev[key]];
+
       if (key === "branches") {
         if (value === "ALL") list = ["ALL"];
         else {
-          if (list.includes("ALL")) list = [];
+          list = list.filter((i) => i !== "ALL");
           if (list.includes(value)) list = list.filter((i) => i !== value);
           else list.push(value);
           if (list.length === 0) list = ["ALL"];
         }
       } else if (key === "audience") {
-        if (value === "PUBLIC") list = ["PUBLIC"];
-        else {
-          list = list
-            .filter((i) => i !== "PUBLIC")
-            .concat(value as AudienceGroup);
+        if (value === AudienceGroup.PUBLIC) {
+          list = [AudienceGroup.PUBLIC];
+        } else {
+          list = list.filter((i) => i !== AudienceGroup.PUBLIC);
           if (list.includes(value)) list = list.filter((i) => i !== value);
           else list.push(value);
-          list = Array.from(new Set(list));
+          if (list.length === 0) list = [AudienceGroup.PUBLIC];
         }
       } else {
         if (list.includes(value)) list = list.filter((i) => i !== value);
         else list.push(value);
+        if (list.length === 0) list = ["GENERAL"];
       }
       return { ...prev, [key]: list };
     });
   };
 
+  // --- ATTACHMENT HANDLERS (FIXED) ---
+
   const handleAttachmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+      // Append new files, limiting to 5 total
       const newFiles = Array.from(e.target.files);
       setAttachments((prev) => [...prev, ...newFiles].slice(0, 5));
     }
+    // Reset input value so same file can be selected again if needed
+    if (e.target) e.target.value = "";
+  };
+
+  const removeAttachment = (indexToRemove: number) => {
+    setAttachments((prev) =>
+      prev.filter((_, index) => index !== indexToRemove),
+    );
   };
 
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setCoverImage(e.target.files[0]);
       setCoverPreview(URL.createObjectURL(e.target.files[0]));
+      // Clear error
+      if (errors.coverImage) {
+        setErrors((prev) => {
+          const n = { ...prev };
+          delete n.coverImage;
+          return n;
+        });
+      }
     }
   };
 
-  const validate = () => {
-    const newErrors: Record<string, string> = {};
-    let isValid = true;
+  // --- VERIFICATION & SUBMIT ---
 
-    if (!formData.title.trim()) {
-      newErrors.title = "Event Headline is required";
-      isValid = false;
+  const checkGalleryCategory = async () => {
+    const name = formData.galleryCategory.trim();
+    if (!name) {
+      setGalleryError("Please enter a name first.");
+      return;
     }
-    if (!formData.summary.trim()) {
-      newErrors.summary = "Summary is required";
-      isValid = false;
+    setVerifyingGallery(true);
+    setGalleryError(null);
+    setGalleryVerified(false);
+
+    try {
+      const res = await request<any>({
+        method: "POST",
+        url: "/announcements/events/category",
+        data: { category: name },
+      });
+      if (res.success) {
+        setGalleryVerified(true);
+      } else {
+        setGalleryError(res.message || "Category already exists.");
+      }
+    } catch (e) {
+      setGalleryError("Network error while checking.");
+    } finally {
+      setVerifyingGallery(false);
     }
-    if (!formData.content.trim()) {
-      newErrors.content = "Event details are required";
-      isValid = false;
-    }
-    if (formData.audience.length === 0) {
-      newErrors.audience = "Target Audience required";
-      isValid = false;
+  };
+
+  const handleSubmit = async () => {
+    const newErrors: Record<string, string> = {};
+    const minAllowed = getMinAllowedDateISO();
+
+    if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.content.trim()) newErrors.content = "Content is required";
+    if (!coverImage) newErrors.coverImage = "Cover Image is required";
+
+    if (formData.publishAt < minAllowed)
+      newErrors.global = "Publish date cannot be older than 1 day.";
+    if (formData.event.startDate < minAllowed)
+      newErrors.global = "Start date cannot be older than 1 day.";
+
+    if (formData.galleryEnabled) {
+      if (!formData.galleryCategory.trim()) {
+        newErrors.galleryCategory = "Gallery Category Name is required";
+      } else if (!galleryVerified) {
+        newErrors.galleryCategory = "Please verify the category name first.";
+      }
     }
 
     if (
       formData.event.mode !== EventMode.ONLINE &&
       !formData.event.venue.trim()
     ) {
-      newErrors.venue = "Venue required";
-      isValid = false;
-    }
-    if (
-      formData.event.mode !== EventMode.OFFLINE &&
-      !formData.event.meetingLink.trim()
-    ) {
-      newErrors.meetingLink = "Link required";
-      isValid = false;
+      newErrors.venue = "Venue required for Offline events";
     }
 
-    setErrors(newErrors);
-    return isValid;
-  };
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
 
-  const handleSubmit = async () => {
-    if (!validate()) return;
     setLoading(true);
+
     try {
       const payload = new FormData();
-      Object.entries(formData).forEach(([k, v]) => {
-        if (k === "event") {
-          Object.entries(formData.event).forEach(([ek, ev]) => {
-            if (ev) payload.append(`event[${ek}]`, String(ev));
-          });
-        } else if (Array.isArray(v)) {
-          v.forEach((i) => payload.append(`${k}[]`, i));
-        } else if (k === "notification") {
-          formData.notification.channels.forEach((c) =>
-            payload.append("notification[channels][]", c),
-          );
-        } else {
-          payload.append(k, String(v));
-        }
+      payload.append("type", formData.type);
+      payload.append("title", formData.title);
+      payload.append("summary", formData.summary || "");
+      payload.append("content", formData.content);
+      payload.append("galleryEnabled", String(formData.galleryEnabled));
+      payload.append("isPinned", String(formData.isPinned));
+      payload.append("publishAt", formData.publishAt);
+
+      if (formData.galleryEnabled) {
+        payload.append("galleryCategory", formData.galleryCategory);
+      }
+
+      formData.categories.forEach((c) => payload.append("categories[]", c));
+      formData.branches.forEach((b) => payload.append("branches[]", b));
+      formData.audience.forEach((a) => payload.append("audience[]", a));
+
+      Object.entries(formData.event).forEach(([k, v]) => {
+        payload.append(`event[${k}]`, String(v));
       });
+
       if (coverImage) payload.append("coverImage", coverImage);
       attachments.forEach((f) => payload.append("attachments", f));
 
@@ -280,362 +346,387 @@ export default function AddEventsForm() {
       });
 
       if (res.success) {
-        const dataObj = res.data?.data || res.data;
-        const slug = dataObj?.slug || dataObj?._id || "";
-        setCreatedSlug(slug);
         setSuccess(true);
+        setTimeout(() => {
+          router.push("/announcements/events/");
+        }, 1500);
       } else {
-        setErrors({ global: res.message });
+        setErrors({ global: res.message || "Failed to create event" });
       }
-    } catch {
-      setErrors({ global: "Network connection failed." });
+    } catch (e) {
+      setErrors({ global: "Network Error" });
     }
     setLoading(false);
   };
 
-  if (success)
+  // --- RENDER SUCCESS ---
+  if (success) {
     return (
-      <div className="min-h-screen text-slate-200 flex items-center justify-center p-4 relative">
-        <div className="fixed inset-0 pointer-events-none -z-10">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[120px]" />
-        </div>
-
+      <div className="min-h-screen text-slate-200 flex items-center justify-center p-4">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center shadow-2xl relative overflow-hidden z-50"
+          className="bg-slate-900 border border-slate-800 rounded-3xl p-10 text-center shadow-2xl"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
-
-          <div className="w-24 h-24 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-1 ring-indigo-500/30">
-            <FiCheckCircle size={48} className="text-indigo-400" />
-          </div>
-
-          <h2 className="text-4xl font-black text-white mb-3 tracking-tight">
-            Event Published!
+          <FiCheckCircle size={64} className="text-green-500 mx-auto mb-4" />
+          <h2 className="text-3xl font-bold text-white mb-2">
+            Published Successfully!
           </h2>
-          <p className="text-slate-400 mb-10 text-lg">
-            Your event is live. What would you like to do next?
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 relative z-10">
-            <Link
-              href="/"
-              className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-slate-800 border border-slate-700 hover:border-slate-500 hover:bg-slate-750 transition-all group"
-            >
-              <FiHome
-                size={24}
-                className="text-slate-400 group-hover:text-white"
-              />
-              <span className="text-xs font-bold text-slate-400 group-hover:text-white uppercase tracking-wider">
-                Dashboard
-              </span>
-            </Link>
-
-            <Link
-              href={
-                createdSlug
-                  ? `/announcements/events/${createdSlug}`
-                  : "/announcements/events"
-              }
-              className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-indigo-600 border border-indigo-500 hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-900/50 group"
-            >
-              <FiEye size={24} className="text-white" />
-              <span className="text-xs font-bold text-white uppercase tracking-wider">
-                View Event
-              </span>
-            </Link>
-
-            <button
-              type="button"
-              onClick={handleReset}
-              className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-slate-800 border border-slate-700 hover:border-indigo-500/50 hover:bg-slate-750 transition-all group"
-            >
-              <FiPlus
-                size={24}
-                className="text-indigo-400 group-hover:text-indigo-300"
-              />
-              <span className="text-xs font-bold text-indigo-400 group-hover:text-indigo-300 uppercase tracking-wider">
-                Create New
-              </span>
-            </button>
+          <p className="text-slate-400">Redirecting you to events list...</p>
+          <div className="mt-6">
+            <FiLoader
+              className="animate-spin mx-auto text-indigo-500"
+              size={24}
+            />
           </div>
         </motion.div>
       </div>
     );
+  }
 
+  // --- RENDER FORM ---
   return (
-    <div className="min-h-screen text-slate-200 relative overflow-hidden">
+    <div className="min-h-screen text-slate-200 relative overflow-hidden pb-10">
       <div className="fixed inset-0 pointer-events-none -z-10">
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px]" />
       </div>
 
       <motion.div
         variants={containerVar}
         initial="hidden"
         animate="show"
-        className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 pb-32 relative"
+        className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 pt-8 px-4"
       >
-        <div className="lg:col-span-8 space-y-8">
+        {/* === LEFT COLUMN === */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* TITLE & SUMMARY */}
           <motion.section
             variants={itemVar}
-            className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-10 shadow-2xl relative overflow-hidden group"
+            className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-xl"
           >
-            <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-purple-500 opacity-50 group-hover:opacity-100 transition-opacity" />
-            <div className="space-y-8">
-              <div>
-                <input
-                  className={`w-full bg-transparent text-4xl md:text-5xl font-black text-white placeholder:text-slate-700 outline-none leading-tight tracking-tight ${errors.title ? "placeholder:text-red-900/50" : ""}`}
-                  placeholder="Event Title..."
-                  value={formData.title}
-                  onChange={(e) => handleChange("title", e.target.value)}
-                />
-                {errors.title && (
-                  <p className="text-red-400 text-xs mt-2 font-bold flex items-center gap-1">
-                    <FiAlertCircle /> {errors.title}
-                  </p>
-                )}
-              </div>
-              <div className="relative group/summary">
-                <textarea
-                  className={`w-full bg-slate-950/50 border border-slate-800 rounded-2xl p-5 text-lg text-slate-300 placeholder:text-slate-600 outline-none focus:border-indigo-500/50 transition-all resize-none leading-relaxed h-32 ${errors.summary ? "border-red-500/30 bg-red-900/5" : ""}`}
-                  placeholder="Write a captivating summary for the event card..."
-                  maxLength={500}
-                  value={formData.summary}
-                  onChange={(e) => handleChange("summary", e.target.value)}
-                />
-                {errors.summary && (
-                  <p className="absolute bottom-4 left-4 text-red-400 text-xs font-bold">
-                    {errors.summary}
-                  </p>
-                )}
-                <div className="absolute bottom-4 right-4 text-xs font-bold text-slate-600">
-                  {formData.summary.length}/500
-                </div>
-              </div>
-            </div>
+            <input
+              className="w-full bg-transparent text-4xl md:text-5xl font-black text-white placeholder:text-slate-700 outline-none mb-6"
+              placeholder="Event Title..."
+              value={formData.title}
+              onChange={(e) => handleChange("title", e.target.value)}
+            />
+            {errors.title && (
+              <p className="text-red-400 text-xs font-bold mb-4">
+                {errors.title}
+              </p>
+            )}
+
+            <textarea
+              className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl p-4 text-lg text-slate-300 placeholder:text-slate-600 outline-none h-28 resize-none focus:border-indigo-500/50 transition-all"
+              placeholder="Short Summary (Optional)..."
+              value={formData.summary}
+              onChange={(e) => handleChange("summary", e.target.value)}
+            />
           </motion.section>
 
-          <motion.section variants={itemVar} className="space-y-2">
-            <label className="text-xs font-black text-slate-500 uppercase tracking-widest pl-2 flex items-center gap-2">
-              <FiAlignLeft /> Detailed Agenda{" "}
-              {errors.content && <span className="text-red-500">*</span>}
-            </label>
-            <div
-              className={`bg-slate-900/60 backdrop-blur-xl border rounded-3xl p-6 transition-all ${errors.content ? "border-red-500/30 shadow-red-900/10 shadow-lg" : "border-slate-800 hover:border-indigo-500/30"}`}
-            >
-              <textarea
-                className="w-full bg-transparent text-slate-300 text-lg leading-loose outline-none resize-none font-serif min-h-[400px] placeholder:text-slate-700 custom-scrollbar"
-                placeholder="Enter full event details (Schedule, Rules, etc)..."
-                value={formData.content}
-                onChange={(e) => handleChange("content", e.target.value)}
-              />
-              {errors.content && (
-                <p className="text-red-400 text-xs mt-2 font-bold pt-4 border-t border-red-500/10 flex items-center gap-2">
-                  <FiAlertCircle /> {errors.content}
-                </p>
-              )}
-            </div>
-          </motion.section>
-
+          {/* GALLERY CONFIGURATION */}
           <motion.section
             variants={itemVar}
-            className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-6 shadow-lg"
+            className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 shadow-xl"
           >
-            <div
-              onClick={() => attachmentInputRef.current?.click()}
-              className="flex items-center gap-5 cursor-pointer group flex-1"
-            >
-              <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center group-hover:bg-indigo-600 transition-colors shadow-lg">
-                <FiUploadCloud
-                  size={24}
-                  className="text-slate-400 group-hover:text-white"
-                />
-              </div>
-              <div>
-                <h4 className="font-bold text-white text-lg group-hover:text-indigo-400 transition-colors">
-                  Upload Files
-                </h4>
-                <p className="text-xs text-slate-500 font-bold uppercase">
-                  PDF, DOCX (Max 5)
-                </p>
-              </div>
-            </div>
-            <div className="flex-1 w-full grid grid-cols-1 gap-2">
-              {attachments.map((f, i) => (
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
                 <div
-                  key={i}
-                  className="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-300 group/item"
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    formData.galleryEnabled
+                      ? "bg-pink-500 text-white"
+                      : "bg-slate-800 text-slate-500"
+                  }`}
                 >
-                  <span className="truncate flex items-center gap-3">
-                    <FiPaperclip className="text-indigo-500" /> {f.name}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setAttachments(attachments.filter((_, x) => x !== i))
-                    }
-                    className="text-slate-600 hover:text-red-400 transition-colors"
-                  >
-                    <FiX size={16} />
-                  </button>
+                  <FiCamera size={20} />
                 </div>
-              ))}
+                <div>
+                  <h3 className="font-bold text-white">Event Gallery</h3>
+                  <p className="text-xs text-slate-500">
+                    Create a photo album?
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  handleChange("galleryEnabled", !formData.galleryEnabled)
+                }
+                className={`w-14 h-8 rounded-full p-1 transition-colors ${
+                  formData.galleryEnabled ? "bg-pink-600" : "bg-slate-700"
+                }`}
+              >
+                <div
+                  className={`w-6 h-6 bg-white rounded-full shadow-md transform transition-transform ${
+                    formData.galleryEnabled ? "translate-x-6" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+
+            <AnimatePresence>
+              {formData.galleryEnabled && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 mt-2">
+                    <label className="text-xs font-bold text-pink-400 uppercase mb-2 block">
+                      Gallery Category Name
+                    </label>
+
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <input
+                          type="text"
+                          placeholder="e.g. Freshers Party 2026"
+                          className={`w-full bg-slate-900 border rounded-lg p-3 pr-10 text-sm text-white focus:border-pink-500 outline-none transition-colors ${
+                            galleryVerified
+                              ? "border-green-500/50"
+                              : galleryError
+                                ? "border-red-500/50"
+                                : "border-slate-700"
+                          }`}
+                          value={formData.galleryCategory}
+                          onChange={(e) =>
+                            handleChange("galleryCategory", e.target.value)
+                          }
+                        />
+                        <div className="absolute right-3 top-3">
+                          {verifyingGallery && (
+                            <FiLoader className="animate-spin text-pink-500" />
+                          )}
+                          {galleryVerified && (
+                            <FiCheck className="text-green-400 text-lg" />
+                          )}
+                          {galleryError && (
+                            <FiAlertCircle className="text-red-400" />
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={checkGalleryCategory}
+                        disabled={verifyingGallery || !formData.galleryCategory}
+                        className="bg-slate-800 hover:bg-slate-700 text-white px-4 rounded-lg font-bold text-xs"
+                      >
+                        Verify
+                      </button>
+                    </div>
+
+                    {galleryError && (
+                      <p className="text-red-400 text-xs font-bold mt-2 flex items-center gap-1">
+                        <FiAlertCircle /> {galleryError}
+                      </p>
+                    )}
+                    {galleryVerified && (
+                      <p className="text-green-400 text-xs font-bold mt-2 flex items-center gap-1">
+                        <FiCheckCircle /> Category Available!
+                      </p>
+                    )}
+                    {errors.galleryCategory && (
+                      <p className="text-red-400 text-xs font-bold mt-2">
+                        {errors.galleryCategory}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.section>
+
+          {/* MAIN CONTENT */}
+          <motion.section
+            variants={itemVar}
+            className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6"
+          >
+            <label className="text-xs font-black text-slate-500 uppercase mb-2 block">
+              Full Details
+            </label>
+            <textarea
+              className="w-full bg-transparent text-slate-300 text-lg leading-relaxed outline-none min-h-[300px] placeholder:text-slate-700 custom-scrollbar"
+              placeholder="Enter schedule, rules, and detailed info..."
+              value={formData.content}
+              onChange={(e) => handleChange("content", e.target.value)}
+            />
+            {errors.content && (
+              <p className="text-red-400 text-xs font-bold mt-2">
+                {errors.content}
+              </p>
+            )}
+          </motion.section>
+
+          {/* ATTACHMENTS SECTION (FIXED) */}
+          <motion.section
+            variants={itemVar}
+            className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6"
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <div
+                onClick={() => attachmentInputRef.current?.click()}
+                className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center hover:bg-indigo-600 transition cursor-pointer text-slate-400 hover:text-white"
+              >
+                <FiUploadCloud size={20} />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-bold text-white">Attachments</h4>
+                <p className="text-xs text-slate-500">
+                  {attachments.length} files selected (PDF, DOC)
+                </p>
+              </div>
               <input
                 type="file"
                 multiple
                 ref={attachmentInputRef}
                 className="hidden"
                 onChange={handleAttachmentChange}
-                accept=".pdf,.doc,.docx,.png,.jpg"
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp"
               />
             </div>
+
+            {/* Render Uploaded Files List */}
+            {attachments.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                {attachments.map((file, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center justify-between bg-slate-950 border border-slate-800 p-3 rounded-lg group"
+                  >
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <div className="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-slate-400">
+                        <FiPaperclip size={14} />
+                      </div>
+                      <span className="text-xs font-bold text-slate-300 truncate max-w-[150px]">
+                        {file.name}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeAttachment(idx)}
+                      className="text-slate-600 hover:text-red-400 p-2 transition-colors"
+                    >
+                      <FiX size={16} />
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </motion.section>
         </div>
 
-        <div className="lg:col-span-4 space-y-8">
+        {/* === RIGHT COLUMN === */}
+        <div className="lg:col-span-4 space-y-6">
+          {/* LOGISTICS */}
           <motion.section
             variants={itemVar}
-            className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6 relative overflow-hidden"
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5"
           >
-            <div className="flex items-center gap-3 text-sm font-black text-white uppercase tracking-wider mb-2">
-              <span className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400">
-                <FiLayers />
-              </span>{" "}
-              Logistics
+            <div className="flex items-center gap-2 text-sm font-black text-white uppercase">
+              <FiLayers /> Logistics
             </div>
 
-            <div className="flex gap-1 p-1 bg-slate-950 rounded-xl border border-slate-800">
+            {/* Mode */}
+            <div className="flex bg-slate-950 rounded-lg p-1">
               {Object.values(EventMode).map((m) => (
                 <button
                   key={m}
-                  type="button"
-                  onClick={() =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      event: { ...prev.event, mode: m },
-                    }))
-                  }
-                  className={`flex-1 py-2 text-[10px] font-bold rounded-lg uppercase transition-all ${formData.event.mode === m ? "bg-indigo-600 text-white shadow-lg" : "text-slate-500 hover:text-white"}`}
+                  onClick={() => handleEventChange("mode", m)}
+                  className={`flex-1 py-1.5 text-[10px] font-bold rounded uppercase transition ${
+                    formData.event.mode === m
+                      ? "bg-indigo-600 text-white"
+                      : "text-slate-500"
+                  }`}
                 >
                   {m}
                 </button>
               ))}
             </div>
 
-            <div className="space-y-4">
-              <div className="group">
-                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1.5 ml-1">
+            {/* Dates */}
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
                   Starts
                 </label>
-                <div className="relative bg-slate-950 border border-slate-800 rounded-xl focus-within:border-indigo-500/50 transition-colors">
-                  <FiCalendar className="absolute left-3 top-3 text-slate-500 group-focus-within:text-indigo-400" />
-                  <input
-                    type="datetime-local"
-                    className="w-full bg-transparent border-none pl-10 p-2.5 text-sm font-bold text-slate-200 outline-none color-scheme-dark"
-                    value={formData.event.startDate}
-                    onChange={(e) =>
-                      handleEventChange("startDate", e.target.value)
-                    }
-                  />
-                </div>
+                <input
+                  type="datetime-local"
+                  min={getMinAllowedDateISO()}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-bold text-white outline-none"
+                  value={formData.event.startDate}
+                  onChange={(e) =>
+                    handleEventChange("startDate", e.target.value)
+                  }
+                />
               </div>
-              <div className="group">
-                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1.5 ml-1">
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
                   Ends
                 </label>
-                <div className="relative bg-slate-950 border border-slate-800 rounded-xl focus-within:border-indigo-500/50 transition-colors">
-                  <FiClock className="absolute left-3 top-3 text-slate-500 group-focus-within:text-indigo-400" />
-                  <input
-                    type="datetime-local"
-                    className="w-full bg-transparent border-none pl-10 p-2.5 text-sm font-bold text-slate-200 outline-none color-scheme-dark"
-                    value={formData.event.endDate}
-                    onChange={(e) =>
-                      handleEventChange("endDate", e.target.value)
-                    }
-                  />
-                </div>
+                <input
+                  type="datetime-local"
+                  min={getMinAllowedDateISO()}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-bold text-white outline-none"
+                  value={formData.event.endDate}
+                  onChange={(e) => handleEventChange("endDate", e.target.value)}
+                />
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-800 space-y-4">
-              <div
-                className={
-                  formData.event.mode === EventMode.ONLINE
-                    ? "opacity-30 pointer-events-none grayscale"
-                    : ""
-                }
-              >
-                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1.5 ml-1">
+            {/* Venue */}
+            {formData.event.mode !== EventMode.ONLINE && (
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
                   Venue{" "}
                   {errors.venue && <span className="text-red-500">*</span>}
                 </label>
-                <div
-                  className={`relative bg-slate-950 border rounded-xl transition-all ${errors.venue ? "border-red-500/50 ring-1 ring-red-500/20" : "border-slate-800 focus-within:border-indigo-500/50"}`}
-                >
-                  <FiMapPin
-                    className={`absolute left-3 top-3 ${errors.venue ? "text-red-400" : "text-slate-500"}`}
-                  />
+                <div className="relative">
+                  <FiMapPin className="absolute left-3 top-2.5 text-slate-500" />
                   <input
                     type="text"
-                    className="w-full bg-transparent border-none pl-10 p-2.5 text-sm font-bold text-slate-200 outline-none placeholder:text-slate-700"
-                    placeholder="e.g. Auditorium"
+                    className={`w-full bg-slate-950 border rounded-lg pl-9 p-2 text-xs font-bold text-white outline-none focus:border-indigo-500 ${
+                      errors.venue ? "border-red-500" : "border-slate-800"
+                    }`}
                     value={formData.event.venue}
+                    onFocus={handleVenueFocus}
                     onChange={(e) => handleEventChange("venue", e.target.value)}
                   />
                 </div>
-                {errors.venue && (
-                  <p className="text-red-400 text-[10px] mt-1 ml-1 font-bold">
-                    {errors.venue}
-                  </p>
-                )}
               </div>
+            )}
 
-              <div
-                className={
-                  formData.event.mode === EventMode.OFFLINE
-                    ? "opacity-30 pointer-events-none grayscale"
-                    : ""
-                }
-              >
-                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1.5 ml-1">
-                  Link{" "}
-                  {errors.meetingLink && (
-                    <span className="text-red-500">*</span>
-                  )}
+            {/* Link */}
+            {formData.event.mode !== EventMode.OFFLINE && (
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                  Meeting Link
                 </label>
-                <div
-                  className={`relative bg-slate-950 border rounded-xl transition-all ${errors.meetingLink ? "border-red-500/50 ring-1 ring-red-500/20" : "border-slate-800 focus-within:border-indigo-500/50"}`}
-                >
-                  <FiVideo
-                    className={`absolute left-3 top-3 ${errors.meetingLink ? "text-red-400" : "text-slate-500"}`}
-                  />
-                  <input
-                    type="url"
-                    className="w-full bg-transparent border-none pl-10 p-2.5 text-sm font-bold text-slate-200 outline-none placeholder:text-slate-700"
-                    placeholder="https://..."
-                    value={formData.event.meetingLink}
-                    onChange={(e) =>
-                      handleEventChange("meetingLink", e.target.value)
-                    }
-                  />
-                </div>
-                {errors.meetingLink && (
-                  <p className="text-red-400 text-[10px] mt-1 ml-1 font-bold">
-                    {errors.meetingLink}
-                  </p>
-                )}
+                <input
+                  type="url"
+                  placeholder="https://"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs font-bold text-white outline-none"
+                  value={formData.event.meetingLink}
+                  onChange={(e) =>
+                    handleEventChange("meetingLink", e.target.value)
+                  }
+                />
               </div>
-            </div>
+            )}
           </motion.section>
 
+          {/* BANNER (Required) */}
           <motion.section
             variants={itemVar}
-            className="bg-slate-900 border border-slate-800 rounded-3xl p-2 shadow-xl"
+            className={`bg-slate-900 border rounded-3xl p-2 ${
+              errors.coverImage ? "border-red-500" : "border-slate-800"
+            }`}
           >
             <div
               onClick={() => coverInputRef.current?.click()}
-              className="relative aspect-video bg-slate-950 rounded-2xl border-2 border-dashed border-slate-800 hover:border-indigo-500/50 cursor-pointer group flex flex-col items-center justify-center overflow-hidden transition-all"
+              className="aspect-video bg-slate-950 rounded-2xl border-2 border-dashed border-slate-800 hover:border-indigo-500 cursor-pointer flex flex-col items-center justify-center overflow-hidden relative"
             >
               {coverPreview ? (
                 <Image
@@ -645,150 +736,160 @@ export default function AddEventsForm() {
                   className="object-cover"
                 />
               ) : (
-                <div className="text-center">
-                  <FiImage className="mx-auto text-slate-600 mb-2" />
-                  <span className="text-xs font-bold text-slate-500 uppercase">
-                    Banner
+                <>
+                  <FiImage className="text-slate-600 mb-2" />
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">
+                    Upload Banner *
                   </span>
-                </div>
+                </>
               )}
-              <input
-                type="file"
-                ref={coverInputRef}
-                className="hidden"
-                onChange={handleCoverChange}
-                accept="image/*"
-              />
             </div>
+            <input
+              type="file"
+              ref={coverInputRef}
+              className="hidden"
+              onChange={handleCoverChange}
+              accept="image/*"
+            />
+            {errors.coverImage && (
+              <p className="text-red-400 text-[10px] font-bold text-center mt-1">
+                Required
+              </p>
+            )}
           </motion.section>
 
+          {/* CATEGORY & AUDIENCE & BRANCHES */}
           <motion.section
             variants={itemVar}
-            className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6"
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4"
           >
             <div>
-              <label className="text-xs font-bold text-slate-500 uppercase mb-3 block">
+              <label className="text-[10px] font-bold text-slate-500 uppercase mb-2 block">
                 Audience
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {Object.values(AudienceGroup).map((aud) => (
                   <button
                     key={aud}
                     onClick={() => handleToggle("audience", aud)}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold border uppercase transition-all ${formData.audience.includes(aud) ? "bg-white text-slate-900" : "bg-slate-950 text-slate-500 border-slate-800"}`}
+                    className={`px-2 py-1 text-[10px] font-bold rounded border uppercase ${
+                      formData.audience.includes(aud)
+                        ? "bg-white text-black border-white"
+                        : "bg-slate-950 text-slate-500 border-slate-800"
+                    }`}
                   >
                     {aud}
                   </button>
                 ))}
               </div>
             </div>
-            <div className="pt-4 border-t border-slate-800">
-              <label className="text-xs font-bold text-slate-500 uppercase mb-3 block flex items-center gap-2">
-                <FiCpu /> Branches
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {BRANCHES.map((br) => (
-                  <button
-                    key={br}
-                    onClick={() => handleToggle("branches", br)}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold border uppercase transition-all ${formData.branches.includes(br) ? "bg-indigo-600 text-white border-indigo-600" : "bg-slate-950 text-slate-500 border-slate-800"}`}
-                  >
-                    {br.replace("_", " ")}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="pt-4 border-t border-slate-800">
-              <label className="text-xs font-bold text-slate-500 uppercase mb-3 block">
+
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 uppercase mb-2 block">
                 Category
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 {CATEGORIES.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => handleToggle("categories", cat)}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold border uppercase transition-all ${formData.categories.includes(cat) ? "bg-purple-600 text-white" : "bg-slate-950 text-slate-500 border-slate-800"}`}
+                    className={`px-2 py-1 text-[10px] font-bold rounded border uppercase ${
+                      formData.categories.includes(cat)
+                        ? "bg-purple-600 text-white border-purple-600"
+                        : "bg-slate-950 text-slate-500 border-slate-800"
+                    }`}
                   >
                     {cat}
                   </button>
                 ))}
               </div>
             </div>
+
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 uppercase mb-2 block">
+                Branches
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                {BRANCHES.map((br) => (
+                  <button
+                    key={br}
+                    onClick={() => handleToggle("branches", br)}
+                    className={`px-2 py-1 text-[10px] font-bold rounded border uppercase ${
+                      formData.branches.includes(br)
+                        ? "bg-indigo-600 text-white border-indigo-600"
+                        : "bg-slate-950 text-slate-500 border-slate-800"
+                    }`}
+                  >
+                    {br.replace("_", "-")}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ✅ PUBLISH TIME */}
+            <div className="pt-4 border-t border-slate-800">
+              <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2">
+                Publish Date & Time
+              </label>
+              <div className="relative">
+                <FiClock className="absolute left-2.5 top-2.5 text-slate-500" />
+                <input
+                  type="datetime-local"
+                  min={getMinAllowedDateISO()}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 pl-9 text-xs font-bold text-white outline-none focus:border-indigo-500 transition-colors"
+                  value={formData.publishAt}
+                  onChange={(e) => handleChange("publishAt", e.target.value)}
+                />
+              </div>
+              <div className="mt-2 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="pinCheck"
+                  checked={formData.isPinned}
+                  onChange={(e) => handleChange("isPinned", e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900"
+                />
+                <label
+                  htmlFor="pinCheck"
+                  className="text-xs font-bold text-slate-400 select-none flex items-center gap-1"
+                >
+                  <FiStar
+                    className={formData.isPinned ? "text-amber-400" : ""}
+                  />
+                  Pin this event to top
+                </label>
+              </div>
+            </div>
+
+            {/* ✅ PUBLISH BUTTON */}
+            <div className="pt-2">
+              <button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-xl font-black uppercase text-sm tracking-widest flex items-center justify-center gap-2 transition-all shadow-xl shadow-indigo-600/20 active:scale-95"
+              >
+                {loading ? (
+                  <>
+                    <FiLoader className="animate-spin" /> PUBLISHING...
+                  </>
+                ) : (
+                  <>
+                    <FiSend /> PUBLISH EVENT
+                  </>
+                )}
+              </button>
+
+              {errors.global && (
+                <div className="mt-4 text-center">
+                  <span className="text-red-400 bg-red-500/10 px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-2">
+                    <FiAlertCircle /> {errors.global}
+                  </span>
+                </div>
+              )}
+            </div>
           </motion.section>
         </div>
       </motion.div>
-
-      <div className="fixed bottom-0 left-0 right-0 bg-slate-900/80 backdrop-blur-xl border-t border-slate-800 p-4 shadow-2xl z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <AnimatePresence mode="wait">
-              {errors.global ? (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="flex items-center gap-2 text-red-400 font-bold text-xs bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-500/20"
-                >
-                  <FiAlertCircle /> {errors.global}
-                </motion.div>
-              ) : isCostly ? (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="flex items-center gap-2 text-amber-400 font-bold text-xs bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20"
-                >
-                  <FiDollarSign /> Costly! Avoid if possible.
-                </motion.div>
-              ) : (
-                <div className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-wider">
-                  <FiInfo className="text-indigo-500" /> Ready to publish
-                </div>
-              )}
-            </AnimatePresence>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="hidden md:flex gap-3">
-              {Object.values(NotificationChannel).map((ch) => (
-                <label
-                  key={ch}
-                  className={`text-[10px] font-bold uppercase px-3 py-1.5 rounded-lg border cursor-pointer ${formData.notification.channels.includes(ch) ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/50" : "text-slate-600 border-slate-800"}`}
-                >
-                  <input
-                    type="checkbox"
-                    className="hidden"
-                    checked={formData.notification.channels.includes(ch)}
-                    onChange={() => {
-                      const active =
-                        formData.notification.channels.includes(ch);
-                      setFormData((p) => ({
-                        ...p,
-                        notification: {
-                          channels: active
-                            ? p.notification.channels.filter((c) => c !== ch)
-                            : [...p.notification.channels, ch],
-                        },
-                      }));
-                    }}
-                  />{" "}
-                  {ch.replace("_", " ")}
-                </label>
-              ))}
-            </div>
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-sm flex items-center gap-2"
-            >
-              {loading ? (
-                <FiLayout className="animate-spin" />
-              ) : (
-                <>
-                  <FiSend /> Publish
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
