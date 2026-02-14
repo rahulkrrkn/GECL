@@ -44,6 +44,14 @@ export const PERMISSIONS = {
 
     ASSIGN_SUBJECT: "faculty:assign_subject",
   },
+  GALLERY: {
+    READ: "gallery:read",
+    CREATE: "gallery:create",
+    UPDATE: "gallery:update",
+    DELETE: "gallery:delete",
+    UPDATE_STATUS: "gallery:update_status",
+    APPROVE: "gallery:approve",
+  },
 } as const;
 
 /* -------------------------------------------------------------------------- */
@@ -104,6 +112,13 @@ export const ROLE_PERMISSIONS: Record<string, readonly PermissionKey[]> = {
     PERMISSIONS.NEWS.CREATE,
     PERMISSIONS.NEWS.UPDATE,
     PERMISSIONS.NEWS.DELETE,
+
+    /* Event */
+    PERMISSIONS.EVENT.READ,
+    PERMISSIONS.EVENT.CREATE,
+    PERMISSIONS.EVENT.UPDATE,
+    PERMISSIONS.EVENT.DELETE,
+    PERMISSIONS.EVENT.UPDATE_STATUS,
 
     /* Faculty */
     PERMISSIONS.FACULTY.READ,

@@ -26,9 +26,10 @@ export class FacultyValidation {
   static getAll = z.object({
     page: z.string().optional(),
     limit: z.string().optional(),
-    department: mongoId.optional(),
+    branch: z.string().optional(),
     designation: z.string().optional(),
     isActive: z.enum(["true", "false"]).optional(),
+    search: z.string().optional(),
   });
 
   static search = z.object({

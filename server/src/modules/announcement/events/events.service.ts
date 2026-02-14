@@ -24,44 +24,98 @@ interface CreateParams {
 }
 
 export class EventService {
+  static async verifyCategory(category: string) {
+    if (!category) throw new BadRequestError("Category name is required");
+
+    // 1. Normalize the incoming string (This will be the standard format for NEW entries)
+    const normalizedCategory = category
+      .trim()
+      .toLowerCase()
+      .replace(/[^\w\s\-\&\+]+$/, "") // Remove trailing special chars
+      .replace(/\s+/g, "-") // Spaces to hyphens
+      .replace(/-+/g, "-"); // Collapse multiple hyphens
+
+    /**
+     * 2. Prepare the Database Search Pattern
+     * We replace hyphens in our normalized string with a regex group [\s\-]+
+     * This means: "Look for a space OR a hyphen in this position".
+     */
+    const fuzzySearchPattern = normalizedCategory.replace(/-/g, "[\\s\\-]+");
+
+    // 3. Perform the Case-Insensitive Regex Check
+    const categoryExists = await Announcement.exists({
+      galleryCategory: {
+        $regex: new RegExp(`^${fuzzySearchPattern}$`, "i"),
+      },
+    });
+
+    if (categoryExists) {
+      throw new BadRequestError(
+        `A category similar to "${category}" already exists (Normalized as: ${normalizedCategory})`,
+      );
+    }
+
+    // Return the cleaned string to be saved
+    return normalizedCategory;
+  }
+
   /* ================= CREATE EVENT ================= */
   static async createEvent(params: CreateParams) {
     const { body, user, req, files } = params;
 
+    // 1. Destructure all fields (Added Gallery fields)
     const {
       title,
       summary,
       content,
       categories,
-      branches = ["ALL"],
+      branches, // Defaults handled in Schema/Zod, but good to have here
       audience,
+
       // ✅ Event Specific Data
       event,
-      isPinned = false,
+
+      // ✅ Gallery Specific Data (Missing in your snippet)
+      galleryEnabled,
+      galleryCategory,
+
+      isPinned,
       publishAt,
     } = body;
 
-    /* ---------- SLUG ---------- */
-    let slug = slugify(title);
+    /* ---------- SLUG GENERATION ---------- */
+    // Ensure unique slug
+    let baseSlug = slugify(title);
+    let slug = baseSlug;
     let counter = 1;
+
+    // Efficiently check for existence
     while (await Announcement.exists({ slug })) {
-      slug = slugify(`${title}-${counter++}`);
+      slug = `${baseSlug}-${counter++}`;
     }
 
-    /* ---------- FILES ---------- */
+    /* ---------- FILE RENAMING PREP ---------- */
+    // Prepare naming convention for R2/S3
     const fileNames: any = {};
-    if (files.coverImage?.length)
+
+    if (files?.coverImage?.length) {
       fileNames.coverImage = [`${slug}-event-cover`];
-    if (files.attachments?.length)
+    }
+
+    if (files?.attachments?.length) {
       fileNames.attachments = files.attachments.map(
         (_, i) => `${slug}-doc-${i + 1}`,
       );
+    }
 
+    // Upload/Rename files
     const uploaded = await renameToR2({ req, fileNames });
 
-    // Construct Objects
+    /* ---------- CONSTRUCT MEDIA OBJECTS ---------- */
+    // Match Schema Interface: { url, name, mimeType, size }
+
     let coverImage = null;
-    if (uploaded.coverImage?.length) {
+    if (uploaded.coverImage && uploaded.coverImage.length > 0) {
       const f = uploaded.coverImage[0];
       coverImage = {
         name: f.originalName,
@@ -72,7 +126,7 @@ export class EventService {
     }
 
     let attachments: any[] = [];
-    if (uploaded.attachments) {
+    if (uploaded.attachments && uploaded.attachments.length > 0) {
       attachments = uploaded.attachments.map((f: any) => ({
         name: f.originalName,
         url: f.url,
@@ -89,23 +143,33 @@ export class EventService {
       const created = await Announcement.create(
         [
           {
-            type: AnnouncementType.EVENT, // ✅ Strict Type
+            type: AnnouncementType.EVENT,
             title,
-            summary,
             slug,
+            summary, // Allowed to be empty string
             content,
+
             categories,
-            branches,
+            branches: branches || ["ALL"], // Fallback if Zod didn't catch it
             audience,
 
-            event, // ✅ Save the event sub-document (validated by Zod)
+            // ✅ Event Sub-document
+            event,
 
+            // ✅ Gallery Fields (Now included)
+            galleryEnabled: galleryEnabled || false,
+            galleryCategory: galleryEnabled ? galleryCategory : undefined,
+
+            // ✅ Media
             coverImage,
             attachments,
 
-            isPinned,
-            status: AnnouncementStatus.PUBLISHED,
-            publishAt: publishAt ?? new Date(),
+            // ✅ Meta
+            isPinned: isPinned || false,
+            status: AnnouncementStatus.PUBLISHED, // or DRAFT based on your flow
+            publishAt: publishAt || new Date(),
+
+            // ✅ System fields
             isDeleted: false,
             addedBy: user._id,
           },
@@ -114,12 +178,15 @@ export class EventService {
       );
 
       const doc = created[0];
-      if (!doc) throw new InternalServerError("Failed to create event");
+      if (!doc) {
+        throw new InternalServerError("Failed to create event document");
+      }
 
       await session.commitTransaction();
       return doc.toObject();
     } catch (err) {
       await session.abortTransaction();
+      // Pass the error up for global error handling
       throw new InternalServerError("Failed to create event", undefined, err);
     } finally {
       session.endSession();

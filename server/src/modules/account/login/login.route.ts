@@ -2,6 +2,7 @@ import { Router } from "express";
 import { LoginValidation } from "./login.validation.js";
 import { validateRequest } from "../../../middlewares/validateRequest.mid.js";
 import { LoginController } from "./login.controller.js";
+import { requireTrustedOrigin } from "../../../middlewares/requireTrustedOrigin.middleware.js";
 
 const auth = Router();
 
@@ -42,10 +43,6 @@ auth.post(
 );
 
 // 4. Refresh Token Flow
-auth.post(
-  "/refresh",
-  // usually no body validation needed for refresh, just cookie check
-  LoginController.refreshSession,
-);
+auth.post("/refresh", requireTrustedOrigin, LoginController.refreshSession);
 
 export default auth;

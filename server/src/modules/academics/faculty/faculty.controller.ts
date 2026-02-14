@@ -9,11 +9,20 @@ export class FacultyController {
   =========================================== */
 
   static async getAllFaculty(req: Request, res: Response) {
-    const faculty = await FacultyService.getAllFaculty({
-      branch: req.query.branch as string,
-      designation: req.query.designation as string,
-      search: req.query.search as string,
-    });
+    const query = req.validatedQuery as {
+      branch?: string;
+      designation?: string;
+      search?: string;
+    };
+
+    const filters: { branch?: string; designation?: string; search?: string } =
+      {};
+    if (query.branch) filters.branch = query.branch;
+    if (query.designation) filters.designation = query.designation;
+    if (query.search) filters.search = query.search;
+
+    const faculty = await FacultyService.getAllFaculty(filters);
+
     return sendSuccess(res, "Faculty fetched successfully", faculty);
   }
 
@@ -36,7 +45,7 @@ export class FacultyController {
   }
 
   static async searchFaculty(req: Request, res: Response) {
-    const { q } = req.query;
+    const { q } = req.validatedQuery as { q: string };
 
     if (!q) {
       throw new NotFoundError();

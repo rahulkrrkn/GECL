@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { Types } from "mongoose";
 
 import {
-  sendCookie,
+  clearCookie,
   sendError,
   sendSuccess,
 } from "../../../helpers/response.helper.js";
@@ -23,11 +23,6 @@ const keyGeclUserPageAccess = (userId: string) =>
 /* -------------------------------------------------------------------------- */
 /*                               COOKIE HELPER                                 */
 /* -------------------------------------------------------------------------- */
-
-const clearCookie = (res: any, name: string) => {
-  // Must match original cookie options (path, domain, sameSite, etc.)
-  sendCookie(res, name, "", 0);
-};
 
 /* -------------------------------------------------------------------------- */
 /*                                   LOGOUT                                    */

@@ -194,3 +194,14 @@ export const checkUser = async (
     next();
   }
 };
+
+export const verifyUser = (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
+  if (!req.user) {
+    throw new UnauthorizedError("Missing user", "NO_USER");
+  }
+  next();
+};

@@ -1,6 +1,9 @@
 import { HeadObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import exifr from "exifr";
 import { r2 } from "../config/r2Client.config.js";
 import { optimizeImage } from "../utils/imageOptimizer.utils.js";
+
+/* ================= TYPES ================= */
 
 type UploadedFile = Express.Multer.File & {
   folder: string;
@@ -10,9 +13,7 @@ type UploadedFile = Express.Multer.File & {
 
 export type FileNamesPayload = Record<string, string[]>;
 
-// --------------------
-// Utils
-// --------------------
+/* ================= UTILS ================= */
 
 function slugify(text: string) {
   return text
@@ -25,6 +26,23 @@ function slugify(text: string) {
 function getExt(originalName: string) {
   const parts = originalName.split(".");
   return parts.length > 1 ? parts.pop()!.toLowerCase() : "bin";
+}
+
+/* -------- EXIF CAPTURE DATE -------- */
+
+async function getImageCaptureDate(buffer: Buffer): Promise<Date | null> {
+  try {
+    const exif = await exifr.parse(buffer, {
+      tiff: true,
+      exif: true,
+    });
+
+    return (
+      exif?.DateTimeOriginal || exif?.CreateDate || exif?.ModifyDate || null
+    );
+  } catch {
+    return null;
+  }
 }
 
 async function keyExists(bucket: string, key: string): Promise<boolean> {
@@ -112,7 +130,12 @@ export async function renameToR2(params: {
         baseName = `${fieldName}-${i + 1}`;
       }
 
-      // 🔥 IMAGE OPTIMIZATION (AUTO WEBP)
+      /* ---------- CAPTURE DATE (EXIF) ---------- */
+
+      const capturedAt = await getImageCaptureDate(file.buffer);
+
+      /* ---------- IMAGE OPTIMIZATION ---------- */
+
       const optimized = await optimizeImage({
         buffer: file.buffer,
         mimeType: file.mimetype,
@@ -145,6 +168,8 @@ export async function renameToR2(params: {
         url: buildPublicUrl(key),
         mimeType: optimized.mimeType,
         size: optimized.buffer.length,
+        capturedAt, // ✅ real photo date (can be null)
+        uploadedAt: new Date(), // ✅ always present
       });
     }
   }

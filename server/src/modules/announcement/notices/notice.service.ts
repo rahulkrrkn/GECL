@@ -130,7 +130,6 @@ export class AnnouncementService {
             source: NoticeSource.GECL,
 
             attachments,
-            seo,
 
             isPinned,
             status: AnnouncementStatus.PUBLISHED,
@@ -174,7 +173,7 @@ export class AnnouncementService {
       await session.commitTransaction();
       session.endSession();
 
-      return announcementDoc.toObject();
+      return;
     } catch (err) {
       await session.abortTransaction();
       session.endSession();

@@ -7,6 +7,36 @@ export enum AnnouncementType {
   NOTICE = "NOTICE",
   NEWS = "NEWS",
   EVENT = "EVENT",
+  GALLERY = "GALLERY",
+}
+
+export enum AnnouncementCategory {
+  /* COMMON */
+  ACADEMIC = "ACADEMIC",
+  GENERAL = "GENERAL",
+
+  /* EVENT */
+  CULTURAL = "CULTURAL",
+  SPORTS = "SPORTS",
+  TECHNICAL = "TECHNICAL",
+  ADMINISTRATIVE = "ADMINISTRATIVE",
+  WORKSHOP = "WORKSHOP",
+  SEMINAR = "SEMINAR",
+
+  /* NOTICE */
+  EXAM = "EXAM",
+  ADMIN = "ADMIN",
+  HOLIDAY = "HOLIDAY",
+  SCHOLARSHIP = "SCHOLARSHIP",
+  ADMISSION = "ADMISSION",
+  PLACEMENT = "PLACEMENT",
+
+  /* NEWS */
+  EVENT = "EVENT",
+  STUDENT = "STUDENT",
+  FACULTY = "FACULTY",
+  COLLEGE = "COLLEGE",
+  ACHIEVEMENT = "ACHIEVEMENT",
 }
 
 export enum AnnouncementStatus {
@@ -43,12 +73,6 @@ export interface IAttachment {
   size?: number;
 }
 
-export interface ISeo {
-  metaTitle?: string;
-  metaDescription?: string;
-  keywords?: string[];
-}
-
 export interface ICoverImage {
   url: string;
   name: string;
@@ -63,9 +87,11 @@ export interface IAnnouncement extends Document {
   summary?: string;
   content: string;
 
-  categories: string[];
-  branches: string[];
+  galleryEnabled?: boolean;
+  galleryCategory?: string; // required when galleryEnabled is true
 
+  categories: AnnouncementCategory[];
+  branches: string[];
   audience: AudienceGroup[];
 
   event?: {
@@ -77,23 +103,15 @@ export interface IAnnouncement extends Document {
   };
 
   source?: NoticeSource;
-
   coverImage?: ICoverImage | null;
-
-  attachments?: {
-    name?: string;
-    url?: string;
-    mimeType?: string;
-    size?: number;
-  }[];
-
-  seo?: ISeo;
+  attachments?: IAttachment[];
 
   status: AnnouncementStatus;
   publishAt: Date;
   expireAt?: Date | null;
 
   isPinned: boolean;
+
   isDeleted: boolean;
   deletedAt?: Date | null;
   deletedBy?: Types.ObjectId;
@@ -101,6 +119,7 @@ export interface IAnnouncement extends Document {
   addedBy: Types.ObjectId;
 
   createdAt: Date;
+  updatedAt: Date;
 }
 
 /* ================= SCHEMA ================= */
@@ -119,15 +138,39 @@ const AnnouncementSchema = new Schema<IAnnouncement>(
     summary: String,
     content: { type: String, required: true },
 
-    categories: { type: [String], required: true, index: true },
-    branches: { type: [String], default: ["ALL"], index: true },
+    /* ---------- Gallery ---------- */
+
+    galleryEnabled: { type: Boolean, default: false, index: true },
+
+    galleryCategory: {
+      type: String,
+      index: true,
+    },
+
+    /* ---------- Category ---------- */
+
+    categories: {
+      type: [String],
+      enum: Object.values(AnnouncementCategory),
+      default: [AnnouncementCategory.GENERAL],
+      required: true,
+      index: true,
+    },
+
+    branches: {
+      type: [String],
+      default: ["ALL"],
+      index: true,
+    },
 
     audience: {
       type: [String],
       enum: Object.values(AudienceGroup),
-      required: true,
+      default: [AudienceGroup.PUBLIC],
       index: true,
     },
+
+    /* ---------- Event ---------- */
 
     event: {
       mode: { type: String, enum: Object.values(EventMode) },
@@ -143,12 +186,14 @@ const AnnouncementSchema = new Schema<IAnnouncement>(
       default: NoticeSource.GECL,
     },
 
+    /* ---------- Media ---------- */
+
     coverImage: {
       type: {
         url: { type: String, required: true },
         name: { type: String, required: true },
-        mimeType: { type: String },
-        size: { type: Number },
+        mimeType: String,
+        size: Number,
       },
       default: null,
     },
@@ -156,20 +201,16 @@ const AnnouncementSchema = new Schema<IAnnouncement>(
     attachments: {
       type: [
         {
-          url: { type: String },
-          name: { type: String },
-          mimeType: { type: String },
-          size: { type: Number },
+          url: String,
+          name: String,
+          mimeType: String,
+          size: Number,
         },
       ],
       default: [],
     },
 
-    seo: {
-      metaTitle: String,
-      metaDescription: String,
-      keywords: [String],
-    },
+    /* ---------- Publish ---------- */
 
     status: {
       type: String,
@@ -182,6 +223,8 @@ const AnnouncementSchema = new Schema<IAnnouncement>(
     expireAt: { type: Date, default: null },
 
     isPinned: { type: Boolean, default: false, index: true },
+
+    /* ---------- Soft Delete ---------- */
 
     isDeleted: { type: Boolean, default: false, index: true },
     deletedAt: { type: Date, default: null },
@@ -196,25 +239,31 @@ const AnnouncementSchema = new Schema<IAnnouncement>(
   },
 );
 
+/* ================= PLUGINS ================= */
+
 AnnouncementSchema.plugin(softDeletePlugin);
 
-/* ================= HARD SECURITY ================= */
+/* ================= VALIDATIONS ================= */
 
 AnnouncementSchema.pre("validate", function () {
-  if (!this.audience || this.audience.length === 0) {
-    throw new Error("Audience is mandatory");
+  /* EVENT VALIDATION */
+  if (this.type === AnnouncementType.EVENT) {
+    if (!this.event?.mode || !this.event?.startDate) {
+      throw new Error("Event must have mode and startDate");
+    }
+
+    if (this.event.mode === EventMode.ONLINE && !this.event.meetingLink) {
+      throw new Error("Online event requires meetingLink");
+    }
+
+    if (this.event.mode === EventMode.OFFLINE && !this.event.venue) {
+      throw new Error("Offline event requires venue");
+    }
   }
 
-  // PUBLIC must be exclusive
-  if (
-    this.audience.includes(AudienceGroup.PUBLIC) &&
-    this.audience.length > 1
-  ) {
-    throw new Error("PUBLIC audience cannot be combined with other groups");
-  }
-
-  if (this.branches.includes("ALL") && this.branches.length > 1) {
-    throw new Error("ALL branch cannot be combined");
+  /* GALLERY VALIDATION (STRICT TS SAFE) */
+  if (this.galleryEnabled && !this.galleryCategory) {
+    throw new Error("galleryCategory is required when galleryEnabled is true");
   }
 });
 
@@ -223,6 +272,13 @@ AnnouncementSchema.pre("validate", function () {
 AnnouncementSchema.index({ status: 1, publishAt: -1 });
 AnnouncementSchema.index({ audience: 1, status: 1 });
 AnnouncementSchema.index({ isPinned: -1, publishAt: -1 });
+
+AnnouncementSchema.index(
+  { galleryCategory: 1 },
+  { unique: true, partialFilterExpression: { galleryEnabled: true } },
+);
+
+/* ================= EXPORT ================= */
 
 export default mongoose.model<IAnnouncement>(
   "gecl_announcement",

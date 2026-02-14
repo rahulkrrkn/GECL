@@ -167,7 +167,6 @@ NotificationSchema.pre("validate", function () {
 
 NotificationSchema.index({ announcementId: 1, status: 1 });
 NotificationSchema.index({ "channels.name": 1, "channels.status": 1 });
-NotificationSchema.index({ scheduledAt: 1 });
 
 /* =====================================================
    MODEL EXPORT

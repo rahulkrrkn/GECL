@@ -1,6 +1,10 @@
 import GeclUser from "../../../models/gecl_user.model.js";
 import { Types } from "mongoose";
 
+function escapeRegex(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export class FacultyService {
   static async getAllFaculty(filters: {
     branch?: string;
@@ -17,7 +21,8 @@ export class FacultyService {
     if (filters.designation) query["teacher.designation"] = filters.designation;
 
     if (filters.search) {
-      query.fullName = { $regex: filters.search, $options: "i" };
+      const safeSearch = escapeRegex(filters.search.trim().slice(0, 80));
+      query.fullName = { $regex: safeSearch, $options: "i" };
     }
 
     return GeclUser.find(query)
@@ -54,6 +59,8 @@ export class FacultyService {
   }
 
   static async searchFaculty(queryText: string) {
+    const safeSearch = escapeRegex(queryText.trim().slice(0, 80));
+
     return GeclUser.find({
       personType: "employee",
       role: "teacher",

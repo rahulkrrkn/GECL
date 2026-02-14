@@ -104,8 +104,8 @@ export function sendCookie(
     ...extraOptions,
   };
 
-  if (!isDev) {
-    cookieOptions.domain = process.env.COOKIE_DOMAIN || "rahulkrrkn.com";
+  if (!isDev && process.env.COOKIE_DOMAIN) {
+    cookieOptions.domain = process.env.COOKIE_DOMAIN || "geclakhisarai.com";
   }
 
   res.cookie(nameOfCookie, data, cookieOptions);
@@ -130,8 +130,8 @@ export function clearCookie(
     ...extraOptions,
   };
 
-  if (!isDev) {
-    cookieOptions.domain = process.env.COOKIE_DOMAIN0 || "rahulkrrkn.com";
+  if (!isDev && process.env.COOKIE_DOMAIN) {
+    cookieOptions.domain = process.env.COOKIE_DOMAIN || "geclakhisarai.com";
   }
 
   res.clearCookie(nameOfCookie, cookieOptions);

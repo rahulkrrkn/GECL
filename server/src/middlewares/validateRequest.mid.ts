@@ -12,10 +12,19 @@ export type RequestSchemas = {
   headers?: ZodSchema<unknown>;
 };
 
+const DEBUG = process.env.NODE_ENV === "development";
+
 export const validateRequest =
   (schemas: RequestSchemas): RequestHandler =>
   (req, _res, next) => {
     try {
+      if (DEBUG) {
+        // console.log("schemas", schemas);
+        console.log("req.body", req.body);
+        console.log("req.query", req.query);
+        console.log("req.params", req.params);
+        console.log("req.headers", req.headers);
+      }
       const validateSection = <T>(
         schema: ZodSchema<T> | undefined,
         value: unknown,
@@ -47,6 +56,13 @@ export const validateRequest =
       validateSection(schemas.headers, req.headers, (data) => {
         req.validatedHeaders = data;
       });
+
+      if (DEBUG) {
+        console.log("req.validatedBody", req.validatedBody);
+        console.log("req.validatedQuery", req.validatedQuery);
+        console.log("req.validatedParams", req.validatedParams);
+        console.log("req.validatedHeaders", req.validatedHeaders);
+      }
 
       next();
     } catch (err) {

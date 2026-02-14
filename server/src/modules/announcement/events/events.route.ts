@@ -39,6 +39,26 @@ const uploadEventMedia = createUploadMiddleware({
   ],
 });
 
+eventsRouter.post(
+  "/category/",
+  validateRequest({ body: EventValidation.verifyCategory }),
+  EventController.verifyCategory,
+);
+eventsRouter.use("/", (req, res, next) => {
+  console.log(req.body);
+  console.log("req.body");
+  next();
+});
+
+/* ================= CREATE EVENT ================= */
+eventsRouter.post(
+  "/",
+  requirePermission(PERMISSIONS.EVENT.CREATE),
+  uploadEventMedia,
+  validateRequest({ body: EventValidation.create }),
+  EventController.create,
+);
+
 /* ================= READ ROUTES ================= */
 eventsRouter.get(
   "/",
@@ -52,15 +72,6 @@ eventsRouter.get(
   checkUser,
   validateRequest({ params: EventValidation.getBySlug }),
   EventController.getBySlug,
-);
-
-/* ================= WRITE ROUTES ================= */
-eventsRouter.post(
-  "/",
-  requirePermission(PERMISSIONS.EVENT.CREATE), // Ensure you have this permission constant
-  uploadEventMedia,
-  validateRequest({ body: EventValidation.create }),
-  EventController.create,
 );
 
 export default eventsRouter;
