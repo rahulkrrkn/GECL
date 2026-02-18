@@ -2,3 +2,5 @@
 
 /server_old
 /server_old2
+# Hide all env
+.env*
