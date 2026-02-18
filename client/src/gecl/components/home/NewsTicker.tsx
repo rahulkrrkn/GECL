@@ -69,10 +69,10 @@ export const NewsTicker = () => {
 
   return (
     <div className="bg-blue-900 text-white overflow-hidden py-2.5 border-b border-white/10 relative z-50 shadow-sm">
-      <div className="container mx-auto px-4 flex items-center">
+      <div className="container px-4 flex items-center">
         {/* Label */}
         <span className="bg-red-600 text-xs font-bold px-3 py-1 rounded-sm mr-6 shrink-0 uppercase tracking-wider shadow-md animate-pulse">
-          Latest Updates
+          Updates
         </span>
 
         {/* Marquee Container */}
